@@ -108,7 +108,7 @@ function placeholderMeaning(placeholder: Placeholder, type: LetterTypeId): strin
     case 'DEADLINE':
       return deadline === 'none' ? 'a date' : `the date in the letter: here, ${DEADLINE_IS[deadline]}`;
     case 'DAYS_LEFT':
-      return 'how long until that date, already written out as a full phrase such as "14 days from today"; do not add "in" or "days" around it';
+      return `how far off that date is, filled in as a finished phrase in the reader's language (in English it would read "in 14 days" or "tomorrow"). Use it only in brackets straight after the date, exactly like this: ${mark('DEADLINE')} (${mark('DAYS_LEFT')}). Add no words around it`;
     case 'PHONE':
       return 'the phone number printed on the letter';
   }
