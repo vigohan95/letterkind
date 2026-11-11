@@ -71,6 +71,24 @@ describe('source boundaries', () => {
     expect(starters).toEqual([CHANNEL]);
   });
 
+  it('keeps the app that carries App Check apart from the one that reads letters', () => {
+    // The AI service takes up App Check when it is first built for an app. A request sent
+    // through the app the reader already used would go out without proof and be refused.
+    const users = files
+      .filter((f) => f.path !== 'firebase.ts')
+      .filter((f) => /\boutboundApp\b/.test(f.text))
+      .map((f) => f.path)
+      .sort();
+    expect(users).toEqual([APP_CHECK, CHANNEL]);
+
+    const appCheck = files.find((f) => f.path === APP_CHECK)!.text;
+    expect(appCheck).toContain('initializeAppCheck(outboundApp(),');
+    expect(appCheck).not.toMatch(/\bfirebaseApp\b/);
+
+    const channel = files.find((f) => f.path === CHANNEL)!.text;
+    expect(channel).toContain("getAI(where === 'device' ? firebaseApp() : outboundApp(),");
+  });
+
   it('starts App Check after the on-device attempt, never when a module loads', () => {
     const channel = files.find((f) => f.path === CHANNEL)!.text;
     const calls = [...channel.matchAll(/^(\s*)startAppCheck\(\);$/gm)];

@@ -1,12 +1,8 @@
 import { type FirebaseApp, initializeApp } from 'firebase/app';
 
-let app: FirebaseApp | undefined;
-
-/** The Firebase app, created on first use from the build-time environment. */
-export function firebaseApp(): FirebaseApp {
-  if (app) return app;
+function config() {
   // Each value is named on its own, so the build puts in these six and nothing else from the environment.
-  const config = {
+  const values = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -14,9 +10,31 @@ export function firebaseApp(): FirebaseApp {
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   };
-  if (!config.apiKey || !config.projectId || !config.appId) {
+  if (!values.apiKey || !values.projectId || !values.appId) {
     throw new Error('Firebase is not configured. Copy .env.example to .env.local and fill it in.');
   }
-  app = initializeApp(config);
-  return app;
+  return values;
+}
+
+let reading: FirebaseApp | undefined;
+let outbound: FirebaseApp | undefined;
+
+/**
+ * The Firebase app the model in the browser is reached through, created on
+ * first use from the build-time environment. App Check is never attached to
+ * it, so nothing done through it loads reCAPTCHA.
+ */
+export function firebaseApp(): FirebaseApp {
+  return (reading ??= initializeApp(config()));
+}
+
+/**
+ * A second instance of the same app, for requests that leave the device.
+ *
+ * It is kept apart for a practical reason: the AI service takes up App Check
+ * at the moment it is first built for an app, and reading a letter builds it
+ * long before any request goes out. Only `src/outbound/` may use this one.
+ */
+export function outboundApp(): FirebaseApp {
+  return (outbound ??= initializeApp(config(), 'outbound'));
 }

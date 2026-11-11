@@ -33,7 +33,7 @@ describe('the policy the site is served with', () => {
         "'self'",
         'blob:',
         'data:',
-        'https://firebaseappcheck.googleapis.com',
+        'https://content-firebaseappcheck.googleapis.com',
         'https://firebasevertexai.googleapis.com',
         'https://www.google.com/recaptcha/',
       ].sort(),
@@ -59,6 +59,15 @@ describe('the policy the site is served with', () => {
 
   it('frames nothing but reCAPTCHA', () => {
     expect([...(policy.get('frame-src') ?? [])].sort()).toEqual(['https://recaptcha.google.com/recaptcha/', 'https://www.google.com/recaptcha/']);
+  });
+
+  it('has the browser ask for the page each time, and keeps only the fingerprinted files', () => {
+    // A stale page would keep running an old build, with whatever it used to allow.
+    expect(header('Cache-Control')).toBe('no-cache');
+    const assets = hosting.headers.find((rule) => rule.source === '/assets/**');
+    expect(assets?.headers.find((h) => h.key === 'Cache-Control')?.value).toContain('immutable');
+    // The later rule wins where both match, so it has to be the one for the fingerprinted files.
+    expect(hosting.headers.indexOf(assets!)).toBeGreaterThan(hosting.headers.indexOf(everywhere!));
   });
 
   it('sends no referrer and no guessed content types', () => {

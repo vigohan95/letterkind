@@ -1,5 +1,5 @@
 import { getAI, getGenerativeModel, type GenerativeModel, GoogleAIBackend, InferenceMode, InferenceSource } from 'firebase/ai';
-import { firebaseApp } from '../firebase';
+import { firebaseApp, outboundApp } from '../firebase';
 import { startAppCheck } from './appCheck';
 import type { Ledger, LedgerEntry, Ran } from './ledger';
 import { Prepared, type Route } from './prompts';
@@ -106,7 +106,8 @@ function modelFor({ request, route, schema }: Prepared, where: 'device' | 'cloud
       promptOptions: { responseConstraint: schema },
     };
     model = getGenerativeModel(
-      getAI(firebaseApp(), { backend: new GoogleAIBackend() }),
+      // A request that leaves goes through the app that carries App Check; one that stays does not.
+      getAI(where === 'device' ? firebaseApp() : outboundApp(), { backend: new GoogleAIBackend() }),
       where === 'device'
         ? { mode: InferenceMode.ONLY_ON_DEVICE, onDeviceParams }
         : {

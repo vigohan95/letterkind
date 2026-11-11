@@ -1,5 +1,5 @@
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
-import { firebaseApp } from '../firebase';
+import { outboundApp } from '../firebase';
 
 /**
  * Proof, for the server, that a request comes from this app.
@@ -32,7 +32,7 @@ export function startAppCheck(): void {
     (globalThis as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string }).FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
   }
 
-  initializeAppCheck(firebaseApp(), {
+  initializeAppCheck(outboundApp(), {
     provider: new ReCaptchaEnterpriseProvider(siteKey),
     isTokenAutoRefreshEnabled: false,
   });
