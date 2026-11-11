@@ -438,6 +438,193 @@ mark[data-field='reference'] {
   margin: 20px 0 0;
 }
 
+/* Guidance written for a kind of letter, with the details of this letter put in on the device. */
+.guidance {
+  margin-top: 24px;
+  padding: 16px 20px 18px;
+  border: 1px solid var(--rule);
+  border-top: 4px solid var(--accent);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+
+.guidance h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.guidance > p {
+  max-width: 78ch;
+  margin: 6px 0 0;
+}
+
+/* The few things a request carries, set out as a form so they can be counted at a glance. */
+.guidance-sent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin: 12px 0 0;
+}
+
+.guidance-sent dt {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guidance-sent dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+select {
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--sheet);
+  color: inherit;
+  font: inherit;
+}
+
+.guidance-actions {
+  margin: 12px 0 0;
+}
+
+.guidance .working,
+.guidance .error {
+  margin-top: 14px;
+}
+
+.guidance .error h3 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+.guidance .error p + p {
+  margin-top: 6px;
+}
+
+.guidance-text {
+  max-width: 74ch;
+  margin-top: 16px;
+  padding-top: 4px;
+  border-top: 1px solid var(--rule);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.guidance-text h3 {
+  margin: 16px 0 4px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guidance-text p,
+.guidance-text ol,
+.guidance-text ul {
+  margin: 0;
+}
+
+.guidance-text ol,
+.guidance-text ul {
+  padding-inline-start: 1.4em;
+}
+
+.guidance-text li + li {
+  margin-top: 6px;
+}
+
+.guidance-text mark {
+  font-weight: 600;
+}
+
+/* A gap the letter gave nothing for: said in general words, and visibly not a fact. */
+.stand-in {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.guidance .fact-source {
+  margin-top: 8px;
+}
+
+/* Everything that was asked of a model outside this browser. */
+.ledger {
+  margin-top: 28px;
+  padding: 10px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+
+.ledger > summary {
+  cursor: pointer;
+}
+
+.ledger-heading {
+  font-weight: 650;
+}
+
+.ledger-total {
+  color: var(--ink-soft);
+}
+
+.ledger-total[data-out='0'] {
+  color: var(--accent);
+}
+
+.ledger-entries {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ledger-entries li {
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.ledger-what {
+  margin: 0;
+}
+
+.ledger-entries li[data-left='stayed'] strong {
+  color: var(--accent);
+}
+
+.ledger-entries .fact-source {
+  margin-top: 8px;
+}
+
+.ledger-entries details {
+  margin-top: 8px;
+}
+
+.ledger-entries summary {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.ledger-words {
+  max-height: 22em;
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  overflow: auto;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--paper);
+  font: 0.8rem/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 footer {
   margin-top: 40px;
   padding-top: 12px;

@@ -6,11 +6,15 @@ import { type Reading, readLetter } from '../ai/read';
 import { joinPages, transcribePage, unreadableCount } from '../ai/transcribe';
 import { localIsoDate } from '../domain/deadline';
 import { LETTER_TYPE_IDS, type LetterTypeId } from '../domain/letterTypes';
+import { ledger, liveGuidance } from '../guidance/live';
 import { en } from '../i18n/en';
 import { ACCEPTED_FILES, openFiles, UnsupportedFile } from '../input/files';
 import { SAMPLE_LETTERS } from '../samples/letters';
+import { GuidancePanel } from './Guidance';
+import { LedgerView } from './LedgerView';
 import { LetterView } from './LetterView';
 import { PagePictures, Transcribing } from './Pages';
+import { browserStorage, loadPrefs, type Prefs, savePrefs } from './prefs';
 import { ReadingView } from './ReadingView';
 
 type Phase =
@@ -40,6 +44,7 @@ export function App() {
   const [notice, setNotice] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>({ at: 'idle' });
   const [other, setOther] = useState<LetterTypeId>('other');
+  const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs(browserStorage(), navigator.languages));
   // Each reading gets a number, so an answer that arrives after the reader has moved on is dropped.
   const run = useRef(0);
   const stop = useRef<AbortController | null>(null);
@@ -154,6 +159,11 @@ export function App() {
     } catch (error) {
       if (run.current === id) setPhase({ at: 'error', message: messageOf(error) });
     }
+  }
+
+  function choosePrefs(next: Prefs): void {
+    setPrefs(next);
+    savePrefs(browserStorage(), next);
   }
 
   function reset(): void {
@@ -328,7 +338,10 @@ export function App() {
       )}
 
       {phase.at === 'done' && (
-        <ReadingView letter={phase.letter} classification={phase.classification} reading={phase.reading} chosenByReader={phase.chosen} t={t} />
+        <>
+          <ReadingView letter={phase.letter} classification={phase.classification} reading={phase.reading} chosenByReader={phase.chosen} t={t} />
+          <GuidancePanel reading={phase.reading} prefs={prefs} onPrefs={choosePrefs} source={liveGuidance} t={t} />
+        </>
       )}
 
       {phase.at === 'error' && (
@@ -345,6 +358,8 @@ export function App() {
           </button>
         </p>
       )}
+
+      <LedgerView ledger={ledger} t={t} />
 
       <footer>{t.notAdvice}</footer>
     </main>

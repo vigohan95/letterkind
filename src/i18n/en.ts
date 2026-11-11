@@ -1,4 +1,7 @@
 import type { AmountMeaning, DeadlineMeaning, LetterTypeId } from '../domain/letterTypes';
+import type { RejectReason } from '../domain/template';
+import type { Left, Ran } from '../outbound/ledger';
+import type { OutboundRequest } from '../outbound/requests';
 
 /**
  * Every word the interface shows, in English. Other languages provide the
@@ -132,6 +135,80 @@ export const en = {
   error: {
     heading: 'The letter could not be read',
     retry: 'Try again',
+  },
+
+  guidance: {
+    heading: 'What this means and what to do',
+    intro:
+      'Letterkind can fetch a plain explanation of this kind of letter, written by a larger model in the cloud. That model is told these three things and nothing else:',
+    kind: 'Kind of letter',
+    state: 'State',
+    stateNotGiven: 'Not given',
+    language: 'Language',
+    nothingElse:
+      'Your letter is not sent, and neither is any name, amount, date or number in it. The explanation comes back with gaps, and the gaps are filled in here from what was checked against your letter.',
+    ask: 'Get the explanation',
+    checking: 'Looking for an explanation already kept on this device…',
+    asking: 'Asking for an explanation of this kind of letter…',
+    what: 'What this letter is',
+    steps: 'What to do',
+    ifIgnored: 'If you do nothing',
+    whoCanHelp: 'Who can help',
+    legend: 'Highlighted words were put in on this device, from your letter. The model that wrote the rest never saw them.',
+    standInLegend: 'Words in italics stand where your letter gave no detail that could be checked.',
+    fromCloud: (model: string, ms: number, bytes: number) =>
+      `Written by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes, none of them from your letter. Kept on this device for next time.`,
+    fromSaved: (day: string) => `Kept on this device since ${day}. Nothing was sent this time.`,
+    fromDevice: 'Written by the on-device model, because the cloud could not be reached. It is not kept.',
+    forget: 'Forget kept explanations',
+    rejectedHeading: 'The explanation was thrown away',
+    rejectedBody: 'An answer came back, but it broke one of Letterkind’s rules, so none of it is shown.',
+    rejected: {
+      not_json: () => 'It was not in the form that was asked for.',
+      wrong_shape: () => 'It was not in the form that was asked for.',
+      too_long: () => 'It was longer than allowed.',
+      unknown_marker: (found: string) => `It left a gap Letterkind does not know how to fill (“${found}”).`,
+      marker_not_allowed_here: (found: string) => `It left a gap (“${found}”) for a detail this kind of letter does not have.`,
+      amount: (found: string) => `It contained an amount of its own (“${found}”). An amount may only come from your letter.`,
+      date: (found: string) => `It contained a date of its own (“${found}”). A date may only come from your letter.`,
+      phone: (found: string) => `It contained a phone number of its own (“${found}”). A phone number may only come from your letter.`,
+      web_address: (found: string) => `It contained a web or e-mail address (“${found}”). Letterkind does not show addresses a model wrote.`,
+    } satisfies Record<RejectReason, (found: string) => string>,
+    askAgain: 'Ask again',
+    unavailableHeading: 'No explanation could be fetched',
+    unavailableBody:
+      'The first explanation of each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',
+    unavailableLanguage: (language: string) => `An explanation in ${language} can only be written in the cloud.`,
+  },
+
+  ledger: {
+    heading: 'What has left this device',
+    nothing: 'Nothing has left this device.',
+    sent: (n: number, bytes: number) =>
+      `${n === 1 ? '1 request' : `${n} requests`} sent, ${bytes.toLocaleString('en-US')} bytes in all. None of it from a letter.`,
+    attempted: (n: number) => (n === 1 ? '1 request was tried and got no answer from a server.' : `${n} requests were tried and got no answer from a server.`),
+    stayed: (n: number) => (n === 1 ? '1 request was answered on this device.' : `${n} requests were answered on this device.`),
+    note: 'Reading a letter is done by the model inside this browser and sends nothing. This list holds every request Letterkind made to a model outside it, word for word.',
+    purpose: {
+      explain: 'Explanation of a kind of letter',
+      reply: 'Outline of a reply',
+      term: 'Meaning of a term',
+    } satisfies Record<OutboundRequest['purpose'], string>,
+    left: {
+      sent: 'Sent',
+      attempted: 'Tried to send',
+      stayed: 'Stayed on this device',
+    } satisfies Record<Left, string>,
+    ran: {
+      cloud: 'answered in the cloud',
+      device: 'answered on this device',
+      nowhere: 'no answer',
+    } satisfies Record<Ran, string>,
+    term: 'Term',
+    bytes: (n: number) => `${n.toLocaleString('en-US')} bytes`,
+    words: 'The exact words that were sent',
+    wordsNote:
+      'These words are fixed in the app: anyone who picks the same kind of letter, state and language sends the same ones. A fixed description of the form the answer must take goes with them.',
   },
 
   kinds: {
