@@ -123,3 +123,26 @@ export function blanksFor(language: LanguageId): Readonly<Record<StandIn, string
     PHONE: `[${words.PHONE}]`,
   };
 }
+
+/**
+ * The blank for the reader's own name, as the copy of a reply in their
+ * language should write it. A prompt shows it as the example to follow, so
+ * that a blank is not left in English in a copy meant for someone who does
+ * not read English.
+ */
+const NAME_BLANKS: Record<LanguageId, string> = {
+  en: '[YOUR FULL NAME]',
+  es: '[SU NOMBRE COMPLETO]',
+  'zh-Hans': '[您的全名]',
+  'zh-Hant': '[您的全名]',
+  vi: '[HỌ VÀ TÊN CỦA BẠN]',
+  tl: '[ANG BUONG PANGALAN MO]',
+  ko: '[귀하의 성명]',
+  ar: '[اسمك الكامل]',
+  ru: '[ВАШЕ ПОЛНОЕ ИМЯ]',
+  ht: '[NON KONPLÈ OU]',
+  pt: '[SEU NOME COMPLETO]',
+  fr: '[VOTRE NOM COMPLET]',
+};
+
+export const nameBlank = (language: LanguageId): string => NAME_BLANKS[language];

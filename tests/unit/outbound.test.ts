@@ -157,6 +157,7 @@ describe('prompts', () => {
       expect(prompt).toContain('a greeting on its own line');
       expect(prompt).toContain('"I" is always the reader and "you" is always the sender');
       expect(prompt).toContain('Do not explain the law');
+      expect(prompt).toContain('never say what the sender "must" do');
     }
     expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'NY', language: 'vi' })).toContain('with the same line breaks');
     expect(promptFor({ purpose: 'explain', type: 'medical_bill', state: 'NY', language: 'en' })).not.toContain('a greeting on its own line');

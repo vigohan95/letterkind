@@ -56,7 +56,8 @@ export type RejectReason =
   | 'phone'
   | 'web_address'
   | 'not_in_language'
-  | 'translation_differs';
+  | 'translation_differs'
+  | 'blank_left_in_english';
 
 /**
  * A template that broke a rule. It is thrown away whole: a model that has

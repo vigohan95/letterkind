@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { LANGUAGE_IDS, type LanguageId } from '../../src/domain/languages';
 import type { LetterTypeId } from '../../src/domain/letterTypes';
 import { fillLetter, parseReply } from '../../src/domain/reply';
-import { blanksFor } from '../../src/domain/standIns';
+import { blanksFor, nameBlank } from '../../src/domain/standIns';
 import { filledText, type RejectReason, TemplateRejected, type Values } from '../../src/domain/template';
 import { templateKey } from '../../src/guidance/kept';
 import { draftReply, type ReplyRequest, savedDraft } from '../../src/guidance/reply';
@@ -73,6 +73,18 @@ function rejection(text: string, type: LetterTypeId = 'medical_bill', language: 
 }
 
 describe('a draft of a reply', () => {
+  it('is thrown away when the copy to read leaves a blank in English', () => {
+    const left = carta.replace('[SU NOMBRE COMPLETO]', '[YOUR FULL NAME]');
+    expect(rejection(inSpanish({ body_translated: left }), 'medical_bill', 'es')).toMatchObject({
+      reason: 'blank_left_in_english',
+      field: 'body_translated',
+      found: '[YOUR FULL NAME]',
+    });
+    // One word can be the same in both languages.
+    const same = { body_en: `${letter}\n[EMAIL]`, body_translated: `${carta}\n[EMAIL]` };
+    expect(parseReply(inSpanish(same), 'medical_bill', 'es').bodyTranslated).toContain('[EMAIL]');
+  });
+
   it('is thrown away when it comes as one block of text and not laid out as a letter', () => {
     const block = (text: string): string => text.replace(/\n+/g, ' ');
     expect(rejection(inEnglish({ body_en: block(letter) }))).toMatchObject({ reason: 'wrong_shape', field: 'body_en' });
@@ -156,6 +168,18 @@ describe('a draft of a reply', () => {
       field: 'body_translated',
     });
     expect(rejection(inSpanish({ body_translated: `{{SENDER}} {{REFERENCE}} {{AMOUNT}} {{DEADLINE}} ${chinese}` }), 'medical_bill', 'es')).toMatchObject({ reason: 'not_in_language' });
+  });
+});
+
+describe('the blank a prompt shows as an example', () => {
+  it('is written by hand for every language but English, and is never the English one', () => {
+    for (const language of LANGUAGE_IDS) {
+      if (language === 'en') continue;
+      expect(nameBlank(language), language).toMatch(/^\[[^[\]\n]{2,40}\]$/);
+      expect(nameBlank(language), language).not.toBe('[YOUR FULL NAME]');
+      expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'US', language }), language).toContain(`[YOUR FULL NAME] becomes ${nameBlank(language)}`);
+    }
+    expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'US', language: 'en' })).not.toContain('becomes');
   });
 });
 

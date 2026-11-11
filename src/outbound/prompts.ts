@@ -1,6 +1,7 @@
 import { languageName, writableOnDevice, type LanguageId } from '../domain/languages';
 import { letterType, type AmountMeaning, type DeadlineMeaning, type LetterTypeId } from '../domain/letterTypes';
 import { stateName, type StateId } from '../domain/states';
+import { nameBlank } from '../domain/standIns';
 import { mark, placeholdersFor, type Placeholder } from '../domain/template';
 import { term } from '../domain/terms';
 import { parseRequest, type OutboundRequest } from './requests';
@@ -188,8 +189,8 @@ function replyPrompt(type: LetterTypeId, state: StateId, language: LanguageId): 
     '  subject         The subject line of the reply, in English.',
     '  body_en         The reply, in formal, polite English, ready to print: the most common reason a person writes back to this kind of letter (for example to ask for proof, more time, a payment plan, a review or a correction). State facts and requests only. Admit nothing and promise nothing on the reader\'s behalf. Do not repeat the subject line inside it.',
     '                  Lay it out as a letter: a greeting on its own line, then short paragraphs, then a closing and the blank for the reader\'s name each on its own line, with an empty line between the parts.',
-    '                  Write it in the first person, from the reader to the sender: in the letter "I" is always the reader and "you" is always the sender. Do not explain the law to anyone in it; where a rule of the state matters, ask the sender to apply it.',
-    ...(translated ? [`  body_translated The same reply in ${languageName(language)}, so the reader knows exactly what they are signing. Keep every marker exactly as it is in body_en, with the same line breaks, and write each blank in ${languageName(language)}, still in square brackets.`] : []),
+    '                  Write it in the first person, from the reader to the sender: in the letter "I" is always the reader and "you" is always the sender. Do not explain the law in it, and never say what the sender "must" do: the reader cannot check that and would be signing it. Where a rule of the state may help the reader, ask about it instead (for example "Please tell me whether I qualify, and send me the form to apply").',
+    ...(translated ? [`  body_translated The same reply in ${languageName(language)}, so the reader knows exactly what they are signing. Keep every marker exactly as it is in body_en, with the same line breaks, and write each blank in ${languageName(language)}, still in square brackets: [YOUR FULL NAME] becomes ${nameBlank(language)}. No blank stays in English.`] : []),
     `  before_sending  In ${languageName(language)}: what to check, attach and keep before sending, one item each.`,
     '',
     'If replying in writing is not the usual way to handle this kind of letter, say so in the first item of before_sending and keep the reply short.',

@@ -101,6 +101,10 @@ export function parseReply(answer: string, type: LetterTypeId, language: Languag
     const read = details(template.bodyTranslated);
     const odd = PLACEHOLDERS.find((p) => sent.has(p) !== read.has(p));
     if (odd) throw new TemplateRejected('translation_differs', 'body_translated', mark(odd));
+    // What the reader has to write in must be named in words they can read. One word may be the same in both.
+    const english = new Set(template.bodyEn.match(BLANK) ?? []);
+    const left = (template.bodyTranslated.match(BLANK) ?? []).find((blank) => english.has(blank) && /\s/.test(blank));
+    if (left) throw new TemplateRejected('blank_left_in_english', 'body_translated', left);
   }
   if (!writtenAs(ownWords(template.beforeSending.join(' ')), language)) throw new TemplateRejected('not_in_language', 'before_sending');
   return template;

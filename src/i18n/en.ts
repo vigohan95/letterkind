@@ -174,6 +174,7 @@ export const en = {
       web_address: (found: string) => `It contained a web or e-mail address (“${found}”). Letterkind does not show addresses a model wrote.`,
       not_in_language: () =>
         'It was not written the way the language you chose is written — in other letters, or with the accents left off.',
+      blank_left_in_english: (found: string) => `Its translation left a place for you to fill in (“${found}”) in English.`,
       translation_differs: (found: string) =>
         `Its translation did not match the English: a gap for a detail of your letter (“${found}”) was in one and not in the other.`,
     } satisfies Record<RejectReason, (found: string) => string>,
