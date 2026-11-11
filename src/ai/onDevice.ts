@@ -1,9 +1,9 @@
 import { getAI, getGenerativeModel, type GenerativeModel, GoogleAIBackend, InferenceMode, InferenceSource } from 'firebase/ai';
 import { firebaseApp } from '../firebase';
-import { textSessionOptions } from './availability';
+import { imageSessionOptions, textSessionOptions } from './availability';
 import { CLASSIFY_SCHEMA } from './classify';
 import { EXTRACT_SCHEMA } from './extract';
-import type { Generate } from './types';
+import type { Generate, Look } from './types';
 
 /**
  * The models that read the letter.
@@ -11,9 +11,11 @@ import type { Generate } from './types';
  * Every model built in this file is pinned to ONLY_ON_DEVICE: Firebase AI
  * Logic runs it on Gemini Nano inside the browser, and if the device cannot
  * run it the call fails — it does not fall back to a server. This is the only
- * file that may hand the text of a letter to a model, and a test fails the
- * build if any other inference mode is ever named here.
+ * file that may hand a letter, as text or as a picture, to a model, and a test
+ * fails the build if any other inference mode is ever named here.
  */
+
+const NOT_ON_DEVICE = 'On-device inference was required, but the response did not come from the device.';
 
 function onDeviceModel(responseConstraint: object): GenerativeModel {
   return getGenerativeModel(getAI(firebaseApp(), { backend: new GoogleAIBackend() }), {
@@ -32,7 +34,7 @@ function asGenerate(model: GenerativeModel): Generate {
     // The mode already makes this impossible. Checked anyway, on every call,
     // so that the promise "your letter stayed here" rests on an observation.
     if (response.inferenceSource !== InferenceSource.ON_DEVICE) {
-      throw new Error('On-device inference was required, but the response did not come from the device.');
+      throw new Error(NOT_ON_DEVICE);
     }
     return { text: response.text(), ms: Math.round(performance.now() - started) };
   };
@@ -40,12 +42,32 @@ function asGenerate(model: GenerativeModel): Generate {
 
 let classifier: GenerativeModel | undefined;
 let extractor: GenerativeModel | undefined;
+let transcriber: GenerativeModel | undefined;
 
 const classifierModel = (): GenerativeModel => (classifier ??= onDeviceModel(CLASSIFY_SCHEMA));
 const extractorModel = (): GenerativeModel => (extractor ??= onDeviceModel(EXTRACT_SCHEMA));
 
+/** No answer format is imposed on the transcriber: its answer is the text of the page. */
+const transcriberModel = (): GenerativeModel =>
+  (transcriber ??= getGenerativeModel(getAI(firebaseApp(), { backend: new GoogleAIBackend() }), {
+    mode: InferenceMode.ONLY_ON_DEVICE,
+    onDeviceParams: { createOptions: imageSessionOptions() },
+  }));
+
 export const onDeviceClassifier: Generate = (prompt) => asGenerate(classifierModel())(prompt);
 export const onDeviceExtractor: Generate = (prompt) => asGenerate(extractorModel())(prompt);
+
+/** Shows the on-device model one page of a letter and passes on its answer as it is written. */
+export const onDeviceLook: Look = async function* (prompt, image) {
+  const { stream } = await transcriberModel().generateContentStream([
+    prompt,
+    { type: 'inlineData', inlineData: { mimeType: image.mimeType, data: image.data } },
+  ]);
+  for await (const piece of stream) {
+    if (piece.inferenceSource !== InferenceSource.ON_DEVICE) throw new Error(NOT_ON_DEVICE);
+    yield piece.text();
+  }
+};
 
 /**
  * Make the on-device model ready, downloading it if the browser has not yet.

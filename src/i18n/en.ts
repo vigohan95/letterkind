@@ -6,7 +6,7 @@ import type { AmountMeaning, DeadlineMeaning, LetterTypeId } from '../domain/let
  */
 export const en = {
   appName: 'Letterkind',
-  tagline: 'Paste an official letter. It is read on this device and never leaves it.',
+  tagline: 'Paste, photograph or open an official letter. It is read on this device and never leaves it.',
   notAdvice: 'Letterkind helps you read a letter. It is not legal, tax or medical advice.',
 
   device: {
@@ -27,11 +27,34 @@ export const en = {
     again: 'Read another letter',
     samples: 'Or try a made-up sample:',
     sampleNote: 'Sample letter. The sender, names and numbers are invented.',
+    add: 'Open a photo or PDF',
+    addNote: 'Photos and PDFs are opened in this browser. They are not uploaded.',
+    noPictures:
+      'The on-device model in this browser cannot look at pictures, so a photo or a scanned PDF cannot be read here. A PDF that contains its text still can.',
+    unsupportedFile: (name: string) => `${name} is not something Letterkind can open. It opens photos (JPEG, PNG, WebP), PDFs and plain text files.`,
+    leftOut: (n: number, read: number) =>
+      n === 1
+        ? `The last page was left out: Letterkind reads the first ${read} pages.`
+        : `The last ${n} pages were left out: Letterkind reads the first ${read} pages.`,
+    fromFile: 'This text was taken from your file, on this device, without a model. Check it, then read the letter.',
+    fromPicture: (ms: number) =>
+      `The on-device model copied this text from your picture in ${Math.round(ms / 1000)} seconds. Compare the amounts, dates and numbers with the letter itself and correct any mistake before going on: what Letterkind tells you next is checked against this text, not against the picture.`,
+    unreadable: (n: number) =>
+      n === 1
+        ? 'The model marked one place as [unreadable]. Fill it in from the letter if it matters.'
+        : `The model marked ${n} places as [unreadable]. Fill them in from the letter if they matter.`,
+    pictureOf: (page: number) => `Page ${page} of your letter`,
   },
 
   progress: {
     classifying: 'Working out what kind of letter this is…',
     extracting: 'Finding what it asks of you…',
+    opening: 'Opening the file…',
+    transcribing: (page: number, pages: number) =>
+      pages === 1 ? 'Copying out the text of the picture, on this device…' : `Copying out page ${page} of ${pages}, on this device…`,
+    transcribingNote:
+      'On a computer without a graphics chip this can take a minute or more for each page. The text appears as it is read, and you can correct it afterwards.',
+    stop: 'Stop',
   },
 
   where: {

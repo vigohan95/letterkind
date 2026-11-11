@@ -24,15 +24,30 @@ export function textSessionOptions(): {
   };
 }
 
+/**
+ * Session options for copying the text out of a picture of a letter. The
+ * picture is handed to the same built-in model, in the same browser.
+ */
+export function imageSessionOptions(): {
+  expectedInputs: ({ type: 'text'; languages: string[] } | { type: 'image' })[];
+  expectedOutputs: { type: 'text'; languages: string[] }[];
+} {
+  return {
+    expectedInputs: [{ type: 'text', languages: ['en'] }, { type: 'image' }],
+    expectedOutputs: [{ type: 'text', languages: ['en', 'es'] }],
+  };
+}
+
 interface BuiltInModel {
   availability(options?: object): Promise<string>;
 }
 
-export async function deviceModelStatus(): Promise<DeviceModelStatus> {
+/** `options` says what the model will be asked to do: read text (the default) or look at a picture. */
+export async function deviceModelStatus(options: object = textSessionOptions()): Promise<DeviceModelStatus> {
   const builtIn = (globalThis as { LanguageModel?: BuiltInModel }).LanguageModel;
   if (!builtIn) return 'unsupported';
   try {
-    const answer = await builtIn.availability(textSessionOptions());
+    const answer = await builtIn.availability(options);
     if (answer === 'available') return 'ready';
     if (answer === 'downloadable' || answer === 'downloading') return answer;
     return 'unavailable';

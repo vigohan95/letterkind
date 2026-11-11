@@ -1,22 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
-import { type DeviceModelStatus, deviceModelStatus } from '../ai/availability';
+import { type DeviceModelStatus, deviceModelStatus, imageSessionOptions } from '../ai/availability';
 import { type Classification, classify } from '../ai/classify';
-import { onDeviceClassifier, onDeviceExtractor, prepareDeviceModel } from '../ai/onDevice';
+import { onDeviceClassifier, onDeviceExtractor, onDeviceLook, prepareDeviceModel } from '../ai/onDevice';
 import { type Reading, readLetter } from '../ai/read';
+import { joinPages, transcribePage, unreadableCount } from '../ai/transcribe';
 import { localIsoDate } from '../domain/deadline';
 import { LETTER_TYPE_IDS, type LetterTypeId } from '../domain/letterTypes';
 import { en } from '../i18n/en';
+import { ACCEPTED_FILES, openFiles, UnsupportedFile } from '../input/files';
 import { SAMPLE_LETTERS } from '../samples/letters';
 import { LetterView } from './LetterView';
+import { PagePictures, Transcribing } from './Pages';
 import { ReadingView } from './ReadingView';
 
 type Phase =
   | { at: 'idle' }
+  | { at: 'opening' }
+  | { at: 'transcribing'; page: number; pages: number; text: string }
   | { at: 'classifying'; letter: string }
   | { at: 'choosing'; letter: string; classification: Classification }
   | { at: 'extracting'; letter: string; classification: Classification }
   | { at: 'done'; letter: string; classification: Classification; reading: Reading; chosen: boolean }
   | { at: 'error'; message: string };
+
+/** Where the text in the box came from, when it was not typed or pasted. */
+type Source = { from: 'file' } | { from: 'picture'; ms: number };
 
 const t = en;
 const messageOf = (error: unknown): string => (error instanceof Error ? error.message : String(error));
@@ -24,22 +32,33 @@ const messageOf = (error: unknown): string => (error instanceof Error ? error.me
 export function App() {
   const [status, setStatus] = useState<DeviceModelStatus | 'checking'>('checking');
   const [download, setDownload] = useState<{ fraction: number | null; error: string | null }>({ fraction: null, error: null });
+  const [pictureStatus, setPictureStatus] = useState<DeviceModelStatus | 'checking'>('checking');
   const [draft, setDraft] = useState('');
   const [sample, setSample] = useState(false);
+  const [source, setSource] = useState<Source | null>(null);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [notice, setNotice] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>({ at: 'idle' });
   const [other, setOther] = useState<LetterTypeId>('other');
   // Each reading gets a number, so an answer that arrives after the reader has moved on is dropped.
   const run = useRef(0);
+  const stop = useRef<AbortController | null>(null);
 
   useEffect(() => {
     let live = true;
     void deviceModelStatus().then((s) => {
       if (live) setStatus(s);
     });
+    void deviceModelStatus(imageSessionOptions()).then((s) => {
+      if (live) setPictureStatus(s);
+    });
     return () => {
       live = false;
     };
   }, []);
+
+  // The pictures are held as object URLs; let go of the old ones whenever they are replaced.
+  useEffect(() => () => previews.forEach((url) => URL.revokeObjectURL(url)), [previews]);
 
   async function downloadModel(): Promise<void> {
     setStatus('downloading');
@@ -51,6 +70,60 @@ export function App() {
       setDownload({ fraction: null, error: messageOf(error) });
     }
     setStatus(await deviceModelStatus());
+    setPictureStatus(await deviceModelStatus(imageSessionOptions()));
+  }
+
+  /** A photo, a scan, a PDF or a text file becomes text in the box, for the reader to check before it is read. */
+  async function open(files: readonly File[]): Promise<void> {
+    if (files.length === 0) return;
+    const id = ++run.current;
+    stop.current?.abort();
+    const stopper = (stop.current = new AbortController());
+    setNotice(null);
+    setSource(null);
+    setSample(false);
+    setPreviews([]);
+    setPhase({ at: 'opening' });
+    try {
+      const opened = await openFiles(files);
+      if (run.current !== id) return;
+      const pictures = opened.pages.flatMap((page) => (page.kind === 'picture' ? [page] : []));
+      if (pictures.length > 0 && pictureStatus !== 'ready') {
+        setNotice(t.input.noPictures);
+        setPhase({ at: 'idle' });
+        return;
+      }
+      setPreviews(pictures.map((page) => URL.createObjectURL(page.preview)));
+      const texts: string[] = [];
+      let ms = 0;
+      for (const [i, page] of opened.pages.entries()) {
+        if (page.kind === 'text') {
+          texts.push(page.text);
+          continue;
+        }
+        const before = [...texts];
+        const showing = (text: string): void => {
+          if (run.current === id) setPhase({ at: 'transcribing', page: i + 1, pages: opened.pages.length, text: joinPages([...before, text]) });
+        };
+        showing('');
+        const copied = await transcribePage(page.image, onDeviceLook, showing, stopper.signal);
+        if (run.current !== id) return;
+        texts.push(copied.text);
+        ms += copied.ms;
+      }
+      setDraft(joinPages(texts));
+      setSource(pictures.length > 0 ? { from: 'picture', ms } : { from: 'file' });
+      setNotice(opened.leftOut > 0 ? t.input.leftOut(opened.leftOut, opened.pages.length) : null);
+      setPhase({ at: 'idle' });
+    } catch (error) {
+      if (run.current !== id) return;
+      if (error instanceof UnsupportedFile) {
+        setNotice(t.input.unsupportedFile(error.fileName));
+        setPhase({ at: 'idle' });
+      } else {
+        setPhase({ at: 'error', message: messageOf(error) });
+      }
+    }
   }
 
   async function extractAs(letter: string, classification: Classification, type: LetterTypeId, chosen: boolean, id: number): Promise<void> {
@@ -85,6 +158,9 @@ export function App() {
 
   function reset(): void {
     run.current++;
+    stop.current?.abort();
+    // Stopped part-way: the pictures on show no longer belong to the text in the box.
+    if (phase.at === 'opening' || phase.at === 'transcribing') setPreviews([]);
     setPhase({ at: 'idle' });
   }
 
@@ -122,24 +198,58 @@ export function App() {
             event.preventDefault();
             void read();
           }}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            void open([...event.dataTransfer.files]);
+          }}
         >
           <label htmlFor="letter">{t.input.label}</label>
-          <textarea
-            id="letter"
-            value={draft}
-            placeholder={t.input.placeholder}
-            spellCheck={false}
-            rows={16}
-            onChange={(event) => {
-              setDraft(event.target.value);
-              setSample(false);
-            }}
-          />
+          <div className={previews.length > 0 ? 'compose-check' : undefined}>
+            <textarea
+              id="letter"
+              value={draft}
+              placeholder={t.input.placeholder}
+              spellCheck={false}
+              rows={16}
+              onChange={(event) => {
+                setDraft(event.target.value);
+                setSample(false);
+              }}
+              onPaste={(event) => {
+                // A pasted screenshot or file is opened; pasted text is left to the browser.
+                if (event.clipboardData.files.length === 0) return;
+                event.preventDefault();
+                void open([...event.clipboardData.files]);
+              }}
+            />
+            <PagePictures previews={previews} t={t} />
+          </div>
           {sample && <p className="hint">{t.input.sampleNote}</p>}
+          {source?.from === 'file' && <p className="hint">{t.input.fromFile}</p>}
+          {source?.from === 'picture' && <p className="hint check">{t.input.fromPicture(source.ms)}</p>}
+          {source?.from === 'picture' && unreadableCount(draft) > 0 && <p className="hint check">{t.input.unreadable(unreadableCount(draft))}</p>}
+          {notice && (
+            <p className="hint check" role="status">
+              {notice}
+            </p>
+          )}
           <div className="compose-actions">
             <button type="submit" className="primary" disabled={status !== 'ready' || draft.trim() === ''}>
               {t.input.read}
             </button>
+            <label className="file">
+              <input
+                type="file"
+                accept={ACCEPTED_FILES}
+                multiple
+                onChange={(event) => {
+                  void open([...(event.target.files ?? [])]);
+                  event.target.value = '';
+                }}
+              />
+              {t.input.add}
+            </label>
             <span className="samples">
               {t.input.samples}
               {SAMPLE_LETTERS.map((s) => (
@@ -149,6 +259,9 @@ export function App() {
                   onClick={() => {
                     setDraft(s.text);
                     setSample(true);
+                    setSource(null);
+                    setPreviews([]);
+                    setNotice(null);
                   }}
                 >
                   {s.title}
@@ -156,8 +269,17 @@ export function App() {
               ))}
             </span>
           </div>
+          <p className="hint">{t.input.addNote}</p>
         </form>
       )}
+
+      {phase.at === 'opening' && (
+        <p className="working" role="status">
+          {t.progress.opening}
+        </p>
+      )}
+
+      {phase.at === 'transcribing' && <Transcribing previews={previews} page={phase.page} pages={phase.pages} text={phase.text} t={t} />}
 
       {(phase.at === 'classifying' || phase.at === 'extracting') && (
         <div className="reading">
@@ -219,7 +341,7 @@ export function App() {
       {phase.at !== 'idle' && (
         <p className="again">
           <button type="button" onClick={reset}>
-            {phase.at === 'error' ? t.error.retry : t.input.again}
+            {phase.at === 'error' ? t.error.retry : phase.at === 'opening' || phase.at === 'transcribing' ? t.progress.stop : t.input.again}
           </button>
         </p>
       )}
