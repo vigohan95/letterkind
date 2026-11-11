@@ -173,8 +173,10 @@ export const en = {
       phone: (found: string) => `It contained a phone number of its own (“${found}”). A phone number may only come from your letter.`,
       web_address: (found: string) => `It contained a web or e-mail address (“${found}”). Letterkind does not show addresses a model wrote.`,
       not_in_language: () =>
-        'It was not written the way the language you chose is written — in other letters, or with the accents left off.',
+        'It was not written the way the language you chose is written — in other letters, in English, or with the accents left off.',
       blank_left_in_english: (found: string) => `Its translation left a place for you to fill in (“${found}”) in English.`,
+      states_the_law: (found: string) =>
+        `Its letter stated something about the law (“${found}”). You would be signing a claim nobody here can check, so it was not kept. A letter from Letterkind asks; it does not tell the sender what the law says.`,
       translation_differs: (found: string) =>
         `Its translation did not match the English: a gap for a detail of your letter (“${found}”) was in one and not in the other.`,
     } satisfies Record<RejectReason, (found: string) => string>,

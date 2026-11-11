@@ -57,7 +57,8 @@ export type RejectReason =
   | 'web_address'
   | 'not_in_language'
   | 'translation_differs'
-  | 'blank_left_in_english';
+  | 'blank_left_in_english'
+  | 'states_the_law';
 
 /**
  * A template that broke a rule. It is thrown away whole: a model that has
@@ -182,15 +183,32 @@ const OWN_LETTERS: Record<Exclude<Script, 'latin' | 'latin_marked'>, RegExp> = {
 };
 /** Fewer letters than this is too little to tell a language by. */
 const ENOUGH_LETTERS = 200;
+/** Fewer Latin letters than this can be correct Spanish with no accent in it; more cannot. */
+const ENOUGH_FOR_ACCENTS = 400;
+/** The fewest accents a long text may have: one letter in this many. */
+const SPARSEST_ACCENTS = 600;
 const count = (text: string, letters: RegExp): number => text.match(letters)?.length ?? 0;
+
+// Words English cannot do without, and that none of the other languages on the list has.
+const ENGLISH_WORDS = new Set(['the', 'and', 'of', 'your', 'you', 'is', 'are', 'this', 'that', 'with', 'it', 'have', 'not', 'be']);
+/** One word in ten. English runs to twice that; a name or a term in English inside another language does not come near. */
+function readsAsEnglish(text: string): boolean {
+  const words = text.toLowerCase().match(/\p{L}+/gu) ?? [];
+  return words.length > 0 && words.filter((word) => ENGLISH_WORDS.has(word)).length * 10 >= words.length;
+}
 
 /**
  * Is this text written the way the language is written?
  *
- * Not a test of grammar or meaning — only of the letters used. It catches an
- * answer in the wrong language's script, and Spanish, Vietnamese, French,
- * Portuguese or Haitian Creole sent back with the accents left off: at least
- * one letter in two hundred must carry one, far below what any of them uses.
+ * Not a test of grammar or meaning — only of the letters and the commonest
+ * words. It catches an answer in the wrong language's script, English sent
+ * back for another language written in Latin letters, and a long text in
+ * Spanish, Vietnamese, French, Portuguese or Haitian Creole with the accents
+ * left off.
+ *
+ * The rule for accents is loose on purpose. Measured on real answers, a
+ * checklist in correct formal Spanish had two accents in three hundred
+ * letters; a stricter rule threw away about one good draft in five.
  */
 export function writtenAs(text: string, language: LanguageId): boolean {
   const letters = count(text, /\p{L}/gu);
@@ -199,7 +217,9 @@ export function writtenAs(text: string, language: LanguageId): boolean {
   if (script !== 'latin' && script !== 'latin_marked') return count(text, OWN_LETTERS[script]) * 2 >= letters;
   const latin = count(text, LATIN);
   if (latin * 2 < letters) return false;
-  return script === 'latin' || count(text, MARKED_LATIN) * 200 >= latin;
+  if (language !== 'en' && readsAsEnglish(text)) return false;
+  if (script === 'latin' || latin < ENOUGH_FOR_ACCENTS) return true;
+  return count(text, MARKED_LATIN) >= Math.max(1, Math.floor(latin / SPARSEST_ACCENTS));
 }
 
 /**

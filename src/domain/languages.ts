@@ -8,7 +8,7 @@
  *
  * `script` is how the language is written. An answer that comes back written
  * some other way is not shown: `latin_marked` languages are written with
- * accents, and text without any is not that language written properly.
+ * accents, and a long text without any is not that language written properly.
  */
 
 export const LANGUAGES = [

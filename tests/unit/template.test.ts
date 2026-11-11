@@ -7,6 +7,7 @@ import {
   parseExplain,
   placeholdersFor,
   TemplateRejected,
+  writtenAs,
   type Piece,
   type RejectReason,
 } from '../../src/domain/template';
@@ -282,6 +283,48 @@ describe('the language a template is written in', () => {
     expect(rejection(answer(), 'medical_bill', 'vi').reason).toBe('not_in_language');
   });
 
+  // Correct Spanish of the kind a checklist is written in. Real answers have had as few as two accents in three hundred letters.
+  const plain = [
+    'Revise que su nombre y la cuenta sean los mismos que aparecen en la factura del hospital.',
+    'Adjunte una copia de la factura y de la tarjeta de su seguro, nunca los originales.',
+    'Guarde una copia firmada de esta carta junto con el comprobante de correo certificado.',
+  ].join(' ');
+  const sparse = `${plain} Anote la fecha de envío y el nombre de la persona con la que hable si llama.`;
+  const checklist = [
+    'Check that your name and the account number are the same as on the bill.',
+    'Attach a copy of the bill and of your insurance card, never the originals.',
+    'Keep a signed copy of this letter with the receipt for certified mail.',
+    'Write down the day you sent it and the name of anyone you speak with.',
+  ].join(' ');
+  const tagalog = [
+    'Tiyaking ang pangalan mo at ang numero ng account ay pareho sa nakasulat sa singil.',
+    'Maglakip ng kopya ng singil at ng iyong insurance card, huwag ang orihinal.',
+    'Magtabi ng pirmadong kopya ng sulat na ito kasama ang resibo ng koreo.',
+    'Isulat ang araw na ipinadala mo ito at ang pangalan ng sinumang nakausap mo.',
+  ].join(' ');
+
+  it('does not throw away short Spanish for having few accents, or none', () => {
+    expect(plain.match(/\p{L}/gu)?.length).toBeGreaterThan(200);
+    expect(plain).toBe(unmarked(plain));
+    expect(writtenAs(plain, 'es')).toBe(true);
+    expect(sparse.match(/[áéíóúñ]/g)).toHaveLength(1);
+    expect(writtenAs(sparse, 'es')).toBe(true);
+  });
+
+  it('still rejects a long text with its accents left off', () => {
+    const long = `${sparse} ${sparse}`;
+    expect(writtenAs(long, 'es')).toBe(true);
+    expect(writtenAs(unmarked(long), 'es')).toBe(false);
+  });
+
+  it('tells English from any other language written in Latin letters, however short the text', () => {
+    expect(writtenAs(checklist, 'en')).toBe(true);
+    for (const language of ['es', 'vi', 'tl', 'ht', 'pt', 'fr'] as const) expect(writtenAs(checklist, language), language).toBe(false);
+    expect(writtenAs(tagalog, 'tl')).toBe(true);
+    // A name in English inside a sentence in Spanish is not English.
+    expect(writtenAs(`${plain} Pida la solicitud de Financial Assistance Policy del hospital.`, 'es')).toBe(true);
+  });
+
   it('judges only what the reader is shown, not the hint kept in English for the extractor', () => {
     // `reading_hint` is English in every template; it must not count against the language.
     expect(() => parseExplain(answer(chinese), 'medical_bill', 'zh-Hant')).not.toThrow();
@@ -307,8 +350,8 @@ describe('the language a template is written in', () => {
           return error instanceof TemplateRejected ? error.reason : 'crashed';
         }
       })();
-      // The English sample passes for the two languages written in plain Latin letters and for no other.
-      expect(outcome, language).toBe(language === 'en' || language === 'tl' ? 'accepted' : 'not_in_language');
+      // The English sample passes for English and for no other.
+      expect(outcome, language).toBe(language === 'en' ? 'accepted' : 'not_in_language');
     }
   });
 });

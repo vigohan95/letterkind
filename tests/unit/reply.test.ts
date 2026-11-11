@@ -131,6 +131,25 @@ describe('a draft of a reply', () => {
     expect(rejection(inEnglish(change))).toMatchObject({ reason, field });
   });
 
+  it.each<[string, string, string]>([
+    ['what a law requires', 'Illinois law requires hospitals to provide financial assistance to eligible patients.', 'law requires'],
+    ['a law it names', 'Under the No Surprises Act, I ask for a good faith estimate.', 'Under the No Surprises Act'],
+    ['what is required by law', 'Please send the itemized statement as required by law.', 'as required by law'],
+    ['what the sender must do', 'You must stop all collection until you answer.', 'You must'],
+    ['what the sender is required to do', 'I understand you are legally required to answer within thirty days.', 'you are legally required'],
+  ])('is thrown away when the letter to sign states %s', (_, sentence, found) => {
+    const claimed = letter.replace('Before I pay,', `${sentence} Before I pay,`);
+    expect(rejection(inEnglish({ body_en: claimed }))).toMatchObject({ reason: 'states_the_law', field: 'body_en', found });
+  });
+
+  it('keeps a letter that asks about a rule instead of stating it', () => {
+    const asked = letter.replace(
+      'Before I pay,',
+      'Please tell me whether I qualify for your financial assistance policy, and what I must send you to apply. The charge is listed under the billing code on the statement. Before I pay,',
+    );
+    expect(parseReply(inEnglish({ body_en: asked }), 'medical_bill', 'en').bodyEn).toBe(asked);
+  });
+
   it('is thrown away when it is not the form that was asked for', () => {
     expect(rejection('Dear Sir or Madam,')).toMatchObject({ reason: 'not_json' });
     expect(rejection('[]')).toMatchObject({ reason: 'wrong_shape' });
@@ -162,7 +181,7 @@ describe('a draft of a reply', () => {
     const chinese = '我收到了贵方寄来的账单，在付款之前，请先把每一项收费的明细寄给我，并说明保险已经支付的部分。\n'.repeat(6);
     expect(rejection(inSpanish({ body_en: chinese }), 'medical_bill', 'es')).toMatchObject({ reason: 'not_in_language', field: 'body_en' });
 
-    const noAccents = 'Recibi su factura y antes de pagar les pido un desglose de cada cargo que aparece en ella.\n'.repeat(4);
+    const noAccents = 'Recibi su factura y antes de pagar les pido un desglose de cada cargo que aparece en ella.\n'.repeat(6);
     expect(rejection(inSpanish({ body_translated: `{{SENDER}} {{REFERENCE}} {{AMOUNT}} {{DEADLINE}} ${noAccents}`, before_sending: ['Guarde una copia.'] }), 'medical_bill', 'es')).toMatchObject({
       reason: 'not_in_language',
       field: 'body_translated',

@@ -73,6 +73,24 @@ const details = (text: string): Set<Placeholder> => new Set(markersIn(text).filt
  * reader's language is written, and the translation has a gap for exactly
  * the details the English has.
  */
+/**
+ * What the law requires, a law by name, what the sender must do. The reader
+ * signs the letter and cannot check any of it, and the cloud was never told
+ * which rule applies to them. A letter may ask; it may not state.
+ */
+const LEGAL_CLAIMS = [
+  /\b(?:[Ll]aws?|[Ss]tatutes?|[Rr]egulations?|Act|Code)\s+(?:requires?|mandates?|obligates?|entitles?|prohibits?|forbids?|says|states|provides|gives|guarantees?)\b/,
+  /\b(?:[Uu]nder|[Aa]ccording to|[Aa]s required by|[Pp]ursuant to|[Ii]n accordance with)\s+(?:the\s+)?(?:[A-Za-z]+\s+){0,5}(?:laws?|statutes?|regulations?|Act|Code)\b/,
+  /\b[Yy]ou\s+(?:must|are\s+(?:legally\s+)?(?:required|obligated|obliged))\b/,
+];
+function legalClaim(text: string): string | null {
+  for (const claim of LEGAL_CLAIMS) {
+    const found = claim.exec(text);
+    if (found) return found[0].slice(0, 60);
+  }
+  return null;
+}
+
 /** A greeting, what is asked, and a closing: fewer lines than that is a block of text, not a letter. */
 const MIN_LINES = 3;
 const laidOut = (text: string): boolean => text.split('\n').filter((line) => line.trim() !== '').length >= MIN_LINES;
@@ -93,6 +111,8 @@ export function parseReply(answer: string, type: LetterTypeId, language: Languag
   // It is going to be printed and signed; one unbroken block is not something to put a name under.
   if (!laidOut(template.bodyEn)) throw new TemplateRejected('wrong_shape', 'body_en');
   if (!writtenAs(ownWords(template.bodyEn), 'en')) throw new TemplateRejected('not_in_language', 'body_en');
+  const claim = legalClaim(template.bodyEn);
+  if (claim) throw new TemplateRejected('states_the_law', 'body_en', claim);
   if (template.bodyTranslated !== null) {
     if (!laidOut(template.bodyTranslated)) throw new TemplateRejected('wrong_shape', 'body_translated');
     if (!writtenAs(ownWords(template.bodyTranslated), language)) throw new TemplateRejected('not_in_language', 'body_translated');
