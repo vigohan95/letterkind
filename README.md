@@ -32,7 +32,8 @@ when an explanation is fetched:
 
 - **In the code.** `src/outbound/channel.ts` is the only file that can reach a
   model outside the browser, and it accepts a closed set of requests: a kind of
-  letter, a US state and a language, or a single glossary term. Lint rules and
+  letter, a US state and a language, or one entry of Letterkind's own glossary
+  and the language to put it into. Lint rules and
   `tests/unit/sourceBoundaries.test.ts` fail the build if any other file names
   a cloud-capable mode or opens a connection.
 - **In the browser.** `firebase.json` serves the site with a content security

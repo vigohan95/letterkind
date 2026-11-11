@@ -12,13 +12,17 @@ import { isTermId, TERM_IDS, type TermId } from '../domain/terms';
  * `allRequests` walks all of it — the tests use that to check every outbound
  * message against the full list rather than against a pattern.
  */
+
+/** The glossary is written in English, so English is never asked for. */
+export type TermLanguage = Exclude<LanguageId, 'en'>;
+
 export type OutboundRequest =
   /** What this kind of letter is and what to do about it. */
   | { purpose: 'explain'; type: LetterTypeId; state: StateId; language: LanguageId }
   /** A formal reply the reader can send, with blanks for their details. */
   | { purpose: 'reply'; type: LetterTypeId; state: StateId; language: LanguageId }
-  /** What one glossary word means. */
-  | { purpose: 'term'; term: TermId; language: LanguageId };
+  /** One entry of the glossary, put into another language. */
+  | { purpose: 'term'; term: TermId; language: TermLanguage };
 
 export type Purpose = OutboundRequest['purpose'];
 
@@ -67,6 +71,7 @@ export function parseRequest(input: unknown): OutboundRequest {
   if (purpose === 'term') {
     const { term } = record;
     if (!isTermId(term)) throw new OutboundRejected('term is not in the glossary');
+    if (language === 'en') throw new OutboundRejected('the glossary is already in English');
     return { purpose, term, language };
   }
 
@@ -93,10 +98,12 @@ export function* allRequests(): Generator<OutboundRequest> {
     }
   }
   for (const term of TERM_IDS) {
-    for (const language of LANGUAGE_IDS) yield { purpose: 'term', term, language };
+    for (const language of LANGUAGE_IDS) {
+      if (language !== 'en') yield { purpose: 'term', term, language };
+    }
   }
 }
 
 /** How many requests `allRequests` yields, worked out from the list sizes. */
 export const requestCount = (): number =>
-  2 * LETTER_TYPE_IDS.length * STATE_IDS.length * LANGUAGE_IDS.length + TERM_IDS.length * LANGUAGE_IDS.length;
+  2 * LETTER_TYPE_IDS.length * STATE_IDS.length * LANGUAGE_IDS.length + TERM_IDS.length * (LANGUAGE_IDS.length - 1);

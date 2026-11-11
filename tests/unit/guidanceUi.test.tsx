@@ -280,7 +280,7 @@ describe('the list of what left the device', () => {
   it('keeps a request the device answered apart from one that left', async () => {
     const { ledger, deps } = setup(() => Promise.resolve({ text: JSON.stringify({ term: 'x' }), ran: 'device' }));
     const term = TERM_IDS.find((id) => id === 'deductible') ?? TERM_IDS[0]!;
-    await deps.channel.send({ purpose: 'term', term, language: 'en' }).catch(() => undefined);
+    await deps.channel.send({ purpose: 'term', term, language: 'es' }).catch(() => undefined);
     const entry = ledger.entries()[0];
     const html = renderToStaticMarkup(<LedgerView ledger={ledger} t={en} />);
 

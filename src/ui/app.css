@@ -762,6 +762,24 @@ footer {
   line-height: 1.5;
 }
 
+.term-english {
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--rule);
+}
+
+.term-english h4 {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.term-english p {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
 .term-panel .fact-source {
   margin-top: 8px;
 }

@@ -4,7 +4,7 @@ import { stateName, type StateId } from '../domain/states';
 import { nameBlank } from '../domain/standIns';
 import { mark, placeholdersFor, type Placeholder } from '../domain/template';
 import { term } from '../domain/terms';
-import { parseRequest, type OutboundRequest } from './requests';
+import { parseRequest, type OutboundRequest, type TermLanguage } from './requests';
 
 /**
  * What is said to a server-side model, word for word.
@@ -15,8 +15,11 @@ import { parseRequest, type OutboundRequest } from './requests';
  * in.
  */
 
-/** Bump when the wording changes, so cached answers to the old wording are dropped. */
-export const PROMPT_VERSION = 3;
+/**
+ * Bump when the wording changes, so cached answers to the old wording are dropped.
+ * The glossary's meanings are part of the wording: change one and bump this too.
+ */
+export const PROMPT_VERSION = 4;
 
 /**
  * Where a request may run.
@@ -36,7 +39,9 @@ export function routeFor(request: OutboundRequest): Route {
     // A formal letter the reader will sign and mail. A weaker draft is worse than none.
     case 'reply':
       return 'cloud_only';
-    // One short definition: the device is enough wherever it can write the language.
+    // Putting a meaning the glossary already has into another language. The model in the browser
+    // was first asked to explain the word itself and got specialised terms wrong; translating a
+    // few sentences it is given is within its reach, wherever it can write the language.
     case 'term':
       return writableOnDevice(request.language) ? 'device_first' : 'cloud_only';
   }
@@ -209,12 +214,19 @@ function replyPrompt(type: LetterTypeId, state: StateId, language: LanguageId): 
   ].join('\n');
 }
 
-function termPrompt(id: Extract<OutboundRequest, { purpose: 'term' }>['term'], language: LanguageId): string {
+function termPrompt(id: Extract<OutboundRequest, { purpose: 'term' }>['term'], language: TermLanguage): string {
+  const entry = term(id);
+  const into = languageName(language);
   return [
-    `Explain what "${term(id).words}" means when it appears in an official letter in the United States.`,
-    `Write in: ${languageName(language)}`,
-    'At most three short sentences, in everyday words, for someone reading at a sixth-grade level.',
-    'Say what it is and what it usually means for the person who got the letter. No dollar amounts, dates, phone numbers or web addresses. Plain text only.',
+    `Translate one entry of a glossary into ${into}. The glossary explains words found in official letters in the United States to the people who receive them.`,
+    '',
+    `Term: ${entry.words}`,
+    `Meaning: ${entry.meaning}`,
+    '',
+    `Write the meaning in ${into}, in everyday words, for someone reading at a sixth-grade level.`,
+    'Say everything the English says and nothing more: no examples, advice or facts of your own.',
+    `Where you name the term, give the usual ${into} word for it and keep the English term beside it in brackets, because the letter prints it in English. Names of programs, agencies and forms stay as they are.`,
+    'Plain text only.',
   ].join('\n');
 }
 
