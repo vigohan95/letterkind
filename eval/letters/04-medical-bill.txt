@@ -1,0 +1,33 @@
+CEDAR HOLLOW FAMILY CLINIC
+Patient Billing Office
+410 Example Road, Suite 12
+Maplewood, OR 97000
+
+STATEMENT
+Statement date: November 2, 2026
+Account number: CH-208814
+Patient: Jamie R. Sample
+
+Date        Description                              Amount
+            Previous balance                         $310.00
+10/14/2026  Office visit, established patient        $142.00
+10/14/2026  Lab: basic metabolic panel                $44.50
+10/29/2026  Insurance payment - thank you           -$121.50
+
+Total balance due                                    $375.00
+Payment due date: November 23, 2026
+
+Your insurance has processed the charges above. The balance shown is your responsibility.
+
+Can't pay the full balance right now?
+You may pay in 3 monthly installments of $125.00 with no interest. Call us before the due date to set this up. Accounts with no payment 60 days after the due date may be referred to an outside collection agency.
+
+Ways to pay
+- Online at pay.cedarhollow.example with your account number
+- By phone at (503) 555-0148, Monday through Friday, 8 a.m. to 5 p.m.
+- By mail: detach the coupon below and send it with your check
+
+If you think this bill is wrong, or you would like to ask about financial assistance, call the Patient Billing Office at the number above.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - -
+Account CH-208814          Amount enclosed: $________

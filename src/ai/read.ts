@@ -3,7 +3,7 @@ import { letterType, type LetterTypeId } from '../domain/letterTypes';
 import type { PhoneMatch } from '../domain/parse/phone';
 import { applyTypeRules, type RuledFields } from '../domain/rules';
 import { verifyAmount, verifyDate, verifyPhone, verifyQuote, type Verdict } from '../domain/verify';
-import { extract, type RawFields } from './extract';
+import { extract, type ExtractOptions, type RawFields } from './extract';
 import type { Generate } from './types';
 
 /**
@@ -26,8 +26,14 @@ export interface Reading extends RuledFields {
   ms: number;
 }
 
-export async function readLetter(letter: string, type: LetterTypeId, generate: Generate, todayIso: string): Promise<Reading> {
-  const { fields, ms } = await extract(letter, letterType(type), generate);
+export async function readLetter(
+  letter: string,
+  type: LetterTypeId,
+  generate: Generate,
+  todayIso: string,
+  options: ExtractOptions = {},
+): Promise<Reading> {
+  const { fields, ms } = await extract(letter, letterType(type), generate, options);
   const ruled = applyTypeRules(type, {
     amount: verifyAmount(letter, fields?.amount),
     deadline: verifyDate(letter, fields?.deadline),

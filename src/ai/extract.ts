@@ -55,7 +55,15 @@ const DEADLINE_ASK: Record<DeadlineMeaning, string> = {
   none: 'leave this empty — this kind of letter sets no deadline for the reader',
 };
 
-export function buildExtractPrompt(letter: string, type: LetterType): string {
+export interface ExtractOptions {
+  /**
+   * Include the reading hint for this kind of letter. On by default; the
+   * evaluation page turns it off to measure what the hint is worth.
+   */
+  hint?: boolean;
+}
+
+export function buildExtractPrompt(letter: string, type: LetterType, { hint = true }: ExtractOptions = {}): string {
   return [
     'Fill in the fields from the letter below. Copy each value exactly as it is printed in the letter.',
     'If the letter does not state a value, answer with an empty string. Never work a value out, and never reword one.',
@@ -68,8 +76,7 @@ export function buildExtractPrompt(letter: string, type: LetterType): string {
     `- deadline: ${DEADLINE_ASK[type.deadline]}. Only a date printed in the letter counts; "within 30 days" is not a date.`,
     '- phone: the phone number to call about this letter.',
     '',
-    `HOW TO READ THIS KIND OF LETTER: ${type.hint}`,
-    '',
+    ...(hint ? [`HOW TO READ THIS KIND OF LETTER: ${type.hint}`, ''] : []),
     'LETTER:',
     letter.slice(0, EXTRACT_MAX_CHARS),
   ].join('\n');
@@ -98,7 +105,7 @@ export interface Extraction {
   ms: number;
 }
 
-export async function extract(letter: string, type: LetterType, generate: Generate): Promise<Extraction> {
-  const { text, ms } = await generate(buildExtractPrompt(letter, type));
+export async function extract(letter: string, type: LetterType, generate: Generate, options: ExtractOptions = {}): Promise<Extraction> {
+  const { text, ms } = await generate(buildExtractPrompt(letter, type, options));
   return { fields: parseExtraction(text), ms };
 }

@@ -1,0 +1,34 @@
+CLÍNICA FAMILIAR LAS LOMAS
+Oficina de Facturación
+1840 Example Avenida Central, Suite 3
+
+ESTADO DE CUENTA
+
+Fecha del estado de cuenta: 3 de noviembre de 2026
+Número de cuenta: LL-338201
+Paciente: Rosa E. Sample
+
+Estimada paciente:
+
+Su seguro médico ya procesó los cargos de su visita. El saldo que aparece abajo es la parte que le corresponde pagar a usted.
+
+Fecha de servicio: 9 de octubre de 2026
+Descripción                               Importe
+Consulta médica                           $280.00
+Análisis de laboratorio                   $140.00
+Total de cargos                           $420.00
+Pago del seguro                          -$265.00
+Ajuste por contrato con el seguro         -$35.00
+
+SALDO PENDIENTE                           $120.00
+Fecha límite de pago: 24 de noviembre de 2026
+
+Si no puede pagar el saldo completo
+Llámenos antes de la fecha límite. Podemos ofrecerle un plan de dos pagos mensuales de $60.00 sin intereses, o revisar si usted califica para nuestro programa de ayuda financiera. Las cuentas sin pago después de 90 días pueden enviarse a una agencia de cobranza.
+
+Cómo pagar
+- En línea: pagos.laslomas.example, con su número de cuenta
+- Por teléfono: (213) 555-0161, de lunes a viernes, de 8 a.m. a 5 p.m. Hablamos español.
+- Por correo: envíe un cheque a nombre de Clínica Familiar Las Lomas junto con el talón de abajo
+
+Si cree que esta cuenta tiene un error, o si su seguro cambió, llame a la Oficina de Facturación al número de arriba.

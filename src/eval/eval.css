@@ -1,0 +1,180 @@
+.eval .masthead p {
+  max-width: 72ch;
+}
+
+.eval .build {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font: 0.85rem var(--mono);
+}
+
+.eval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 16px 0 8px;
+}
+
+.eval-actions .download {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.eval-actions .progress {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.eval h2 {
+  margin: 36px 0 10px;
+  font-size: 1.15rem;
+  letter-spacing: -0.005em;
+}
+
+.eval .about ul {
+  max-width: 72ch;
+  padding-left: 1.2em;
+  color: var(--ink-soft);
+}
+
+.eval .about li + li {
+  margin-top: 8px;
+}
+
+.eval .note {
+  max-width: 78ch;
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.eval .partial {
+  margin: 20px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--warn);
+  border-radius: 8px;
+  color: var(--warn);
+  font-size: 0.92rem;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+
+.tile-value {
+  font-size: 2rem;
+  font-weight: 650;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.tile-of {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.tile-label {
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.eval .scroll {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+
+.eval table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.eval th,
+.eval td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--rule);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.eval tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.eval thead th {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: normal;
+  vertical-align: bottom;
+}
+
+.eval thead th[colspan] {
+  text-align: center;
+  color: var(--ink);
+}
+
+.eval th:first-child,
+.eval td:first-child {
+  text-align: left;
+}
+
+.eval tbody th {
+  font-weight: 500;
+  white-space: normal;
+}
+
+.eval .group {
+  border-left: 1px solid var(--rule);
+}
+
+.eval tr.total > * {
+  font-weight: 650;
+}
+
+.eval .sub {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.eval .bad {
+  color: var(--warn);
+  font-weight: 650;
+}
+
+.eval table.letters td {
+  text-align: center;
+}
+
+.eval table.letters tbody th {
+  font: 0.82rem var(--mono);
+  white-space: nowrap;
+}
+
+.eval .pair {
+  display: inline-flex;
+  gap: 5px;
+  align-items: baseline;
+}
+
+.eval .arrow {
+  color: var(--ink-soft);
+  font-size: 0.8em;
+}

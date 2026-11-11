@@ -14,3 +14,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** Short hash of the commit this build was made from (with `-dirty` if there were uncommitted changes); set in vite.config.ts. */
+declare const __BUILD_COMMIT__: string;
