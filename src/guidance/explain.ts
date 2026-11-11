@@ -21,14 +21,14 @@ export type Guidance =
       status: 'ready';
       template: ExplainTemplate;
       /** `saved`: read back from this device; nothing was sent this time. */
-      from: 'cloud' | 'device' | 'saved';
+      from: 'cloud' | 'saved';
       /** When the template was written, ISO 8601. */
       at: string;
       /** The ledger entry for the request; null when nothing was asked. */
       entry: LedgerEntry | null;
     }
   /** An answer came back and broke a rule. Nothing from it is shown. */
-  | { status: 'rejected'; reason: RejectReason; field: string; found: string; ran: 'cloud' | 'device'; entry: LedgerEntry }
+  | { status: 'rejected'; reason: RejectReason; field: string; found: string; entry: LedgerEntry }
   /** No answer could be had: no connection, no model, or the service refused. */
   | { status: 'unavailable'; error: string };
 
@@ -79,16 +79,13 @@ export async function explain(request: ExplainRequest, { channel, store }: Expla
     template = parseExplain(answer.text, request.type, request.language);
   } catch (error) {
     if (!(error instanceof TemplateRejected)) throw error;
-    return { status: 'rejected', reason: error.reason, field: error.field, found: error.found, ran: answer.ran, entry: answer.entry };
+    return { status: 'rejected', reason: error.reason, field: error.field, found: error.found, entry: answer.entry };
   }
 
-  // Only the cloud model's work is kept. What the device wrote as a stand-by is replaced when the cloud can be reached.
-  if (answer.ran === 'cloud') {
-    try {
-      await store.put(templateKey(request), { text: answer.text, at: answer.entry.at });
-    } catch {
-      // Not being able to keep a template is no reason to withhold it.
-    }
+  try {
+    await store.put(templateKey(request), { text: answer.text, at: answer.entry.at });
+  } catch {
+    // Not being able to keep a template is no reason to withhold it.
   }
-  return { status: 'ready', template, from: answer.ran, at: answer.entry.at, entry: answer.entry };
+  return { status: 'ready', template, from: 'cloud', at: answer.entry.at, entry: answer.entry };
 }

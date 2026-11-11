@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import type { FieldName } from '../ai/extract';
 import type { Reading } from '../ai/read';
-import { LANGUAGES, type LanguageId, languageName, writableOnDevice } from '../domain/languages';
+import { LANGUAGES, type LanguageId } from '../domain/languages';
 import { standInsFor } from '../domain/standIns';
 import { STATES, type StateId } from '../domain/states';
 import { fill, type Placeholder, type StandIn, type Values } from '../domain/template';
@@ -105,9 +105,7 @@ export function GuidanceReady({ guidance, reading, language, onForget, t }: Guid
       <p className="fact-source" data-from={from}>
         {from === 'cloud' && entry
           ? t.guidance.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes)
-          : from === 'saved'
-            ? t.guidance.fromSaved(day.format(new Date(guidance.at)))
-            : t.guidance.fromDevice}
+          : t.guidance.fromSaved(day.format(new Date(guidance.at)))}
       </p>
       {from === 'saved' && onForget && (
         <p className="guidance-actions">
@@ -168,7 +166,6 @@ export function GuidanceBody({ status, reading, prefs, onAsk, onForget, t }: Gui
         <>
           <h3>{t.guidance.unavailableHeading}</h3>
           <p>{t.guidance.unavailableBody}</p>
-          {!writableOnDevice(prefs.language) && <p>{t.guidance.unavailableLanguage(languageName(prefs.language))}</p>}
           <p className="fact-source">{guidance.error}</p>
         </>
       )}

@@ -159,7 +159,6 @@ export const en = {
     fromCloud: (model: string, ms: number, bytes: number) =>
       `Written by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes, none of them from your letter. Kept on this device for next time.`,
     fromSaved: (day: string) => `Kept on this device since ${day}. Nothing was sent this time.`,
-    fromDevice: 'Written by the on-device model, because the cloud could not be reached. It is not kept.',
     forget: 'Forget kept explanations',
     rejectedHeading: 'The explanation was thrown away',
     rejectedBody: 'An answer came back, but it broke one of Letterkind’s rules, so none of it is shown.',
@@ -180,7 +179,6 @@ export const en = {
     unavailableHeading: 'No explanation could be fetched',
     unavailableBody:
       'The first explanation of each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',
-    unavailableLanguage: (language: string) => `An explanation in ${language} can only be written in the cloud.`,
   },
 
   ledger: {

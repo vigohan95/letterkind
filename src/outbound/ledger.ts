@@ -52,8 +52,8 @@ export const byteLength = (value: string): number => new TextEncoder().encode(va
 export function leftDevice(route: Route, ran: Ran): Left {
   if (ran === 'cloud') return 'sent';
   if (ran === 'device' && route === 'device_first') return 'stayed';
-  // Answered on the device after the cloud was tried first, or not answered at all:
-  // the request may have reached the network, so it is not counted as having stayed.
+  // Not answered at all: the request may have reached the network, so it is not
+  // counted as having stayed.
   return 'attempted';
 }
 

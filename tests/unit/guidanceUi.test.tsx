@@ -201,16 +201,13 @@ describe('the guidance panel', () => {
     expect(html).not.toMatch(/Compare la factura|agencia de cobros|guidance-text/);
   });
 
-  it('says plainly when no explanation could be had, and why a language needs the cloud', async () => {
+  it('says plainly when no explanation could be had, and offers nothing written on the device in its place', async () => {
     const { deps } = setup(offline);
-    const reading = await read(truthful);
-    const inSpanish = body(await explain(request, deps), reading);
-    expect(inSpanish).toContain(en.guidance.unavailableHeading);
-    expect(inSpanish).toContain('Failed to reach the service.');
-    expect(inSpanish).not.toContain('can only be written in the cloud');
-
-    const inKorean = body(await explain({ ...request, language: 'ko' }, deps), reading, { state: 'CA', language: 'ko' });
-    expect(inKorean).toContain('An explanation in Korean can only be written in the cloud.');
+    const html = body(await explain(request, deps), await read(truthful));
+    expect(html).toContain(en.guidance.unavailableHeading);
+    expect(html).toContain(en.guidance.unavailableBody);
+    expect(html).toContain('Failed to reach the service.');
+    expect(html).not.toContain('on-device model');
   });
 });
 

@@ -24,6 +24,13 @@ import type { OutboundRequest } from './requests';
 /** The server-side model that writes templates. */
 export const CLOUD_MODEL = 'gemini-3.5-flash-lite';
 
+/**
+ * How long one request to the cloud may take, in milliseconds. The SDK's own
+ * limit is three minutes, and a server in trouble has been seen to use nearly
+ * all of it before answering 503. Answers that do come take 2 to 15 seconds.
+ */
+export const CLOUD_TIMEOUT_MS = 25_000;
+
 /** How long to wait before asking the cloud a second time, in milliseconds. */
 const RETRY_AFTER_MS = 1500;
 
@@ -78,6 +85,11 @@ export function createChannel({ transport, ledger, now = () => new Date(), clock
         record('nowhere', error instanceof Error ? error.message : String(error));
         throw error;
       }
+      if (prepared.route === 'cloud_only' && delivery.ran !== 'cloud') {
+        const error = new Error('An answer came from the device to a request only the cloud may answer.');
+        record('nowhere', error.message);
+        throw error;
+      }
       const entry = record(delivery.ran, null);
       return { ...delivery, ms: entry.ms, entry };
     },
@@ -103,12 +115,11 @@ function statusOf(error: unknown): number | undefined {
  * and not inside the SDK.
  *
  *  - `device_first`: the model in the browser; the cloud only if that fails.
- *  - `cloud_first`:  the cloud; the model in the browser if the cloud fails.
  *  - `cloud_only`:   the cloud, and nothing else.
  *
- * A cloud request that fails with a server error is put once more before
- * giving up on the cloud: the model in the browser is far slower and writes
- * worse, so one short wait is the better first resort.
+ * A cloud request that fails with a server error is put once more after a
+ * short wait. Nothing is ever handed from the cloud to the model in the
+ * browser: what that model cannot be trusted to write, it is not asked for.
  */
 export async function carry(route: Route, { device, cloud, pause }: Ways): Promise<Delivery> {
   if (route === 'device_first') {
@@ -118,26 +129,17 @@ export async function carry(route: Route, { device, cloud, pause }: Ways): Promi
       // The model in the browser could not write this. The request goes out instead, and the ledger says so.
     }
   }
-  let failure: unknown;
   try {
     return { text: await cloud(), ran: 'cloud' };
-  } catch (error) {
-    failure = error;
-  }
-  if ((statusOf(failure) ?? 0) >= 500) {
+  } catch (failure) {
+    if ((statusOf(failure) ?? 0) < 500) throw failure;
     await pause(RETRY_AFTER_MS);
     try {
       return { text: await cloud(), ran: 'cloud' };
     } catch {
       // The first failure is the one reported.
+      throw failure;
     }
-  }
-  if (route !== 'cloud_first') throw failure;
-  try {
-    return { text: await device(), ran: 'device' };
-  } catch {
-    // Neither could answer. What the cloud said is the more useful thing to show.
-    throw failure;
   }
 }
 
@@ -167,6 +169,7 @@ function modelFor({ request, schema }: Prepared, where: 'device' | 'cloud'): Gen
               generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema },
             },
           },
+      where === 'device' ? undefined : { timeout: CLOUD_TIMEOUT_MS },
     );
     models.set(key, model);
   }

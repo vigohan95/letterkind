@@ -41,10 +41,6 @@ const cloud =
   (text: string): Transport =>
   () =>
     Promise.resolve({ text, ran: 'cloud' });
-const device =
-  (text: string): Transport =>
-  () =>
-    Promise.resolve({ text, ran: 'device' });
 const offline: Transport = () => Promise.reject(new Error('Failed to reach the service.'));
 
 describe('asking for an explanation', () => {
@@ -93,21 +89,10 @@ describe('asking for an explanation', () => {
     const { deps, ledger, store } = setup(cloud(withItsOwnPhone));
     const result = await explain(request, deps);
 
-    expect(result).toMatchObject({ status: 'rejected', reason: 'phone', field: 'if_ignored', ran: 'cloud' });
+    expect(result).toMatchObject({ status: 'rejected', reason: 'phone', field: 'if_ignored' });
     if (result.status === 'rejected') expect(result.entry).toBe(ledger.entries()[0]);
     expect(await store.get(templateKey(request))).toBeNull();
     expect(JSON.stringify(result)).not.toContain('Compare la factura');
-  });
-
-  it('uses a template the device wrote, but does not keep it in place of the cloud’s', async () => {
-    const store = memoryStore();
-    const first = await explain(request, setup(device(good), store).deps);
-    expect(first).toMatchObject({ status: 'ready', from: 'device' });
-    expect(await store.get(templateKey(request))).toBeNull();
-
-    const second = setup(cloud(good), store);
-    expect(await explain(request, second.deps)).toMatchObject({ status: 'ready', from: 'cloud' });
-    expect(second.calls()).toBe(1);
   });
 
   it('says so when no answer can be had, and writes the attempt down', async () => {

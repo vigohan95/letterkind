@@ -19,18 +19,19 @@ export const PROMPT_VERSION = 1;
 
 /**
  * Where a request may run.
- *  - `cloud_first`:  the cloud writes it; if the cloud cannot be reached, the device may.
  *  - `cloud_only`:   the cloud writes it or nobody does.
  *  - `device_first`: the device writes it; the cloud only if the device cannot.
  */
-export type Route = 'cloud_first' | 'cloud_only' | 'device_first';
+export type Route = 'cloud_only' | 'device_first';
 
 export function routeFor(request: OutboundRequest): Route {
   switch (request.purpose) {
-    // General knowledge about a kind of letter: the cloud writes it better and in more
-    // languages. Offline, the device can still write a shorter one in a language it knows.
+    // General knowledge about a kind of letter. The model in the browser was tried as a
+    // stand-by for when the cloud fails, and dropped: on the hosted site it took 46 to 100
+    // seconds, two of its three answers broke the template rules, and the one that passed
+    // stated a deadline in state law that does not exist. No explanation is better than that.
     case 'explain':
-      return writableOnDevice(request.language) ? 'cloud_first' : 'cloud_only';
+      return 'cloud_only';
     // A formal letter the reader will sign and mail. A weaker draft is worse than none.
     case 'reply':
       return 'cloud_only';

@@ -99,6 +99,16 @@ describe('source boundaries', () => {
     expect(channel.indexOf("modelFor(prepared, 'cloud')")).toBeGreaterThan(calls[0]!.index);
   });
 
+  it('gives every request to the cloud a time limit far shorter than the SDK’s three minutes', async () => {
+    // Seen on the hosted site: a request that hung for 178 seconds before the server gave up.
+    const { CLOUD_TIMEOUT_MS } = await import('../../src/outbound/channel');
+    expect(CLOUD_TIMEOUT_MS).toBeGreaterThanOrEqual(15_000);
+    expect(CLOUD_TIMEOUT_MS).toBeLessThanOrEqual(30_000);
+    const channel = files.find((f) => f.path === CHANNEL)!.text;
+    expect(channel.match(/getGenerativeModel\(/g)).toHaveLength(1);
+    expect(channel).toContain("where === 'device' ? undefined : { timeout: CLOUD_TIMEOUT_MS },");
+  });
+
   it('never takes the build environment as a whole, only named values from it', () => {
     // `import.meta.env` used as an object is replaced by every VITE_ value at build time.
     const offenders = files.filter((f) => /import\.meta\.env(?!\.[A-Z_]+\b)/.test(f.text)).map((f) => f.path);
