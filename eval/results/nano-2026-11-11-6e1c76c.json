@@ -1,0 +1,4200 @@
+{
+  "schema": 1,
+  "app": "letterkind",
+  "commit": "6e1c76c",
+  "startedAt": "2026-11-11T11:52:41.089Z",
+  "finishedAt": "2026-11-11T12:06:57.649Z",
+  "setSize": 20,
+  "model": {
+    "name": "Gemini Nano (Chrome built-in model), on-device only, through Firebase AI Logic",
+    "status": "ready"
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "platform": "Windows",
+    "platformVersion": "15.0.0",
+    "architecture": "x86",
+    "browser": "Google Chrome 157.0.8103.40",
+    "logicalCores": 16,
+    "deviceMemoryGb": 32,
+    "gpu": "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "summary": {
+    "letters": 20,
+    "classification": {
+      "model": {
+        "right": 20,
+        "wrong": 0
+      },
+      "keywords": {
+        "right": 18,
+        "wrong": 0,
+        "none": 2
+      },
+      "combined": {
+        "right": 20,
+        "wrong": 0,
+        "asked": 0
+      },
+      "askedWithAnswer": 0,
+      "ms": {
+        "median": 8159,
+        "max": 8730
+      }
+    },
+    "variants": {
+      "full": {
+        "fields": {
+          "sender": {
+            "alone": {
+              "right": 18,
+              "blank": 0,
+              "wrong": 2,
+              "missed": 0
+            },
+            "final": {
+              "right": 18,
+              "blank": 0,
+              "wrong": 2,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "reference": {
+            "alone": {
+              "right": 17,
+              "blank": 0,
+              "wrong": 3,
+              "missed": 0
+            },
+            "final": {
+              "right": 17,
+              "blank": 1,
+              "wrong": 2,
+              "missed": 0
+            },
+            "caughtByVerify": 1,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "amount": {
+            "alone": {
+              "right": 12,
+              "blank": 7,
+              "wrong": 1,
+              "missed": 0
+            },
+            "final": {
+              "right": 12,
+              "blank": 8,
+              "wrong": 0,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 1,
+            "lost": 0
+          },
+          "deadline": {
+            "alone": {
+              "right": 15,
+              "blank": 1,
+              "wrong": 4,
+              "missed": 0
+            },
+            "final": {
+              "right": 15,
+              "blank": 3,
+              "wrong": 2,
+              "missed": 0
+            },
+            "caughtByVerify": 2,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "phone": {
+            "alone": {
+              "right": 20,
+              "blank": 0,
+              "wrong": 0,
+              "missed": 0
+            },
+            "final": {
+              "right": 20,
+              "blank": 0,
+              "wrong": 0,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          }
+        },
+        "total": {
+          "alone": {
+            "right": 82,
+            "blank": 8,
+            "wrong": 10,
+            "missed": 0
+          },
+          "final": {
+            "right": 82,
+            "blank": 12,
+            "wrong": 6,
+            "missed": 0
+          },
+          "caughtByVerify": 3,
+          "caughtByRules": 1,
+          "lost": 0
+        },
+        "ms": {
+          "median": 11364,
+          "max": 14171
+        }
+      },
+      "no_hint": {
+        "fields": {
+          "sender": {
+            "alone": {
+              "right": 16,
+              "blank": 0,
+              "wrong": 4,
+              "missed": 0
+            },
+            "final": {
+              "right": 16,
+              "blank": 0,
+              "wrong": 4,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "reference": {
+            "alone": {
+              "right": 19,
+              "blank": 0,
+              "wrong": 1,
+              "missed": 0
+            },
+            "final": {
+              "right": 19,
+              "blank": 0,
+              "wrong": 1,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "amount": {
+            "alone": {
+              "right": 12,
+              "blank": 6,
+              "wrong": 2,
+              "missed": 0
+            },
+            "final": {
+              "right": 12,
+              "blank": 8,
+              "wrong": 0,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 2,
+            "lost": 0
+          },
+          "deadline": {
+            "alone": {
+              "right": 16,
+              "blank": 1,
+              "wrong": 3,
+              "missed": 0
+            },
+            "final": {
+              "right": 16,
+              "blank": 3,
+              "wrong": 1,
+              "missed": 0
+            },
+            "caughtByVerify": 2,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "phone": {
+            "alone": {
+              "right": 20,
+              "blank": 0,
+              "wrong": 0,
+              "missed": 0
+            },
+            "final": {
+              "right": 20,
+              "blank": 0,
+              "wrong": 0,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          }
+        },
+        "total": {
+          "alone": {
+            "right": 83,
+            "blank": 7,
+            "wrong": 10,
+            "missed": 0
+          },
+          "final": {
+            "right": 83,
+            "blank": 11,
+            "wrong": 6,
+            "missed": 0
+          },
+          "caughtByVerify": 2,
+          "caughtByRules": 2,
+          "lost": 0
+        },
+        "ms": {
+          "median": 11023,
+          "max": 13473
+        }
+      },
+      "untyped": {
+        "fields": {
+          "sender": {
+            "alone": {
+              "right": 15,
+              "blank": 0,
+              "wrong": 5,
+              "missed": 0
+            },
+            "final": {
+              "right": 15,
+              "blank": 0,
+              "wrong": 5,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "reference": {
+            "alone": {
+              "right": 18,
+              "blank": 0,
+              "wrong": 2,
+              "missed": 0
+            },
+            "final": {
+              "right": 18,
+              "blank": 0,
+              "wrong": 1,
+              "missed": 1
+            },
+            "caughtByVerify": 1,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "amount": {
+            "alone": {
+              "right": 11,
+              "blank": 2,
+              "wrong": 7,
+              "missed": 0
+            },
+            "final": {
+              "right": 11,
+              "blank": 2,
+              "wrong": 7,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "deadline": {
+            "alone": {
+              "right": 14,
+              "blank": 1,
+              "wrong": 5,
+              "missed": 0
+            },
+            "final": {
+              "right": 14,
+              "blank": 3,
+              "wrong": 3,
+              "missed": 0
+            },
+            "caughtByVerify": 2,
+            "caughtByRules": 0,
+            "lost": 0
+          },
+          "phone": {
+            "alone": {
+              "right": 20,
+              "blank": 0,
+              "wrong": 0,
+              "missed": 0
+            },
+            "final": {
+              "right": 20,
+              "blank": 0,
+              "wrong": 0,
+              "missed": 0
+            },
+            "caughtByVerify": 0,
+            "caughtByRules": 0,
+            "lost": 0
+          }
+        },
+        "total": {
+          "alone": {
+            "right": 78,
+            "blank": 3,
+            "wrong": 19,
+            "missed": 0
+          },
+          "final": {
+            "right": 78,
+            "blank": 5,
+            "wrong": 16,
+            "missed": 1
+          },
+          "caughtByVerify": 3,
+          "caughtByRules": 0,
+          "lost": 0
+        },
+        "ms": {
+          "median": 11497,
+          "max": 14144
+        }
+      }
+    }
+  },
+  "letters": [
+    {
+      "file": "01-tax-balance-due.txt",
+      "truth": "tax_balance_due",
+      "classification": {
+        "model": "tax_balance_due",
+        "keywords": "tax_balance_due",
+        "type": "tax_balance_due",
+        "candidates": [],
+        "ms": 8140
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "tax_balance_due",
+      "variants": {
+        "full": {
+          "type": "tax_balance_due",
+          "raw": {
+            "sender": "Department of the Treasury\nInternal Revenue Service",
+            "reference": "Notice CP14",
+            "amount": "$1,318.42",
+            "deadline": "November 9, 2026",
+            "phone": "1-800-555-0137"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of the Treasury\nInternal Revenue Service",
+            "reference": "Notice CP14",
+            "amount": "$1,318.42",
+            "deadline": "November 9, 2026",
+            "phone": "1-800-555-0137"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11626
+        },
+        "no_hint": {
+          "type": "tax_balance_due",
+          "raw": {
+            "sender": "Department of the Treasury Internal Revenue Service",
+            "reference": "Notice CP14",
+            "amount": "$1,318.42",
+            "deadline": "November 9, 2026",
+            "phone": "1-800-555-0137"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of the Treasury\nInternal Revenue Service",
+            "reference": "Notice CP14",
+            "amount": "$1,318.42",
+            "deadline": "November 9, 2026",
+            "phone": "1-800-555-0137"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11274
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "Department of the Treasury\nInternal Revenue Service\nOgden, UT 84201-0030",
+            "reference": "Notice CP14",
+            "amount": "$1,318.42",
+            "deadline": "November 9, 2026",
+            "phone": "1-800-555-0137"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of the Treasury\nInternal Revenue Service\nOgden, UT 84201-0030",
+            "reference": "Notice CP14",
+            "amount": "$1,318.42",
+            "deadline": "November 9, 2026",
+            "phone": "1-800-555-0137"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 14097
+        }
+      }
+    },
+    {
+      "file": "02-tax-proposed-change.txt",
+      "truth": "tax_proposed_change",
+      "classification": {
+        "model": "tax_proposed_change",
+        "keywords": "tax_proposed_change",
+        "type": "tax_proposed_change",
+        "candidates": [],
+        "ms": 8508
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "tax_proposed_change",
+      "variants": {
+        "full": {
+          "type": "tax_proposed_change",
+          "raw": {
+            "sender": "STATE DEPARTMENT OF REVENUE",
+            "reference": "L0048812736",
+            "amount": "$640.40",
+            "deadline": "December 3, 2026",
+            "phone": "(617) 555-0164"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "STATE DEPARTMENT OF REVENUE",
+            "reference": "L0048812736",
+            "amount": "$640.40",
+            "deadline": "December 3, 2026",
+            "phone": "(617) 555-0164"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11650
+        },
+        "no_hint": {
+          "type": "tax_proposed_change",
+          "raw": {
+            "sender": "STATE DEPARTMENT OF REVENUE",
+            "reference": "L0048812736",
+            "amount": "$640.40",
+            "deadline": "December 3, 2026",
+            "phone": "(617) 555-0164"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "STATE DEPARTMENT OF REVENUE",
+            "reference": "L0048812736",
+            "amount": "$640.40",
+            "deadline": "December 3, 2026",
+            "phone": "(617) 555-0164"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12759
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "STATE DEPARTMENT OF REVENUE",
+            "reference": "L0048812736",
+            "amount": "$640.40",
+            "deadline": "December 3, 2026",
+            "phone": "(617) 555-0164"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "STATE DEPARTMENT OF REVENUE",
+            "reference": "L0048812736",
+            "amount": "$640.40",
+            "deadline": "December 3, 2026",
+            "phone": "(617) 555-0164"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11150
+        }
+      }
+    },
+    {
+      "file": "03-tax-identity-verification.txt",
+      "truth": "tax_identity_verification",
+      "classification": {
+        "model": "tax_identity_verification",
+        "keywords": "tax_identity_verification",
+        "type": "tax_identity_verification",
+        "candidates": [],
+        "ms": 8489
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "tax_identity_verification",
+      "variants": {
+        "full": {
+          "type": "tax_identity_verification",
+          "raw": {
+            "sender": "Department of the Treasury\nInternal Revenue Service",
+            "reference": "Letter 5071C",
+            "amount": "$2,184.00",
+            "deadline": "within 30 days",
+            "phone": "1-800-555-0119"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "unverified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of the Treasury\nInternal Revenue Service",
+            "reference": "Letter 5071C",
+            "amount": null,
+            "deadline": null,
+            "phone": "1-800-555-0119"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "rules",
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11336
+        },
+        "no_hint": {
+          "type": "tax_identity_verification",
+          "raw": {
+            "sender": "Department of the Treasury",
+            "reference": "Letter 5071C",
+            "amount": "$2,184.00",
+            "deadline": "within 30 days",
+            "phone": "1-800-555-0119"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "unverified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of the Treasury",
+            "reference": "Letter 5071C",
+            "amount": null,
+            "deadline": null,
+            "phone": "1-800-555-0119"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "rules",
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11003
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "Department of the Treasury\nInternal Revenue Service\nKansas City, MO 64999-0025",
+            "reference": "Letter FIFTY-SEVEN C",
+            "amount": "$2,184.00",
+            "deadline": "30 days",
+            "phone": "1-800-555-0119"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "unverified",
+            "amount": "verified",
+            "deadline": "unverified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of the Treasury\nInternal Revenue Service\nKansas City, MO 64999-0025",
+            "reference": null,
+            "amount": "$2,184.00",
+            "deadline": null,
+            "phone": "1-800-555-0119"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "wrong",
+              "final": "missed",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 14144
+        }
+      }
+    },
+    {
+      "file": "04-medical-bill.txt",
+      "truth": "medical_bill",
+      "classification": {
+        "model": "medical_bill",
+        "keywords": null,
+        "type": "medical_bill",
+        "candidates": [],
+        "ms": 8014
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "none",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "medical_bill",
+      "variants": {
+        "full": {
+          "type": "medical_bill",
+          "raw": {
+            "sender": "CEDAR HOLLOW FAMILY CLINIC",
+            "reference": "CH-208814",
+            "amount": "$375.00",
+            "deadline": "November 23, 2026",
+            "phone": "(503) 555-0148"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CEDAR HOLLOW FAMILY CLINIC",
+            "reference": "CH-208814",
+            "amount": "$375.00",
+            "deadline": "November 23, 2026",
+            "phone": "(503) 555-0148"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11377
+        },
+        "no_hint": {
+          "type": "medical_bill",
+          "raw": {
+            "sender": "CEDAR HOLLOW FAMILY CLINIC",
+            "reference": "CH-208814",
+            "amount": "$375.00",
+            "deadline": "November 23, 2026",
+            "phone": "(503) 555-0148"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CEDAR HOLLOW FAMILY CLINIC",
+            "reference": "CH-208814",
+            "amount": "$375.00",
+            "deadline": "November 23, 2026",
+            "phone": "(503) 555-0148"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12600
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "CEDAR HOLLOW FAMILY CLINIC",
+            "reference": "CH-208814",
+            "amount": "$375.00",
+            "deadline": "November 23, 2026",
+            "phone": "(503) 555-0148"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CEDAR HOLLOW FAMILY CLINIC",
+            "reference": "CH-208814",
+            "amount": "$375.00",
+            "deadline": "November 23, 2026",
+            "phone": "(503) 555-0148"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10924
+        }
+      }
+    },
+    {
+      "file": "05-insurance-eob.txt",
+      "truth": "insurance_eob",
+      "classification": {
+        "model": "insurance_eob",
+        "keywords": "insurance_eob",
+        "type": "insurance_eob",
+        "candidates": [],
+        "ms": 8022
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "insurance_eob",
+      "variants": {
+        "full": {
+          "type": "insurance_eob",
+          "raw": {
+            "sender": "HARBORVIEW MUTUAL HEALTH",
+            "reference": "2026-1187-4402",
+            "amount": "",
+            "deadline": "",
+            "phone": "1-800-555-0172"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "not_applicable",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "HARBORVIEW MUTUAL HEALTH",
+            "reference": "2026-1187-4402",
+            "amount": null,
+            "deadline": null,
+            "phone": "1-800-555-0172"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10041
+        },
+        "no_hint": {
+          "type": "insurance_eob",
+          "raw": {
+            "sender": "HARBORVIEW MUTUAL HEALTH",
+            "reference": "2026-1187-4402",
+            "amount": "$1,240.00",
+            "deadline": "",
+            "phone": "1-800-555-0172"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "not_applicable",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "HARBORVIEW MUTUAL HEALTH",
+            "reference": "2026-1187-4402",
+            "amount": null,
+            "deadline": null,
+            "phone": "1-800-555-0172"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "rules",
+              "lost": false
+            },
+            "deadline": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10601
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "HARBORVIEW MUTUAL HEALTH",
+            "reference": "2026-1187-4402",
+            "amount": "$145.60",
+            "deadline": "",
+            "phone": "1-800-555-0172"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "absent",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "HARBORVIEW MUTUAL HEALTH",
+            "reference": "2026-1187-4402",
+            "amount": "$145.60",
+            "deadline": null,
+            "phone": "1-800-555-0172"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10508
+        }
+      }
+    },
+    {
+      "file": "06-insurance-denial.txt",
+      "truth": "insurance_denial",
+      "classification": {
+        "model": "insurance_denial",
+        "keywords": "insurance_denial",
+        "type": "insurance_denial",
+        "candidates": [],
+        "ms": 8647
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "insurance_denial",
+      "variants": {
+        "full": {
+          "type": "insurance_denial",
+          "raw": {
+            "sender": "PINECREST HEALTH PLAN",
+            "reference": "PA-7741903",
+            "amount": "",
+            "deadline": "April 14, 2027",
+            "phone": "1-888-555-0126"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "PINECREST HEALTH PLAN",
+            "reference": "PA-7741903",
+            "amount": null,
+            "deadline": "April 14, 2027",
+            "phone": "1-888-555-0126"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10629
+        },
+        "no_hint": {
+          "type": "insurance_denial",
+          "raw": {
+            "sender": "PINECREST HEALTH PLAN Utilization Management Department",
+            "reference": "PA-7741903",
+            "amount": "",
+            "deadline": "April 14, 2027",
+            "phone": "1-888-555-0126"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "PINECREST HEALTH PLAN\nUtilization Management Department",
+            "reference": "PA-7741903",
+            "amount": null,
+            "deadline": "April 14, 2027",
+            "phone": "1-888-555-0126"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10656
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "PINECREST HEALTH PLAN Utilization Management Department",
+            "reference": "PA-7741903",
+            "amount": "$2,300.00",
+            "deadline": "April 14, 2027",
+            "phone": "1-888-555-0126"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "PINECREST HEALTH PLAN\nUtilization Management Department",
+            "reference": "PA-7741903",
+            "amount": "$2,300.00",
+            "deadline": "April 14, 2027",
+            "phone": "1-888-555-0126"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11690
+        }
+      }
+    },
+    {
+      "file": "07-utility-bill.txt",
+      "truth": "utility_bill",
+      "classification": {
+        "model": "utility_bill",
+        "keywords": "utility_bill",
+        "type": "utility_bill",
+        "candidates": [],
+        "ms": 7759
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "utility_bill",
+      "variants": {
+        "full": {
+          "type": "utility_bill",
+          "raw": {
+            "sender": "TRI-VALLEY WATER & POWER",
+            "reference": "4471-208-336",
+            "amount": "$115.77",
+            "deadline": "November 25, 2026",
+            "phone": "(925) 555-0190"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "TRI-VALLEY WATER & POWER",
+            "reference": "4471-208-336",
+            "amount": "$115.77",
+            "deadline": "November 25, 2026",
+            "phone": "(925) 555-0190"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11344
+        },
+        "no_hint": {
+          "type": "utility_bill",
+          "raw": {
+            "sender": "TRI-VALLEY WATER & POWER",
+            "reference": "4471-208-336",
+            "amount": "115.77",
+            "deadline": "November 25, 2026",
+            "phone": "(925) 555-0190"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "TRI-VALLEY WATER & POWER",
+            "reference": "4471-208-336",
+            "amount": "$115.77",
+            "deadline": "November 25, 2026",
+            "phone": "(925) 555-0190"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10905
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "TRI-VALLEY WATER & POWER",
+            "reference": "4471-208-336",
+            "amount": "$115.77",
+            "deadline": "November 25, 2026",
+            "phone": "(925) 555-0190"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "TRI-VALLEY WATER & POWER",
+            "reference": "4471-208-336",
+            "amount": "$115.77",
+            "deadline": "November 25, 2026",
+            "phone": "(925) 555-0190"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10826
+        }
+      }
+    },
+    {
+      "file": "08-utility-shutoff.txt",
+      "truth": "utility_shutoff",
+      "classification": {
+        "model": "utility_shutoff",
+        "keywords": "utility_shutoff",
+        "type": "utility_shutoff",
+        "candidates": [],
+        "ms": 7904
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "utility_shutoff",
+      "variants": {
+        "full": {
+          "type": "utility_shutoff",
+          "raw": {
+            "sender": "GRANITE STATE GAS COMPANY",
+            "reference": "77-0142-9",
+            "amount": "$236.48",
+            "deadline": "November 19, 2026",
+            "phone": "1-800-555-0105"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "GRANITE STATE GAS COMPANY",
+            "reference": "77-0142-9",
+            "amount": "$236.48",
+            "deadline": "November 19, 2026",
+            "phone": "1-800-555-0105"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11162
+        },
+        "no_hint": {
+          "type": "utility_shutoff",
+          "raw": {
+            "sender": "GRANITE STATE GAS COMPANY\nCredit and Collections",
+            "reference": "77-0142-9",
+            "amount": "$236.48",
+            "deadline": "November 19, 2026",
+            "phone": "1-800-555-0105"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "GRANITE STATE GAS COMPANY\nCredit and Collections",
+            "reference": "77-0142-9",
+            "amount": "$236.48",
+            "deadline": "November 19, 2026",
+            "phone": "1-800-555-0105"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11043
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "GRANITE STATE GAS COMPANY",
+            "reference": "77-0142-9",
+            "amount": "$236.48",
+            "deadline": "November 19, 2026",
+            "phone": "1-800-555-0105"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "GRANITE STATE GAS COMPANY",
+            "reference": "77-0142-9",
+            "amount": "$236.48",
+            "deadline": "November 19, 2026",
+            "phone": "1-800-555-0105"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12273
+        }
+      }
+    },
+    {
+      "file": "09-debt-collection.txt",
+      "truth": "debt_collection",
+      "classification": {
+        "model": "debt_collection",
+        "keywords": "debt_collection",
+        "type": "debt_collection",
+        "candidates": [],
+        "ms": 8215
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "debt_collection",
+      "variants": {
+        "full": {
+          "type": "debt_collection",
+          "raw": {
+            "sender": "Northgate Recovery Services",
+            "reference": "NRS-55-208841",
+            "amount": "$1,961.30",
+            "deadline": "December 1, 2026",
+            "phone": "(402) 555-0111"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Northgate Recovery Services",
+            "reference": "NRS-55-208841",
+            "amount": "$1,961.30",
+            "deadline": "December 1, 2026",
+            "phone": "(402) 555-0111"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12744
+        },
+        "no_hint": {
+          "type": "debt_collection",
+          "raw": {
+            "sender": "Northgate Recovery Services",
+            "reference": "NRS-55-208841",
+            "amount": "$1,961.30",
+            "deadline": "December 1, 2026",
+            "phone": "(402) 555-0111"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Northgate Recovery Services",
+            "reference": "NRS-55-208841",
+            "amount": "$1,961.30",
+            "deadline": "December 1, 2026",
+            "phone": "(402) 555-0111"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11720
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "Northgate Recovery Services",
+            "reference": "NRS-55-208841",
+            "amount": "$1,961.30",
+            "deadline": "December 1, 2026",
+            "phone": "(402) 555-0111"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Northgate Recovery Services",
+            "reference": "NRS-55-208841",
+            "amount": "$1,961.30",
+            "deadline": "December 1, 2026",
+            "phone": "(402) 555-0111"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12761
+        }
+      }
+    },
+    {
+      "file": "10-eviction-notice.txt",
+      "truth": "eviction_notice",
+      "classification": {
+        "model": "eviction_notice",
+        "keywords": "eviction_notice",
+        "type": "eviction_notice",
+        "candidates": [],
+        "ms": 7877
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "eviction_notice",
+      "variants": {
+        "full": {
+          "type": "eviction_notice",
+          "raw": {
+            "sender": "Alder Street Property Management LLC, agent for the owner",
+            "reference": "ASP-4B-0218",
+            "amount": "$1,450.00",
+            "deadline": "within THREE (3) DAYS",
+            "phone": "(916) 555-0153"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "unverified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Alder Street Property Management LLC, agent for the owner",
+            "reference": "ASP-4B-0218",
+            "amount": "$1,450.00",
+            "deadline": null,
+            "phone": "(916) 555-0153"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11538
+        },
+        "no_hint": {
+          "type": "eviction_notice",
+          "raw": {
+            "sender": "Alder Street Property Management LLC, agent for the owner",
+            "reference": "ASP-4B-0218",
+            "amount": "$1,450.00",
+            "deadline": "November 9, 2026",
+            "phone": "(916) 555-0153"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "unverified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Alder Street Property Management LLC, agent for the owner",
+            "reference": "ASP-4B-0218",
+            "amount": "$1,450.00",
+            "deadline": null,
+            "phone": "(916) 555-0153"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10988
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "Alder Street Property Management LLC",
+            "reference": "ASP-4B-0218",
+            "amount": "$1,450.00",
+            "deadline": "November 9, 2026",
+            "phone": "(916) 555-0153"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "unverified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Alder Street Property Management LLC",
+            "reference": "ASP-4B-0218",
+            "amount": "$1,450.00",
+            "deadline": null,
+            "phone": "(916) 555-0153"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11852
+        }
+      }
+    },
+    {
+      "file": "11-rent-increase.txt",
+      "truth": "rent_increase_or_lease_change",
+      "classification": {
+        "model": "rent_increase_or_lease_change",
+        "keywords": "rent_increase_or_lease_change",
+        "type": "rent_increase_or_lease_change",
+        "candidates": [],
+        "ms": 8356
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "rent_increase_or_lease_change",
+      "variants": {
+        "full": {
+          "type": "rent_increase_or_lease_change",
+          "raw": {
+            "sender": "MAPLE COURT APARTMENTS",
+            "reference": "MC-1127",
+            "amount": "$1,360.00",
+            "deadline": "December 1, 2026",
+            "phone": "(971) 555-0182"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "MAPLE COURT APARTMENTS",
+            "reference": "MC-1127",
+            "amount": "$1,360.00",
+            "deadline": "December 1, 2026",
+            "phone": "(971) 555-0182"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10830
+        },
+        "no_hint": {
+          "type": "rent_increase_or_lease_change",
+          "raw": {
+            "sender": "MAPLE COURT APARTMENTS",
+            "reference": "MC-1127",
+            "amount": "$1,360.00",
+            "deadline": "January 1, 2027",
+            "phone": "(971) 555-0182"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "MAPLE COURT APARTMENTS",
+            "reference": "MC-1127",
+            "amount": "$1,360.00",
+            "deadline": "January 1, 2027",
+            "phone": "(971) 555-0182"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10243
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "MAPLE COURT APARTMENTS",
+            "reference": "MC-1127",
+            "amount": "$1,275.00",
+            "deadline": "December 1, 2026",
+            "phone": "(971) 555-0182"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "MAPLE COURT APARTMENTS",
+            "reference": "MC-1127",
+            "amount": "$1,275.00",
+            "deadline": "December 1, 2026",
+            "phone": "(971) 555-0182"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10247
+        }
+      }
+    },
+    {
+      "file": "12-court-summons.txt",
+      "truth": "court_summons_or_lawsuit",
+      "classification": {
+        "model": "court_summons_or_lawsuit",
+        "keywords": "court_summons_or_lawsuit",
+        "type": "court_summons_or_lawsuit",
+        "candidates": [],
+        "ms": 8568
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "court_summons_or_lawsuit",
+      "variants": {
+        "full": {
+          "type": "court_summons_or_lawsuit",
+          "raw": {
+            "sender": "DISTRICT COURT OF REDWATER COUNTY",
+            "reference": "CV-26-004417",
+            "amount": "$3,412.75",
+            "deadline": "December 9, 2026",
+            "phone": "(775) 555-0127"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DISTRICT COURT OF REDWATER COUNTY",
+            "reference": "CV-26-004417",
+            "amount": "$3,412.75",
+            "deadline": "December 9, 2026",
+            "phone": "(775) 555-0127"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11675
+        },
+        "no_hint": {
+          "type": "court_summons_or_lawsuit",
+          "raw": {
+            "sender": "DISTRICT COURT OF REDWATER COUNTY",
+            "reference": "CV-26-004417",
+            "amount": "$3,412.75",
+            "deadline": "December 9, 2026",
+            "phone": "(775) 555-0127"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DISTRICT COURT OF REDWATER COUNTY",
+            "reference": "CV-26-004417",
+            "amount": "$3,412.75",
+            "deadline": "December 9, 2026",
+            "phone": "(775) 555-0127"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11335
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "DISTRICT COURT OF REDWATER COUNTY",
+            "reference": "CV-26-004417",
+            "amount": "$3,412.75",
+            "deadline": "December 9, 2026",
+            "phone": "(775) 555-0127"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DISTRICT COURT OF REDWATER COUNTY",
+            "reference": "CV-26-004417",
+            "amount": "$3,412.75",
+            "deadline": "December 9, 2026",
+            "phone": "(775) 555-0127"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11303
+        }
+      }
+    },
+    {
+      "file": "13-jury-summons.txt",
+      "truth": "jury_summons",
+      "classification": {
+        "model": "jury_summons",
+        "keywords": "jury_summons",
+        "type": "jury_summons",
+        "candidates": [],
+        "ms": 7870
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "jury_summons",
+      "variants": {
+        "full": {
+          "type": "jury_summons",
+          "raw": {
+            "sender": "SUPERIOR COURT, REDWATER COUNTY",
+            "reference": "0044718-J",
+            "amount": "",
+            "deadline": "November 23, 2026",
+            "phone": "(520) 555-0133"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "SUPERIOR COURT, REDWATER COUNTY",
+            "reference": "0044718-J",
+            "amount": null,
+            "deadline": "November 23, 2026",
+            "phone": "(520) 555-0133"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10559
+        },
+        "no_hint": {
+          "type": "jury_summons",
+          "raw": {
+            "sender": "SUPERIOR COURT, REDWATER COUNTY",
+            "reference": "0044718-J",
+            "amount": "",
+            "deadline": "November 23, 2026",
+            "phone": "(520) 555-0133"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "SUPERIOR COURT, REDWATER COUNTY",
+            "reference": "0044718-J",
+            "amount": null,
+            "deadline": "November 23, 2026",
+            "phone": "(520) 555-0133"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11703
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "SUPERIOR COURT, REDWATER COUNTY",
+            "reference": "0044718-J",
+            "amount": "",
+            "deadline": "November 23, 2026",
+            "phone": "(520) 555-0133"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "absent",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "SUPERIOR COURT, REDWATER COUNTY",
+            "reference": "0044718-J",
+            "amount": null,
+            "deadline": "November 23, 2026",
+            "phone": "(520) 555-0133"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10093
+        }
+      }
+    },
+    {
+      "file": "14-parking-ticket.txt",
+      "truth": "traffic_or_parking_ticket",
+      "classification": {
+        "model": "traffic_or_parking_ticket",
+        "keywords": "traffic_or_parking_ticket",
+        "type": "traffic_or_parking_ticket",
+        "candidates": [],
+        "ms": 8187
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "traffic_or_parking_ticket",
+      "variants": {
+        "full": {
+          "type": "traffic_or_parking_ticket",
+          "raw": {
+            "sender": "CITY OF PORT ALDER Parking Violations Bureau",
+            "reference": "PA-90317746",
+            "amount": "$65.00",
+            "deadline": "November 16, 2026",
+            "phone": "(206) 555-0177"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CITY OF PORT ALDER\nParking Violations Bureau",
+            "reference": "PA-90317746",
+            "amount": "$65.00",
+            "deadline": "November 16, 2026",
+            "phone": "(206) 555-0177"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12825
+        },
+        "no_hint": {
+          "type": "traffic_or_parking_ticket",
+          "raw": {
+            "sender": "CITY OF PORT ALDER Parking Violations Bureau",
+            "reference": "PA-90317746",
+            "amount": "$65.00",
+            "deadline": "November 16, 2026",
+            "phone": "(206) 555-0177"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CITY OF PORT ALDER\nParking Violations Bureau",
+            "reference": "PA-90317746",
+            "amount": "$65.00",
+            "deadline": "November 16, 2026",
+            "phone": "(206) 555-0177"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11319
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "CITY OF PORT ALDER",
+            "reference": "PA-90317746",
+            "amount": "$65.00",
+            "deadline": "November 16, 2026",
+            "phone": "(206) 555-0177"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CITY OF PORT ALDER",
+            "reference": "PA-90317746",
+            "amount": "$65.00",
+            "deadline": "November 16, 2026",
+            "phone": "(206) 555-0177"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10804
+        }
+      }
+    },
+    {
+      "file": "15-benefits-renewal.txt",
+      "truth": "benefits_renewal",
+      "classification": {
+        "model": "benefits_renewal",
+        "keywords": "benefits_renewal",
+        "type": "benefits_renewal",
+        "candidates": [],
+        "ms": 7780
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "benefits_renewal",
+      "variants": {
+        "full": {
+          "type": "benefits_renewal",
+          "raw": {
+            "sender": "DEPARTMENT OF HUMAN SERVICES",
+            "reference": "1B-4471-2098",
+            "amount": "",
+            "deadline": "December 10, 2026",
+            "phone": "1-877-555-0158"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DEPARTMENT OF HUMAN SERVICES",
+            "reference": "1B-4471-2098",
+            "amount": null,
+            "deadline": "December 10, 2026",
+            "phone": "1-877-555-0158"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10687
+        },
+        "no_hint": {
+          "type": "benefits_renewal",
+          "raw": {
+            "sender": "DEPARTMENT OF HUMAN SERVICES",
+            "reference": "1B-4471-2098",
+            "amount": "",
+            "deadline": "December 10, 2026",
+            "phone": "1-877-555-0158"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DEPARTMENT OF HUMAN SERVICES",
+            "reference": "1B-4471-2098",
+            "amount": null,
+            "deadline": "December 10, 2026",
+            "phone": "1-877-555-0158"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10561
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "DEPARTMENT OF HUMAN SERVICES",
+            "reference": "1B-4471-2098",
+            "amount": "$291.00",
+            "deadline": "December 10, 2026",
+            "phone": "1-877-555-0158"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DEPARTMENT OF HUMAN SERVICES",
+            "reference": "1B-4471-2098",
+            "amount": "$291.00",
+            "deadline": "December 10, 2026",
+            "phone": "1-877-555-0158"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12004
+        }
+      }
+    },
+    {
+      "file": "16-benefits-reduction.txt",
+      "truth": "benefits_denial_or_reduction",
+      "classification": {
+        "model": "benefits_denial_or_reduction",
+        "keywords": "benefits_denial_or_reduction",
+        "type": "benefits_denial_or_reduction",
+        "candidates": [],
+        "ms": 8177
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "benefits_denial_or_reduction",
+      "variants": {
+        "full": {
+          "type": "benefits_denial_or_reduction",
+          "raw": {
+            "sender": "DEPARTMENT OF SOCIAL SERVICES\nFamily Assistance Division",
+            "reference": "77-208-4471",
+            "amount": "",
+            "deadline": "January 27, 2027",
+            "phone": "1-800-555-0114"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DEPARTMENT OF SOCIAL SERVICES\nFamily Assistance Division",
+            "reference": "77-208-4471",
+            "amount": null,
+            "deadline": "January 27, 2027",
+            "phone": "1-800-555-0114"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10726
+        },
+        "no_hint": {
+          "type": "benefits_denial_or_reduction",
+          "raw": {
+            "sender": "DEPARTMENT OF SOCIAL SERVICES\nFamily Assistance Division",
+            "reference": "77-208-4471",
+            "amount": "",
+            "deadline": "January 27, 2027",
+            "phone": "1-800-555-0114"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DEPARTMENT OF SOCIAL SERVICES\nFamily Assistance Division",
+            "reference": "77-208-4471",
+            "amount": null,
+            "deadline": "January 27, 2027",
+            "phone": "1-800-555-0114"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10737
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "DEPARTMENT OF SOCIAL SERVICES",
+            "reference": "77-208-4471",
+            "amount": "$388.00",
+            "deadline": "January 27, 2027",
+            "phone": "1-800-555-0114"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "DEPARTMENT OF SOCIAL SERVICES",
+            "reference": "77-208-4471",
+            "amount": "$388.00",
+            "deadline": "January 27, 2027",
+            "phone": "1-800-555-0114"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10693
+        }
+      }
+    },
+    {
+      "file": "17-immigration-appointment.txt",
+      "truth": "immigration_appointment",
+      "classification": {
+        "model": "immigration_appointment",
+        "keywords": "immigration_appointment",
+        "type": "immigration_appointment",
+        "candidates": [],
+        "ms": 7964
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "immigration_appointment",
+      "variants": {
+        "full": {
+          "type": "immigration_appointment",
+          "raw": {
+            "sender": "Department of Homeland Security\nU.S. Citizenship and Immigration Services",
+            "reference": "Form I-797C, Notice of Action",
+            "amount": "",
+            "deadline": "11/18/2026",
+            "phone": "1-800-555-0183"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of Homeland Security\nU.S. Citizenship and Immigration Services",
+            "reference": "Form I-797C, Notice of Action",
+            "amount": null,
+            "deadline": "11/18/2026",
+            "phone": "1-800-555-0183"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12908
+        },
+        "no_hint": {
+          "type": "immigration_appointment",
+          "raw": {
+            "sender": "Department of Homeland Security\nU.S. Citizenship and Immigration Services",
+            "reference": "IOE0926447108",
+            "amount": "",
+            "deadline": "11/18/2026",
+            "phone": "1-800-555-0183"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of Homeland Security\nU.S. Citizenship and Immigration Services",
+            "reference": "IOE0926447108",
+            "amount": null,
+            "deadline": "11/18/2026",
+            "phone": "1-800-555-0183"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 13005
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "Department of Homeland Security\nU.S. Citizenship and Immigration Services",
+            "reference": "IOE0926447108",
+            "amount": "$85.00",
+            "deadline": "10/23/2026",
+            "phone": "1-800-555-0183"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "Department of Homeland Security\nU.S. Citizenship and Immigration Services",
+            "reference": "IOE0926447108",
+            "amount": "$85.00",
+            "deadline": "10/23/2026",
+            "phone": "1-800-555-0183"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12160
+        }
+      }
+    },
+    {
+      "file": "18-immigration-rfe.txt",
+      "truth": "immigration_request_for_evidence",
+      "classification": {
+        "model": "immigration_request_for_evidence",
+        "keywords": "immigration_request_for_evidence",
+        "type": "immigration_request_for_evidence",
+        "candidates": [],
+        "ms": 8252
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "immigration_request_for_evidence",
+      "variants": {
+        "full": {
+          "type": "immigration_request_for_evidence",
+          "raw": {
+            "sender": "U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center",
+            "reference": "Form I-797E, Notice of Action\nReceipt number: MSC2790144718",
+            "amount": "",
+            "deadline": "January 15, 2027",
+            "phone": "1-800-555-0183"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center",
+            "reference": "Form I-797E, Notice of Action\nReceipt number: MSC2790144718",
+            "amount": null,
+            "deadline": "January 15, 2027",
+            "phone": "1-800-555-0183"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 14171
+        },
+        "no_hint": {
+          "type": "immigration_request_for_evidence",
+          "raw": {
+            "sender": "U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center",
+            "reference": "MSC2790144718",
+            "amount": "",
+            "deadline": "January 15, 2027",
+            "phone": "1-800-555-0183"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "not_applicable",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center",
+            "reference": "MSC2790144718",
+            "amount": null,
+            "deadline": "January 15, 2027",
+            "phone": "1-800-555-0183"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 13473
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center",
+            "reference": "MSC2790144718",
+            "amount": "",
+            "deadline": "January 15, 2027",
+            "phone": "1-800-555-0183"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "absent",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center",
+            "reference": "MSC2790144718",
+            "amount": null,
+            "deadline": "January 15, 2027",
+            "phone": "1-800-555-0183"
+          },
+          "scores": {
+            "sender": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "blank",
+              "final": "blank",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 13641
+        }
+      }
+    },
+    {
+      "file": "19-medical-bill-es.txt",
+      "truth": "medical_bill",
+      "classification": {
+        "model": "medical_bill",
+        "keywords": null,
+        "type": "medical_bill",
+        "candidates": [],
+        "ms": 7940
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "none",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "medical_bill",
+      "variants": {
+        "full": {
+          "type": "medical_bill",
+          "raw": {
+            "sender": "CLÍNICA FAMILIAR LAS LOMAS",
+            "reference": "LL-338201",
+            "amount": "$120.00",
+            "deadline": "24 de noviembre de 2026",
+            "phone": "(213) 555-0161"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CLÍNICA FAMILIAR LAS LOMAS",
+            "reference": "LL-338201",
+            "amount": "$120.00",
+            "deadline": "24 de noviembre de 2026",
+            "phone": "(213) 555-0161"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11351
+        },
+        "no_hint": {
+          "type": "medical_bill",
+          "raw": {
+            "sender": "CLÍNICA FAMILIAR LAS LOMAS",
+            "reference": "LL-338201",
+            "amount": "$120.00",
+            "deadline": "24 de noviembre de 2026",
+            "phone": "(213) 555-0161"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CLÍNICA FAMILIAR LAS LOMAS",
+            "reference": "LL-338201",
+            "amount": "$120.00",
+            "deadline": "24 de noviembre de 2026",
+            "phone": "(213) 555-0161"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10987
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "CLÍNICA FAMILIAR LAS LOMAS Oficina de Facturación",
+            "reference": "LL-338201",
+            "amount": "$120.00",
+            "deadline": "24 de noviembre de 2026",
+            "phone": "(213) 555-0161"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "CLÍNICA FAMILIAR LAS LOMAS\nOficina de Facturación",
+            "reference": "LL-338201",
+            "amount": "$120.00",
+            "deadline": "24 de noviembre de 2026",
+            "phone": "(213) 555-0161"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 11726
+        }
+      }
+    },
+    {
+      "file": "20-school-notice-bilingual.txt",
+      "truth": "school_notice",
+      "classification": {
+        "model": "school_notice",
+        "keywords": "school_notice",
+        "type": "school_notice",
+        "candidates": [],
+        "ms": 8730
+      },
+      "classificationScore": {
+        "model": "right",
+        "keywords": "right",
+        "combined": "right",
+        "askedWithAnswer": false
+      },
+      "typeUsed": "school_notice",
+      "variants": {
+        "full": {
+          "type": "school_notice",
+          "raw": {
+            "sender": "BROOKFIELD UNIFIED SCHOOL DISTRICT Lincoln Elementary School",
+            "reference": "PERMISSION TRIP PERMISSION / PERMISO PARA EXCURSIÓN",
+            "amount": "$12.00",
+            "deadline": "November 20, 2026",
+            "phone": "408) 555-0139"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "unverified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "BROOKFIELD UNIFIED SCHOOL DISTRICT\nLincoln Elementary School",
+            "reference": null,
+            "amount": "$12.00",
+            "deadline": "November 20, 2026",
+            "phone": "(408) 555-0139"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "wrong",
+              "final": "blank",
+              "caughtBy": "verify",
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 12557
+        },
+        "no_hint": {
+          "type": "school_notice",
+          "raw": {
+            "sender": "BROOKFIELD UNIFIED SCHOOL DISTRICT",
+            "reference": "PERMISSION",
+            "amount": "$12.00",
+            "deadline": "November 20, 2026",
+            "phone": "(408) 555-0139"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "BROOKFIELD UNIFIED SCHOOL DISTRICT",
+            "reference": "PERMISSION",
+            "amount": "$12.00",
+            "deadline": "November 20, 2026",
+            "phone": "(408) 555-0139"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10603
+        },
+        "untyped": {
+          "type": "other",
+          "raw": {
+            "sender": "BROOKFIELD UNIFIED SCHOOL DISTRICT Lincoln Elementary School",
+            "reference": "PERMISSION",
+            "amount": "$12.00",
+            "deadline": "November 20, 2026",
+            "phone": "(408) 555-0139"
+          },
+          "status": {
+            "sender": "verified",
+            "reference": "verified",
+            "amount": "verified",
+            "deadline": "verified",
+            "phone": "verified"
+          },
+          "shown": {
+            "sender": "BROOKFIELD UNIFIED SCHOOL DISTRICT\nLincoln Elementary School",
+            "reference": "PERMISSION",
+            "amount": "$12.00",
+            "deadline": "November 20, 2026",
+            "phone": "(408) 555-0139"
+          },
+          "scores": {
+            "sender": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "reference": {
+              "alone": "wrong",
+              "final": "wrong",
+              "caughtBy": null,
+              "lost": false
+            },
+            "amount": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "deadline": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            },
+            "phone": {
+              "alone": "right",
+              "final": "right",
+              "caughtBy": null,
+              "lost": false
+            }
+          },
+          "ms": 10950
+        }
+      }
+    }
+  ]
+}
