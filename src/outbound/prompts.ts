@@ -16,7 +16,7 @@ import { parseRequest, type OutboundRequest } from './requests';
  */
 
 /** Bump when the wording changes, so cached answers to the old wording are dropped. */
-export const PROMPT_VERSION = 1;
+export const PROMPT_VERSION = 2;
 
 /**
  * Where a request may run.
@@ -116,8 +116,16 @@ function placeholderMeaning(placeholder: Placeholder, type: LetterTypeId): strin
   }
 }
 
-function aboutTheLetter(type: LetterTypeId, state: StateId): string[] {
+/** What a draft of a reply is told about the state: a letter asks, it does not teach the law. */
+function whereToReplyFrom(state: StateId): string {
+  if (state === 'US') return 'The reader did not say which state they live in. Ask only for what a person can ask for anywhere in the United States.';
+  const name = stateName(state);
+  return `The reader lives in ${name}. If ${name} gives people who get this kind of letter something most states do not, do not state that rule in the letter: ask the sender for it there, and name it in before_sending as something the reader can look up. If you are not sure it is specific to ${name}, say in before_sending that it can vary by state.`;
+}
+
+function aboutTheLetter(type: LetterTypeId, state: StateId, purpose: 'explain' | 'reply' = 'explain'): string[] {
   const kind = letterType(type);
+  if (purpose === 'reply') return [`Kind of letter: ${kind.description}`, whereToReplyFrom(state)];
   const where =
     state === 'US'
       ? 'The reader did not say which state they live in. Write only what holds across the United States, and say so where a rule varies by state.'
@@ -176,7 +184,7 @@ function replyPrompt(type: LetterTypeId, state: StateId, language: LanguageId): 
   return [
     'You draft a reply that a person in the United States can send to the sender of an official letter they received.',
     '',
-    ...aboutTheLetter(type, state),
+    ...aboutTheLetter(type, state, 'reply'),
     translated ? `The reader's language: ${languageName(language)}` : 'The reader reads English.',
     '',
     ...gaps(type),

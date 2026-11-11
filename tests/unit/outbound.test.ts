@@ -163,6 +163,16 @@ describe('prompts', () => {
     expect(promptFor({ purpose: 'explain', type: 'medical_bill', state: 'NY', language: 'en' })).not.toContain('a greeting on its own line');
   });
 
+  it('keep what a state does differently out of the letter and in the checklist', () => {
+    const reply = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'NY', language: 'en' });
+    expect(reply).toContain('The reader lives in New York.');
+    expect(reply).toContain('do not state that rule in the letter');
+    expect(reply).toContain('name it in before_sending');
+    expect(reply).not.toContain('say what applies there');
+    expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'US', language: 'en' })).toContain('did not say which state');
+    expect(promptFor({ purpose: 'explain', type: 'medical_bill', state: 'NY', language: 'en' })).toContain('say what applies there');
+  });
+
   it('ask for the blanks of a translated reply in the reader\'s language', () => {
     const prompt = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'TX', language: 'es' });
     expect(prompt).toContain('write each blank in Spanish, still in square brackets');

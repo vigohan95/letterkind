@@ -121,7 +121,7 @@ export function GuidanceBody({ status, reading, prefs, onAsk, onForget, t }: Gui
         <>
           <h3>{t.guidance.rejectedHeading}</h3>
           <p>{t.guidance.rejectedBody}</p>
-          <p>{t.guidance.rejected[guidance.reason](guidance.found)}</p>
+          <p data-field={guidance.field}>{t.guidance.rejected[guidance.reason](guidance.found)}</p>
         </>
       ) : (
         <>

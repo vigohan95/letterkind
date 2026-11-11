@@ -169,7 +169,7 @@ export function ReplyBody({ status, reading, language, onAsk, t }: ReplyBodyProp
         <>
           <h3>{t.reply.rejectedHeading}</h3>
           <p>{t.guidance.rejectedBody}</p>
-          <p>{t.guidance.rejected[outcome.reason](outcome.found)}</p>
+          <p data-field={outcome.field}>{t.guidance.rejected[outcome.reason](outcome.found)}</p>
         </>
       ) : (
         <>

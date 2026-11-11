@@ -141,6 +141,7 @@ describe('the reply panel', () => {
 
     expect(html).toContain('The draft was thrown away');
     expect(html).toContain('Its translation did not match the English');
+    expect(html).toContain('data-field="body_translated"');
     expect(html).not.toContain('itemized statement');
     expect(html).toContain('Ask again');
   });
