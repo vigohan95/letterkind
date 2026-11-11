@@ -22,6 +22,37 @@ npm test
 npm run lint
 ```
 
+Copy `.env.example` to `.env.local` and fill in the web config of a Firebase
+project with Firebase AI Logic (Gemini Developer API) turned on.
+
+## Where the page may connect
+
+Reading a letter makes no network request. Two things limit what can happen
+when an explanation is fetched:
+
+- **In the code.** `src/outbound/channel.ts` is the only file that can reach a
+  model outside the browser, and it accepts a closed set of requests: a kind of
+  letter, a US state and a language, or a single glossary term. Lint rules and
+  `tests/unit/sourceBoundaries.test.ts` fail the build if any other file names
+  a cloud-capable mode or opens a connection.
+- **In the browser.** `firebase.json` serves the site with a content security
+  policy that names the only hosts the page may talk to: itself, the Firebase
+  AI Logic endpoint, Firebase App Check, and Google reCAPTCHA.
+  `tests/unit/hosting.test.ts` pins that list. `npm run preview` serves the
+  built app with the same headers.
+
+Firebase App Check is what stops anyone who copies the public web config from
+using the project's cloud model. It loads Google reCAPTCHA, which is third-party
+traffic, so it is not started when the page opens: the outbound channel starts
+it the first time a request is about to leave, and the page says so next to the
+list of what has left the device. A request that the model in the browser can
+answer never starts it.
+
+On `localhost` reCAPTCHA has no registered domain, so cloud requests are
+refused unless a debug token registered in the Firebase console is put in
+`.env.development.local` as `VITE_APPCHECK_DEBUG_TOKEN`. A production build
+stops with an error if that variable is set.
+
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).

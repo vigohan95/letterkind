@@ -186,9 +186,11 @@ export const en = {
     nothing: 'Nothing has left this device.',
     sent: (n: number, bytes: number) =>
       `${n === 1 ? '1 request' : `${n} requests`} sent, ${bytes.toLocaleString('en-US')} bytes in all. None of it from a letter.`,
-    attempted: (n: number) => (n === 1 ? '1 request was tried and got no answer from a server.' : `${n} requests were tried and got no answer from a server.`),
+    attempted: (n: number) => (n === 1 ? '1 request was tried and brought nothing back.' : `${n} requests were tried and brought nothing back.`),
     stayed: (n: number) => (n === 1 ? '1 request was answered on this device.' : `${n} requests were answered on this device.`),
     note: 'Reading a letter is done by the model inside this browser and sends nothing. This list holds every request Letterkind made to a model outside it, word for word.',
+    appCheck:
+      'One more thing happens the first time a request goes out: Google reCAPTCHA is loaded on this page, so the server can tell the request comes from this app and not from a script. Letterkind passes it nothing from your letter. It is not loaded before that.',
     purpose: {
       explain: 'Explanation of a kind of letter',
       reply: 'Outline of a reply',

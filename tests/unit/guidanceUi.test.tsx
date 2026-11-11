@@ -243,7 +243,7 @@ describe('the list of what left the device', () => {
     const html = renderToStaticMarkup(<LedgerView ledger={ledger} t={en} />);
 
     expect(html).toContain('data-out="1"');
-    expect(html).toContain('1 request was tried and got no answer from a server.');
+    expect(html).toContain('1 request was tried and brought nothing back.');
     expect(html).not.toContain('Nothing has left this device.');
     expect(html).toContain('<strong>Tried to send</strong>');
     expect(html).toContain('no answer');

@@ -42,6 +42,7 @@ export function LedgerView({ ledger, t }: { ledger: Ledger; t: Strings }) {
         </span>
       </summary>
       <p className="hint">{t.ledger.note}</p>
+      <p className="hint">{t.ledger.appCheck}</p>
       <ol className="ledger-entries">
         {entries.map((entry) => (
           <li key={entry.id} data-left={entry.left}>

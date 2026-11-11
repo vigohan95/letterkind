@@ -26,6 +26,7 @@ const files = sourceFiles(SRC).map((full) => ({
 const CLOUD_CAPABLE_MODES = ['ONLY_IN_CLOUD', 'PREFER_IN_CLOUD', 'PREFER_ON_DEVICE'];
 const CHANNEL = 'outbound/channel.ts';
 const ON_DEVICE = 'ai/onDevice.ts';
+const APP_CHECK = 'outbound/appCheck.ts';
 
 describe('source boundaries', () => {
   it('finds source files to scan', () => {
@@ -54,6 +55,35 @@ describe('source boundaries', () => {
       .filter((f) => f.path !== CHANNEL)
       .filter((f) => direct.test(f.text))
       .map((f) => f.path);
+    expect(offenders).toEqual([]);
+  });
+
+  it('imports App Check only in its own module, and starts it only from the outbound channel', () => {
+    const importers = files
+      .filter((f) => /['"](?:firebase\/app-check|@firebase\/app-check)/.test(f.text))
+      .map((f) => f.path);
+    expect(importers).toEqual([APP_CHECK]);
+
+    const starters = files
+      .filter((f) => f.path !== APP_CHECK)
+      .filter((f) => /\bstartAppCheck\b/.test(f.text))
+      .map((f) => f.path);
+    expect(starters).toEqual([CHANNEL]);
+  });
+
+  it('starts App Check after the on-device attempt, never when a module loads', () => {
+    const channel = files.find((f) => f.path === CHANNEL)!.text;
+    const calls = [...channel.matchAll(/^(\s*)startAppCheck\(\);$/gm)];
+    expect(calls).toHaveLength(1);
+    // Indented, so inside a function body rather than at the top of the module.
+    expect(calls[0]![1]!.length).toBeGreaterThan(0);
+    expect(channel.indexOf("modelFor(prepared, 'device')")).toBeLessThan(calls[0]!.index);
+    expect(channel.indexOf("modelFor(prepared, 'cloud')")).toBeGreaterThan(calls[0]!.index);
+  });
+
+  it('never takes the build environment as a whole, only named values from it', () => {
+    // `import.meta.env` used as an object is replaced by every VITE_ value at build time.
+    const offenders = files.filter((f) => /import\.meta\.env(?!\.[A-Z_]+\b)/.test(f.text)).map((f) => f.path);
     expect(offenders).toEqual([]);
   });
 

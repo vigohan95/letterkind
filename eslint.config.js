@@ -8,6 +8,8 @@ import tseslint from 'typescript-eslint';
 //   src/ai/onDevice.ts      builds models that can only run on the device
 //   src/outbound/channel.ts builds the models that may reach the cloud, and
 //                           only accepts the closed request types
+// App Check loads a third-party script, so it too has one home:
+//   src/outbound/appCheck.ts, started only by the channel
 const AI_SDK_BOUNDARY = {
   paths: [
     {
@@ -15,11 +17,19 @@ const AI_SDK_BOUNDARY = {
       message:
         'Only src/ai/onDevice.ts and src/outbound/channel.ts may import firebase/ai. Go through one of them.',
     },
+    {
+      name: 'firebase/app-check',
+      message: 'Only src/outbound/appCheck.ts may import firebase/app-check. The outbound channel starts it.',
+    },
   ],
   patterns: [
     {
       group: ['@firebase/ai', '@firebase/ai/*', 'firebase/ai/*'],
       message: 'Only src/ai/onDevice.ts and src/outbound/channel.ts may import the AI SDK.',
+    },
+    {
+      group: ['@firebase/app-check', '@firebase/app-check/*', 'firebase/app-check/*'],
+      message: 'Only src/outbound/appCheck.ts may import App Check.',
     },
   ],
 };
@@ -49,7 +59,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/ai/onDevice.ts', 'src/outbound/channel.ts'],
+    files: ['src/ai/onDevice.ts', 'src/outbound/channel.ts', 'src/outbound/appCheck.ts'],
     rules: { 'no-restricted-imports': 'off' },
   },
   {
