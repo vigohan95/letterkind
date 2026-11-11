@@ -173,6 +173,8 @@ export const en = {
       date: (found: string) => `It contained a date of its own (“${found}”). A date may only come from your letter.`,
       phone: (found: string) => `It contained a phone number of its own (“${found}”). A phone number may only come from your letter.`,
       web_address: (found: string) => `It contained a web or e-mail address (“${found}”). Letterkind does not show addresses a model wrote.`,
+      not_in_language: () =>
+        'It was not written the way the language you chose is written — in other letters, or with the accents left off.',
     } satisfies Record<RejectReason, (found: string) => string>,
     askAgain: 'Ask again',
     unavailableHeading: 'No explanation could be fetched',

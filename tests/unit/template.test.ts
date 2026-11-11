@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LANGUAGE_IDS } from '../../src/domain/languages';
+import { LANGUAGE_IDS, type LanguageId } from '../../src/domain/languages';
 import { standInsFor } from '../../src/domain/standIns';
 import {
   fill,
@@ -25,9 +25,13 @@ const good = {
 
 const answer = (change: Record<string, unknown> = {}): string => JSON.stringify({ ...good, ...change });
 
-function rejection(text: string, type: Parameters<typeof parseExplain>[1] = 'medical_bill'): TemplateRejected {
+function rejection(
+  text: string,
+  type: Parameters<typeof parseExplain>[1] = 'medical_bill',
+  language: LanguageId = 'en',
+): TemplateRejected {
   try {
-    parseExplain(text, type);
+    parseExplain(text, type, language);
   } catch (error) {
     if (error instanceof TemplateRejected) return error;
     throw error;
@@ -39,7 +43,7 @@ const en = standInsFor('en');
 
 describe('accepting a template', () => {
   it('takes a well-formed answer and keeps every field', () => {
-    const t = parseExplain(answer(), 'medical_bill');
+    const t = parseExplain(answer(), 'medical_bill', 'en');
     expect(t.what).toBe(good.what);
     expect(t.steps).toEqual(good.steps);
     expect(t.ifIgnored).toBe(good.if_ignored);
@@ -54,6 +58,7 @@ describe('accepting a template', () => {
         steps: ['Compare it with your Form 1040.', 'In an emergency call 911.', 'Keep copies for 3 years.'],
       }),
       'tax_proposed_change',
+      'en',
     );
     expect(t.steps).toHaveLength(3);
   });
@@ -65,6 +70,7 @@ describe('accepting a template', () => {
         steps: ['在 {{DEADLINE}}（{{DAYS_LEFT}}）之前付 {{AMOUNT}}，或者申请分期。', 'اتصل بالرقم {{PHONE}} واذكر {{REFERENCE}}.'],
       }),
       'medical_bill',
+      'zh-Hans',
     );
     expect(t.what).toContain('{{SENDER}}');
   });
@@ -225,5 +231,84 @@ describe('filling a template on the device', () => {
       }
     }
     expect(new Set(LANGUAGE_IDS.map((l) => standInsFor(l).AMOUNT)).size).toBe(LANGUAGE_IDS.length);
+  });
+});
+
+describe('the language a template is written in', () => {
+  const spanish = {
+    what: 'Esta carta de {{SENDER}} es una factura por atención médica que usted ya recibió. Llega después de que su seguro pagó su parte, o cuando no hay seguro.',
+    steps: [
+      'Compare la factura con la explicación de beneficios de su seguro médico antes de pagar.',
+      'Llame al {{PHONE}} y pida una factura detallada, con cada servicio por separado.',
+      'Pregunte si hay un plan de pagos o ayuda económica si no puede pagar {{AMOUNT}} antes del {{DEADLINE}}.',
+    ],
+    if_ignored: 'Si no hace nada, la deuda puede pasar a una agencia de cobranza y eso puede dañar su crédito.',
+    who_can_help: ['La oficina de facturación del hospital.', 'Una organización local de asistencia legal gratuita.'],
+  };
+  const chinese = {
+    what: '这是 {{SENDER}} 寄来的医疗账单，要求您支付已经接受的医疗服务的费用。人们收到这类信件，通常是因为保险公司已经付了它该付的部分，剩下的需要您自己承担。',
+    steps: [
+      '把账单和保险公司寄来的理赔说明放在一起核对，看看每一项服务是不是您实际接受过的。',
+      '如果有疑问，请拨打 {{PHONE}}，要求对方提供一份逐项列出的明细账单。',
+      '如果一次付不清 {{AMOUNT}}，请在 {{DEADLINE}} 之前询问能不能分期付款或者申请费用减免。',
+    ],
+    if_ignored: '如果一直不处理，这笔欠款可能会被转给催收公司，并且可能影响您的信用记录。',
+    who_can_help: ['医院的账务部门或者患者财务援助办公室。', '当地免费的法律援助机构。'],
+  };
+  const unmarked = (text: string): string => text.normalize('NFD').replace(/\p{M}/gu, '');
+  const stripped = JSON.parse(unmarked(JSON.stringify(spanish))) as typeof spanish;
+
+  it('accepts Spanish written as Spanish and Chinese written as Chinese', () => {
+    expect(parseExplain(answer(spanish), 'medical_bill', 'es').what).toBe(spanish.what);
+    expect(parseExplain(answer(chinese), 'medical_bill', 'zh-Hans').what).toBe(chinese.what);
+  });
+
+  it('rejects Spanish that came back without its accents', () => {
+    expect(stripped.what).toContain('atencion medica');
+    const r = rejection(answer(stripped), 'medical_bill', 'es');
+    expect(r.reason).toBe('not_in_language');
+    expect(r.field).toBe('answer');
+  });
+
+  it('rejects an answer in a different writing system from the one asked for', () => {
+    expect(rejection(answer(), 'medical_bill', 'zh-Hans').reason).toBe('not_in_language');
+    expect(rejection(answer(spanish), 'medical_bill', 'ko').reason).toBe('not_in_language');
+    expect(rejection(answer(chinese), 'medical_bill', 'en').reason).toBe('not_in_language');
+    expect(rejection(answer(chinese), 'medical_bill', 'ar').reason).toBe('not_in_language');
+  });
+
+  it('rejects English sent back for a language that is written with accents', () => {
+    expect(rejection(answer(), 'medical_bill', 'es').reason).toBe('not_in_language');
+    expect(rejection(answer(), 'medical_bill', 'vi').reason).toBe('not_in_language');
+  });
+
+  it('judges only what the reader is shown, not the hint kept in English for the extractor', () => {
+    // `reading_hint` is English in every template; it must not count against the language.
+    expect(() => parseExplain(answer(chinese), 'medical_bill', 'zh-Hant')).not.toThrow();
+  });
+
+  it('does not judge an answer too short to tell', () => {
+    const short = {
+      what: 'Una factura de {{SENDER}}.',
+      steps: ['Llame al {{PHONE}}.'],
+      if_ignored: 'Puede pasar a cobranza.',
+      who_can_help: ['El hospital.'],
+    };
+    expect(() => parseExplain(answer(short), 'medical_bill', 'es')).not.toThrow();
+  });
+
+  it('has a rule for every language on the list', () => {
+    for (const language of LANGUAGE_IDS) {
+      const outcome = (() => {
+        try {
+          parseExplain(answer(), 'medical_bill', language);
+          return 'accepted';
+        } catch (error) {
+          return error instanceof TemplateRejected ? error.reason : 'crashed';
+        }
+      })();
+      // The English sample passes for the two languages written in plain Latin letters and for no other.
+      expect(outcome, language).toBe(language === 'en' || language === 'tl' ? 'accepted' : 'not_in_language');
+    }
   });
 });

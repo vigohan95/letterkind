@@ -1,4 +1,4 @@
-import { getAI, getGenerativeModel, type GenerativeModel, GoogleAIBackend, InferenceMode, InferenceSource } from 'firebase/ai';
+import { getAI, getGenerativeModel, type GenerativeModel, GoogleAIBackend, InferenceMode } from 'firebase/ai';
 import { firebaseApp, outboundApp } from '../firebase';
 import { startAppCheck } from './appCheck';
 import type { Ledger, LedgerEntry, Ran } from './ledger';
@@ -24,15 +24,8 @@ import type { OutboundRequest } from './requests';
 /** The server-side model that writes templates. */
 export const CLOUD_MODEL = 'gemini-3.5-flash-lite';
 
-/**
- * How each route reaches the cloud. A `device_first` request is first put to
- * the model in the browser on its own; only if that fails is it sent out.
- */
-const CLOUD_MODE: Record<Route, InferenceMode> = {
-  cloud_first: InferenceMode.PREFER_IN_CLOUD,
-  cloud_only: InferenceMode.ONLY_IN_CLOUD,
-  device_first: InferenceMode.ONLY_IN_CLOUD,
-};
+/** How long to wait before asking the cloud a second time, in milliseconds. */
+const RETRY_AFTER_MS = 1500;
 
 export interface Delivery {
   text: string;
@@ -91,10 +84,67 @@ export function createChannel({ transport, ledger, now = () => new Date(), clock
   };
 }
 
+/** The two models a request can be put to, and a way to wait. Swapped for a script in tests. */
+export interface Ways {
+  device(): Promise<string>;
+  cloud(): Promise<string>;
+  pause(ms: number): Promise<void>;
+}
+
+/** The HTTP status a failed cloud request came back with, if it got that far. */
+function statusOf(error: unknown): number | undefined {
+  const status = (error as { customErrorData?: { status?: unknown } } | null)?.customErrorData?.status;
+  return typeof status === 'number' ? status : undefined;
+}
+
+/**
+ * Which model is asked, and in what order. Each model is built to run in one
+ * place only, so the order is decided here, where it can be read and tested,
+ * and not inside the SDK.
+ *
+ *  - `device_first`: the model in the browser; the cloud only if that fails.
+ *  - `cloud_first`:  the cloud; the model in the browser if the cloud fails.
+ *  - `cloud_only`:   the cloud, and nothing else.
+ *
+ * A cloud request that fails with a server error is put once more before
+ * giving up on the cloud: the model in the browser is far slower and writes
+ * worse, so one short wait is the better first resort.
+ */
+export async function carry(route: Route, { device, cloud, pause }: Ways): Promise<Delivery> {
+  if (route === 'device_first') {
+    try {
+      return { text: await device(), ran: 'device' };
+    } catch {
+      // The model in the browser could not write this. The request goes out instead, and the ledger says so.
+    }
+  }
+  let failure: unknown;
+  try {
+    return { text: await cloud(), ran: 'cloud' };
+  } catch (error) {
+    failure = error;
+  }
+  if ((statusOf(failure) ?? 0) >= 500) {
+    await pause(RETRY_AFTER_MS);
+    try {
+      return { text: await cloud(), ran: 'cloud' };
+    } catch {
+      // The first failure is the one reported.
+    }
+  }
+  if (route !== 'cloud_first') throw failure;
+  try {
+    return { text: await device(), ran: 'device' };
+  } catch {
+    // Neither could answer. What the cloud said is the more useful thing to show.
+    throw failure;
+  }
+}
+
 const models = new Map<string, GenerativeModel>();
 
-function modelFor({ request, route, schema }: Prepared, where: 'device' | 'cloud'): GenerativeModel {
-  // The route and the schema both follow from the first two fields.
+function modelFor({ request, schema }: Prepared, where: 'device' | 'cloud'): GenerativeModel {
+  // The schema follows from the first two fields.
   const key = `${request.purpose}|${request.language}|${where}`;
   let model = models.get(key);
   if (!model) {
@@ -111,12 +161,11 @@ function modelFor({ request, route, schema }: Prepared, where: 'device' | 'cloud
       where === 'device'
         ? { mode: InferenceMode.ONLY_ON_DEVICE, onDeviceParams }
         : {
-            mode: CLOUD_MODE[route],
+            mode: InferenceMode.ONLY_IN_CLOUD,
             inCloudParams: {
               model: CLOUD_MODEL,
               generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema },
             },
-            ...(route === 'cloud_first' ? { onDeviceParams } : {}),
           },
     );
     models.set(key, model);
@@ -124,19 +173,18 @@ function modelFor({ request, route, schema }: Prepared, where: 'device' | 'cloud
   return model;
 }
 
-/** The real transport: Firebase AI Logic, in the mode the request's route calls for. */
-export const firebaseTransport: Transport = async (prepared) => {
-  if (prepared.route === 'device_first') {
-    try {
+/** The real transport: Firebase AI Logic, each model in the one place it is built to run. */
+export const firebaseTransport: Transport = (prepared) =>
+  carry(prepared.route, {
+    device: async () => {
       const { response } = await modelFor(prepared, 'device').generateContent(prepared.prompt);
-      if (response.inferenceSource === InferenceSource.ON_DEVICE) return { text: response.text(), ran: 'device' };
-    } catch {
-      // The model in the browser could not write this. The request goes out instead, and the ledger says so.
-    }
-  }
-  // Only now, with a request about to leave, is the app's proof of identity set up.
-  startAppCheck();
-  const { response } = await modelFor(prepared, 'cloud').generateContent(prepared.prompt);
-  // Anything not positively reported as on-device is counted as having gone to the cloud.
-  return { text: response.text(), ran: response.inferenceSource === InferenceSource.ON_DEVICE ? 'device' : 'cloud' };
-};
+      return response.text();
+    },
+    cloud: async () => {
+      // Only now, with a request about to leave, is the app's proof of identity set up.
+      startAppCheck();
+      const { response } = await modelFor(prepared, 'cloud').generateContent(prepared.prompt);
+      return response.text();
+    },
+    pause: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  });

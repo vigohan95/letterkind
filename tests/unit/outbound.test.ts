@@ -5,7 +5,7 @@ import { LETTER_TYPE_IDS, letterType } from '../../src/domain/letterTypes';
 import { STATE_IDS } from '../../src/domain/states';
 import { mark, PLACEHOLDERS, placeholdersFor } from '../../src/domain/template';
 import { TERM_IDS, TERMS, type TermId } from '../../src/domain/terms';
-import { createChannel, type Transport } from '../../src/outbound/channel';
+import { carry, createChannel, type Transport, type Ways } from '../../src/outbound/channel';
 import { byteLength, Ledger, leftDevice } from '../../src/outbound/ledger';
 import { Prepared, promptFor, routeFor, schemaFor } from '../../src/outbound/prompts';
 import { allRequests, OutboundRejected, parseRequest, requestCount, serialize, type OutboundRequest } from '../../src/outbound/requests';
@@ -276,5 +276,84 @@ describe('the channel', () => {
     void channel.send('Dear Jane Roe, your balance of $296.00 is past due.').catch(() => undefined);
     // @ts-expect-error there is no field for free text
     void channel.send({ ...explain, letter: 'Dear Jane Roe' }).catch(() => undefined);
+  });
+});
+
+describe('the order in which the two models are tried', () => {
+  const serverError = Object.assign(new Error('500'), { customErrorData: { status: 500 } });
+  const refused = Object.assign(new Error('401'), { customErrorData: { status: 401 } });
+  const offline = new TypeError('Failed to fetch');
+
+  /** Each model answers from a script of outcomes, in order; the calls made are written down. */
+  function ways(script: { device?: (string | Error)[]; cloud?: (string | Error)[] }) {
+    const calls: string[] = [];
+    const next = (name: 'device' | 'cloud') => (): Promise<string> => {
+      calls.push(name);
+      const outcome = script[name]?.shift();
+      if (outcome === undefined) return Promise.reject(new Error(`${name} was not expected to be asked`));
+      return outcome instanceof Error ? Promise.reject(outcome) : Promise.resolve(outcome);
+    };
+    const w: Ways = {
+      device: next('device'),
+      cloud: next('cloud'),
+      pause: (ms) => {
+        calls.push(`pause ${ms}`);
+        return Promise.resolve();
+      },
+    };
+    return { w, calls };
+  }
+
+  it('keeps a glossary word on the device when the device can answer', async () => {
+    const { w, calls } = ways({ device: ['here'] });
+    expect(await carry('device_first', w)).toEqual({ text: 'here', ran: 'device' });
+    expect(calls).toEqual(['device']);
+  });
+
+  it('sends a glossary word out only after the device has failed', async () => {
+    const { w, calls } = ways({ device: [new Error('no model')], cloud: ['there'] });
+    expect(await carry('device_first', w)).toEqual({ text: 'there', ran: 'cloud' });
+    expect(calls).toEqual(['device', 'cloud']);
+  });
+
+  it('asks the cloud first for an explanation', async () => {
+    const { w, calls } = ways({ cloud: ['there'] });
+    expect(await carry('cloud_first', w)).toEqual({ text: 'there', ran: 'cloud' });
+    expect(calls).toEqual(['cloud']);
+  });
+
+  it('asks the cloud once more when the fault was the server’s, before making the reader wait for the device', async () => {
+    const { w, calls } = ways({ cloud: [serverError, 'there'] });
+    expect(await carry('cloud_first', w)).toEqual({ text: 'there', ran: 'cloud' });
+    expect(calls).toEqual(['cloud', 'pause 1500', 'cloud']);
+  });
+
+  it('falls back to the device when the cloud fails twice', async () => {
+    const { w, calls } = ways({ cloud: [serverError, serverError], device: ['here'] });
+    expect(await carry('cloud_first', w)).toEqual({ text: 'here', ran: 'device' });
+    expect(calls).toEqual(['cloud', 'pause 1500', 'cloud', 'device']);
+  });
+
+  it('goes straight to the device when there is no connection, or the request was refused', async () => {
+    for (const failure of [offline, refused]) {
+      const { w, calls } = ways({ cloud: [failure], device: ['here'] });
+      expect(await carry('cloud_first', w)).toEqual({ text: 'here', ran: 'device' });
+      expect(calls).toEqual(['cloud', 'device']);
+    }
+  });
+
+  it('reports what the cloud said when the device cannot write it either', async () => {
+    const { w } = ways({ cloud: [refused], device: [new Error('no model')] });
+    await expect(carry('cloud_first', w)).rejects.toBe(refused);
+  });
+
+  it('never hands a cloud-only request to the device', async () => {
+    const twice = ways({ cloud: [serverError, serverError] });
+    await expect(carry('cloud_only', twice.w)).rejects.toBe(serverError);
+    expect(twice.calls).toEqual(['cloud', 'pause 1500', 'cloud']);
+
+    const once = ways({ cloud: [refused] });
+    await expect(carry('cloud_only', once.w)).rejects.toBe(refused);
+    expect(once.calls).toEqual(['cloud']);
   });
 });

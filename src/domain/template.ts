@@ -1,3 +1,4 @@
+import { type LanguageId, type Script, scriptOf } from './languages';
 import { letterType, type LetterTypeId } from './letterTypes';
 import { findAmounts } from './parse/amount';
 import { findDates } from './parse/date';
@@ -53,7 +54,8 @@ export type RejectReason =
   | 'amount'
   | 'date'
   | 'phone'
-  | 'web_address';
+  | 'web_address'
+  | 'not_in_language';
 
 /**
  * A template that broke a rule. It is thrown away whole: a model that has
@@ -136,14 +138,45 @@ function checkList(value: unknown, field: 'steps' | 'who_can_help', allowed: rea
   return value.map((item) => checkText(item, field, allowed));
 }
 
+const LATIN = /\p{Script=Latin}/gu;
+const MARKED_LATIN = /(?![A-Za-z])\p{Script=Latin}/gu;
+const OWN_LETTERS: Record<Exclude<Script, 'latin' | 'latin_marked'>, RegExp> = {
+  han: /\p{Script=Han}/gu,
+  hangul: /\p{Script=Hangul}/gu,
+  arabic: /\p{Script=Arabic}/gu,
+  cyrillic: /\p{Script=Cyrillic}/gu,
+};
+/** Fewer letters than this is too little to tell a language by. */
+const ENOUGH_LETTERS = 200;
+const count = (text: string, letters: RegExp): number => text.match(letters)?.length ?? 0;
+
+/**
+ * Is this text written the way the language is written?
+ *
+ * Not a test of grammar or meaning — only of the letters used. It catches an
+ * answer in the wrong language's script, and Spanish, Vietnamese, French,
+ * Portuguese or Haitian Creole sent back with the accents left off: at least
+ * one letter in two hundred must carry one, far below what any of them uses.
+ */
+export function writtenAs(text: string, language: LanguageId): boolean {
+  const letters = count(text, /\p{L}/gu);
+  if (letters < ENOUGH_LETTERS) return true;
+  const script = scriptOf(language);
+  if (script !== 'latin' && script !== 'latin_marked') return count(text, OWN_LETTERS[script]) * 2 >= letters;
+  const latin = count(text, LATIN);
+  if (latin * 2 < letters) return false;
+  return script === 'latin' || count(text, MARKED_LATIN) * 200 >= latin;
+}
+
 /**
  * Turn a model's answer into a template, or throw `TemplateRejected`.
  *
  * Accepted only if it is exactly the five expected fields, every marker is
- * one this kind of letter may use, and the text itself contains no dollar
- * amount, calendar date, phone number or web address.
+ * one this kind of letter may use, the text itself contains no dollar
+ * amount, calendar date, phone number or web address, and what the reader
+ * will be shown is written the way their language is written.
  */
-export function parseExplain(answer: string, type: LetterTypeId): ExplainTemplate {
+export function parseExplain(answer: string, type: LetterTypeId, language: LanguageId): ExplainTemplate {
   let data: unknown;
   try {
     data = JSON.parse(answer);
@@ -156,13 +189,17 @@ export function parseExplain(answer: string, type: LetterTypeId): ExplainTemplat
   if (extra !== undefined) throw new TemplateRejected('wrong_shape', extra.slice(0, 40));
 
   const allowed = placeholdersFor(type);
-  return {
+  const template: ExplainTemplate = {
     what: checkText(record.what, 'what', allowed),
     steps: checkList(record.steps, 'steps', allowed),
     ifIgnored: checkText(record.if_ignored, 'if_ignored', allowed),
     whoCanHelp: checkList(record.who_can_help, 'who_can_help', allowed),
     readingHint: checkText(record.reading_hint, 'reading_hint', []),
   };
+  // The hint for the extractor is English in every template, so it is left out of this.
+  const shown = [template.what, ...template.steps, template.ifIgnored, ...template.whoCanHelp].join(' ').replace(MARKER, ' ');
+  if (!writtenAs(shown, language)) throw new TemplateRejected('not_in_language', 'answer');
+  return template;
 }
 
 /** The checked details of one letter, already written out for the reader. Absent means not known. */

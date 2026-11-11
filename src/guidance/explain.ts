@@ -51,7 +51,7 @@ export async function savedGuidance(request: ExplainRequest, store: TemplateStor
   }
   if (!saved) return null;
   try {
-    return { status: 'ready', template: parseExplain(saved.text, request.type), from: 'saved', at: saved.at, entry: null };
+    return { status: 'ready', template: parseExplain(saved.text, request.type, request.language), from: 'saved', at: saved.at, entry: null };
   } catch (error) {
     if (error instanceof TemplateRejected) return null;
     throw error;
@@ -76,7 +76,7 @@ export async function explain(request: ExplainRequest, { channel, store }: Expla
 
   let template: ExplainTemplate;
   try {
-    template = parseExplain(answer.text, request.type);
+    template = parseExplain(answer.text, request.type, request.language);
   } catch (error) {
     if (!(error instanceof TemplateRejected)) throw error;
     return { status: 'rejected', reason: error.reason, field: error.field, found: error.found, ran: answer.ran, entry: answer.entry };
