@@ -6,19 +6,30 @@
  * only thing that can be sent anywhere is the *id* of an entry in this list —
  * never a word, phrase or sentence taken from their letter.
  *
- * The meanings are written here, in the repository, and reviewed like code: a
- * wrong one is a bug with a diff. No model writes a meaning. A model is only
- * ever asked to put one of these into another language. (Letting the model in
+ * The meanings are fixed text: written ahead of time, kept here in the
+ * repository and reviewed like code, so a wrong one is a bug with a diff.
+ * Nothing is generated when a reader taps a word; a model is only ever asked
+ * to put one of these into another language. (Letting the model in
  * the browser explain a word from memory was tried first. It said a
  * "contractual adjustment" on a hospital bill meant the terms of an agreement
  * were changing, and that "financial assistance" was help with school
  * supplies or a car.)
  *
+ * The Spanish is fixed text too, in `termsEs.ts`. Having the model in the
+ * browser translate a meaning into Spanish was tried: on the hosted site it
+ * took 5.7 seconds a meaning, and of four translations one changed the
+ * meaning and two had defects. Every other language is the English entry
+ * translated in the cloud.
+ *
  * A meaning says what the word generally means and nothing about any letter:
  * no amounts, dates, phone numbers or addresses, and no advice. Where the
- * rule differs by state it says so instead of picking one. When a meaning
- * changes, raise `PROMPT_VERSION` so translations kept on devices are redone.
+ * rule differs by state it says so instead of picking one. When an English
+ * meaning changes, change the Spanish with it and raise `PROMPT_VERSION` so
+ * translations kept on devices are redone.
  */
+
+import type { LanguageId } from './languages';
+import { MEANINGS_ES } from './termsEs';
 
 const ENTRIES = [
   // Money owed, bills, collections
@@ -592,14 +603,19 @@ const ENTRIES = [
   ],
 ] as const satisfies readonly (readonly [words: string, meaning: string])[];
 
+/** The words of every entry, so that the Spanish must have exactly these and no others. */
+export type TermWords = (typeof ENTRIES)[number][0];
+
 export type TermId = string & { readonly __term: unique symbol };
 
 export interface Term {
   id: TermId;
   /** The word or phrase as it appears in letters. */
   words: string;
-  /** What it generally means, in plain English. Written in this file; no model wrote it. */
+  /** What it generally means, in plain English. Fixed text, written in this file. */
   meaning: string;
+  /** The same in Spanish. Fixed text, written in `termsEs.ts`. */
+  meaningEs: string;
 }
 
 const slug = (words: string): string =>
@@ -608,7 +624,7 @@ const slug = (words: string): string =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-export const TERMS: readonly Term[] = ENTRIES.map(([words, meaning]) => ({ id: slug(words) as TermId, words, meaning }));
+export const TERMS: readonly Term[] = ENTRIES.map(([words, meaning]) => ({ id: slug(words) as TermId, words, meaning, meaningEs: MEANINGS_ES[words] }));
 
 export const TERM_IDS: readonly TermId[] = TERMS.map((t) => t.id);
 
@@ -621,3 +637,11 @@ export function term(id: TermId): Term {
   if (!found) throw new Error(`Unknown glossary term: ${id}`);
   return found;
 }
+
+/** The languages the glossary itself is written in. Any other is a translation of the English. */
+export type GlossaryLanguage = 'en' | 'es';
+
+export const isGlossaryLanguage = (language: LanguageId): language is GlossaryLanguage => language === 'en' || language === 'es';
+
+/** What the glossary says a term means, in a language it is written in. */
+export const meaningIn = (id: TermId, language: GlossaryLanguage): string => (language === 'es' ? term(id).meaningEs : term(id).meaning);

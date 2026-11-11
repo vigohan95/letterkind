@@ -73,8 +73,16 @@ describe('a glossary meaning, as a model put it into another language', () => {
 });
 
 describe('the meaning the glossary itself gives', () => {
-  it('is the entry as written, from no model and with nothing sent', () => {
-    expect(ownMeaning(deductible)).toEqual({ status: 'ready', template: { explanation: GLOSS }, from: 'glossary', at: null, entry: null });
+  it('is the entry as written, with nobody asked and nothing sent', () => {
+    expect(ownMeaning(deductible, 'en')).toEqual({ status: 'ready', template: { explanation: GLOSS }, from: 'glossary', at: null, entry: null });
+    expect(ownMeaning(deductible, 'es')).toEqual({
+      status: 'ready',
+      template: { explanation: term(deductible).meaningEs },
+      from: 'glossary',
+      at: null,
+      entry: null,
+    });
+    expect(term(deductible).meaningEs).not.toBe(GLOSS);
   });
 });
 
@@ -97,20 +105,10 @@ function setup(transport: Transport) {
 }
 
 describe('asking for a glossary meaning in another language', () => {
-  const inSpanish: TermRequest = { purpose: 'term', term: deductible, language: 'es' };
   const inKorean: TermRequest = { purpose: 'term', term: deductible, language: 'ko' };
+  const inFrench: TermRequest = { purpose: 'term', term: deductible, language: 'fr' };
 
-  it('is translated on the device where the device can write the language, and nothing leaves', async () => {
-    const { ledger, deps } = setup(device(json(ES)));
-    const meaning = await meaningOf(inSpanish, deps);
-
-    expect(meaning).toMatchObject({ status: 'ready', template: { explanation: ES }, from: 'device' });
-    expect(ledger.entries()).toHaveLength(1);
-    expect(ledger.entries()[0]).toMatchObject({ left: 'stayed', ran: 'device', route: 'device_first' });
-    expect(ledger.totals()).toMatchObject({ sent: 0, attempted: 0, stayed: 1, bytesOut: 0 });
-  });
-
-  it('goes to the cloud for a language the device cannot write, carrying the entry and the language only', async () => {
+  it('goes to the cloud, carrying the entry and the language only', async () => {
     const { ledger, deps } = setup(device(json(KO)));
     const meaning = await meaningOf(inKorean, deps);
 
@@ -124,36 +122,28 @@ describe('asking for a glossary meaning in another language', () => {
     expect(entry?.prompt).toContain('into Korean');
   });
 
-  it('says so when the device could not write it and the cloud did', async () => {
-    const { ledger, deps } = setup(() => Promise.resolve({ text: json(ES), ran: 'cloud' }));
-    const meaning = await meaningOf(inSpanish, deps);
-
-    expect(meaning).toMatchObject({ status: 'ready', from: 'cloud' });
-    expect(ledger.entries()[0]).toMatchObject({ left: 'sent', route: 'device_first' });
-  });
-
   it('keeps a translation that passed, and asks nobody the second time', async () => {
-    const { ledger, deps, calls } = setup(device(json(ES)));
-    expect(await savedMeaning(inSpanish, deps.store)).toBeNull();
-    await meaningOf(inSpanish, deps);
+    const { ledger, deps, calls } = setup(device(json(KO)));
+    expect(await savedMeaning(inKorean, deps.store)).toBeNull();
+    await meaningOf(inKorean, deps);
 
-    const again = await meaningOf(inSpanish, deps);
-    expect(again).toMatchObject({ status: 'ready', template: { explanation: ES }, from: 'saved', entry: null });
-    expect(await savedMeaning(inSpanish, deps.store)).toMatchObject({ from: 'saved' });
+    const again = await meaningOf(inKorean, deps);
+    expect(again).toMatchObject({ status: 'ready', template: { explanation: KO }, from: 'saved', entry: null });
+    expect(await savedMeaning(inKorean, deps.store)).toMatchObject({ from: 'saved' });
     expect(calls()).toBe(1);
     expect(ledger.entries()).toHaveLength(1);
     // Kept for one language is not kept for another.
-    expect(await savedMeaning(inKorean, deps.store)).toBeNull();
+    expect(await savedMeaning(inFrench, deps.store)).toBeNull();
   });
 
   it('shows nothing of a translation that broke a rule, and does not keep it', async () => {
-    const { deps, calls } = setup(device(json('El deducible suele ser de $500.')));
-    const meaning = await meaningOf(inSpanish, deps);
+    const { deps, calls } = setup(device(json('공제액은 보통 $500 정도이며 매년 본인이 먼저 냅니다.')));
+    const meaning = await meaningOf(inKorean, deps);
 
     expect(meaning).toMatchObject({ status: 'rejected', reason: 'amount', field: 'explanation' });
-    expect(JSON.stringify(meaning)).not.toContain('suele ser');
-    expect(await savedMeaning(inSpanish, deps.store)).toBeNull();
-    await meaningOf(inSpanish, deps);
+    expect(JSON.stringify(meaning)).not.toContain('정도이며');
+    expect(await savedMeaning(inKorean, deps.store)).toBeNull();
+    await meaningOf(inKorean, deps);
     expect(calls()).toBe(2);
   });
 

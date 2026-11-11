@@ -192,27 +192,26 @@ export const en = {
 
   terms: {
     inEnglish: (heading: string) =>
-      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means. The meanings are written into Letterkind itself: no model writes them, and tapping sends nothing. To read them in another language, choose it under “${heading}”.`,
-    onDevice: (language: string, heading: string) =>
-      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means, in ${language} — the language chosen under “${heading}”. The meanings are written into Letterkind in English; the model in this browser puts them into ${language}, and nothing is sent. Only if that model fails does Letterkind ask the model in the cloud, which is then told which word you asked about and the language, and nothing else.`,
+      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means. The meanings are fixed text that ships with Letterkind, the same for everyone: nothing is generated when you tap, and nothing is sent. To read them in another language, choose it under “${heading}”.`,
+    inSpanish: (heading: string) =>
+      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means, in Spanish — the language chosen under “${heading}” — with the English beside it. Both are fixed text that ships with Letterkind, the same for everyone: nothing is generated when you tap, and nothing is sent.`,
     inCloud: (language: string, heading: string) =>
-      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means, in ${language} — the language chosen under “${heading}”. The meanings are written into Letterkind in English, and the model in this browser cannot write ${language}, so tapping asks the model in the cloud to translate one. It is told which word you asked about — the glossary’s own entry, not words copied from your letter — and the language, and nothing else.`,
+      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means, in ${language} — the language chosen under “${heading}”. The meanings are written into Letterkind in English and Spanish; for ${language}, tapping asks the model in the cloud to translate one. It is told which word you asked about — the glossary’s own entry, not words copied from your letter — and the language, and nothing else.`,
     heading: (words: string) => `What “${words}” means`,
     close: 'Close',
-    asking: (onDevice: boolean) => (onDevice ? 'Translating the meaning on this device…' : 'Asking the model in the cloud to translate the meaning…'),
+    asking: 'Asking the model in the cloud to translate the meaning…',
     ask: (language: string) => `Translate into ${language}`,
     english: 'In English, as Letterkind’s glossary has it',
     general: 'This is what the word generally means. It says nothing about your letter or your case, and it is not advice.',
     translated: 'A model made the translation, and a translation can be off. The English is the wording Letterkind stands behind.',
-    fromGlossary: 'From Letterkind’s own glossary. No model wrote it, and nothing was sent.',
-    fromDevice: (ms: number) => `Translated on this device in ${(ms / 1000).toFixed(1)} s. Nothing was sent. Kept for next time.`,
+    fromGlossary: 'From Letterkind’s own glossary: fixed text that ships with the app. Nothing was generated, and nothing was sent.',
     fromCloud: (model: string, ms: number, bytes: number) =>
       `Translated by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes: the glossary’s entry and the language, none of them from your letter. Kept on this device for next time.`,
     rejectedHeading: 'The translation was thrown away',
     rejectedBody: 'A translation came back, but it broke one of Letterkind’s rules, so none of it is shown.',
     unavailableHeading: 'No translation could be had',
     unavailableBody:
-      'No model gave an answer. Translating into a language the model in this browser cannot write needs a connection. The English below is Letterkind’s own and needs none.',
+      'No answer came back. Translating a meaning needs a connection. The English below is Letterkind’s own and needs none.',
   },
 
   reply: {

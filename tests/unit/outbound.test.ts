@@ -36,7 +36,7 @@ describe('the closed set of outbound requests', () => {
 
   it('has exactly as many members as the list sizes multiply out to', () => {
     const expected =
-      2 * LETTER_TYPE_IDS.length * STATE_IDS.length * LANGUAGE_IDS.length + TERM_IDS.length * (LANGUAGE_IDS.length - 1);
+      2 * LETTER_TYPE_IDS.length * STATE_IDS.length * LANGUAGE_IDS.length + TERM_IDS.length * (LANGUAGE_IDS.length - 2);
     expect(requestCount()).toBe(expected);
     expect(all).toHaveLength(expected);
   });
@@ -88,10 +88,11 @@ describe('the run-time check', () => {
     ['a language outside the list', { ...explain, language: 'ES' }],
     ['a non-string value', { ...explain, state: ['CA'] }],
     ['an overlong value', { ...explain, type: 'medical_bill'.padEnd(5000, ' Dear Jane Roe, you owe $296.00.') }],
-    ['a term that is not in the glossary', { purpose: 'term', term: 'my account number is 0042', language: 'es' }],
-    ['a term request with a letter kind attached', { purpose: 'term', term: someTerm, language: 'es', type: 'medical_bill' }],
-    // The glossary is in English already: there is nothing to ask anyone for.
+    ['a term that is not in the glossary', { purpose: 'term', term: 'my account number is 0042', language: 'ko' }],
+    ['a term request with a letter kind attached', { purpose: 'term', term: someTerm, language: 'ko', type: 'medical_bill' }],
+    // The glossary has English and Spanish already: there is nothing to ask anyone for.
     ['a glossary entry asked for in English', { purpose: 'term', term: someTerm, language: 'en' }],
+    ['a glossary entry asked for in Spanish', { purpose: 'term', term: someTerm, language: 'es' }],
     ['a symbol key', { ...explain, [Symbol('letter')]: 'Dear Jane Roe' }],
     ['an object that is not plain', Object.assign(Object.create({ note: 'Dear Jane Roe' }) as object, explain)],
     ['a class instance', new (class Request { purpose = 'explain'; type = 'medical_bill'; state = 'CA'; language = 'es'; })()],
@@ -189,8 +190,9 @@ describe('prompts', () => {
     expect(routeFor({ ...explain, language: 'en' })).toBe('cloud_only');
     expect(routeFor({ ...explain, language: 'zh-Hans' })).toBe('cloud_only');
     expect(routeFor({ ...explain, purpose: 'reply', language: 'en' })).toBe('cloud_only');
-    expect(routeFor({ purpose: 'term', term: someTerm, language: 'es' })).toBe('device_first');
     expect(routeFor({ purpose: 'term', term: someTerm, language: 'ko' })).toBe('cloud_only');
+    // As things stand, nothing at all is routed to the model in the browser.
+    for (const request of allRequests()) expect(routeFor(request)).toBe('cloud_only');
   });
 
   it('can only be prepared through the check', () => {
@@ -304,11 +306,10 @@ describe('the channel', () => {
     expect(ledger.totals()).toEqual({ requests: 1, sent: 1, attempted: 0, stayed: 0, bytesOut: answer.entry.bytes });
   });
 
-  it('records a glossary entry translated on the device as never having left', async () => {
+  it('refuses an answer from the device to a glossary request as well', async () => {
     const { channel, ledger } = setup(() => Promise.resolve({ text: '{"explanation":"..."}', ran: 'device' }));
-    const { entry } = await channel.send({ purpose: 'term', term: someTerm, language: 'es' });
-    expect(entry.left).toBe('stayed');
-    expect(ledger.totals()).toMatchObject({ stayed: 1, bytesOut: 0 });
+    await expect(channel.send({ purpose: 'term', term: someTerm, language: 'ko' })).rejects.toThrow(/only the cloud/);
+    expect(ledger.totals()).toMatchObject({ stayed: 0, attempted: 1 });
   });
 
   it('refuses an answer from the device to a request only the cloud may answer', async () => {

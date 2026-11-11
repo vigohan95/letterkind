@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { findTerms } from '../../src/domain/glossary';
 import { roomFor } from '../../src/domain/meaning';
-import { checkText, TemplateRejected } from '../../src/domain/template';
+import { checkText, TemplateRejected, writtenAs } from '../../src/domain/template';
 import { TERMS } from '../../src/domain/terms';
 
 const found = (text: string): string[] => findTerms(text).map((m) => `${m.id}:${text.slice(m.start, m.end)}`);
@@ -83,8 +83,8 @@ describe('finding glossary terms in a letter', () => {
 });
 
 describe('what the glossary says each term means', () => {
-  // The meanings are the one part of a term's panel no model writes, so they are held to the
-  // rules a model's text is held to, and to a few of their own.
+  // The meanings are fixed text shown as they are, so they are held to the rules a model's text
+  // is held to, and to a few of their own.
   const broken = (check: (meaning: string) => boolean): string[] => TERMS.filter((t) => !check(t.meaning)).map((t) => t.id);
 
   it('has a meaning for every term, a sentence or two long', () => {
@@ -120,6 +120,45 @@ describe('what the glossary says each term means', () => {
     // Telling the reader what to do, as against saying what a letter may ask of them.
     const advice = /\byou should\b|\bmake sure\b|\bbe sure to\b|\brecommend|(^|[.:] )(Call|Ask|Contact|Pay|Send|File|Check|Keep|Do not|Never|Always)\b/;
     expect(advice.test('The amount still owed. Call the number on the letter.')).toBe(true);
+    expect(broken((m) => !advice.test(m))).toEqual([]);
+  });
+});
+
+describe('what the glossary says each term means, in Spanish', () => {
+  // The Spanish is fixed text as well, shown as it is and never checked at run time; so it is checked here.
+  const broken = (check: (meaning: string) => boolean): string[] => TERMS.filter((t) => !check(t.meaningEs)).map((t) => t.id);
+
+  it('has a Spanish meaning for every term, a sentence or two long', () => {
+    expect(broken((m) => typeof m === 'string' && m.length >= 30 && m.length <= 400)).toEqual([]);
+    expect(broken((m) => /^[A-ZÁÉÍÓÚÑ]/.test(m) && m.endsWith('.'))).toEqual([]);
+    expect(broken((m) => m === m.trim() && !/\s{2,}|[\r\n\t]/.test(m))).toEqual([]);
+  });
+
+  it('is Spanish, and not the English handed back', () => {
+    expect(broken((m) => writtenAs(m, 'es', 40))).toEqual([]);
+    expect(TERMS.filter((t) => t.meaningEs === t.meaning).map((t) => t.id)).toEqual([]);
+  });
+
+  it('states no amount, date, phone number or web address, and leaves no gap to fill', () => {
+    const rejected = TERMS.flatMap((t) => {
+      try {
+        checkText(t.meaningEs, t.id, 400, []);
+        return [];
+      } catch (error) {
+        if (error instanceof TemplateRejected) return [`${t.id}: ${error.reason} ${error.found ?? ''}`.trim()];
+        throw error;
+      }
+    });
+    expect(rejected).toEqual([]);
+  });
+
+  it('is typeset the way the rest of Letterkind is: no straight quotes', () => {
+    expect(broken((m) => !/['"]/.test(m))).toEqual([]);
+  });
+
+  it('gives no advice: it says what a word means, not what the reader should do', () => {
+    const advice = /\b(debería|deberías|asegúrese|recomienda|recomendamos)\b|(^|[.:] )(Llame|Pida|Pregunte|Pague|Envíe|Presente|Revise|Guarde|No haga|Nunca|Siempre)\b/;
+    expect(advice.test('El monto que aún se debe. Llame al número que aparece en la carta.')).toBe(true);
     expect(broken((m) => !advice.test(m))).toEqual([]);
   });
 });

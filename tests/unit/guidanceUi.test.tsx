@@ -9,7 +9,7 @@ import type { GuidanceSource } from '../../src/guidance/live';
 import { memoryStore } from '../../src/guidance/store';
 import { en } from '../../src/i18n/en';
 import { CLOUD_MODEL, createChannel, type Transport } from '../../src/outbound/channel';
-import { Ledger } from '../../src/outbound/ledger';
+import { Ledger, type LedgerEntry } from '../../src/outbound/ledger';
 import { promptFor } from '../../src/outbound/prompts';
 import { GuidanceBody, GuidancePanel, GuidanceReady } from '../../src/ui/Guidance';
 import { LedgerView } from '../../src/ui/LedgerView';
@@ -277,11 +277,20 @@ describe('the list of what left the device', () => {
     expect(html).toContain('Failed to reach the service.');
   });
 
-  it('keeps a request the device answered apart from one that left', async () => {
-    const { ledger, deps } = setup(() => Promise.resolve({ text: JSON.stringify({ term: 'x' }), ran: 'device' }));
+  it('keeps a request the device answered apart from one that left', () => {
+    // No request is routed to the device as things stand (see `routeFor`), so the entry is made by hand.
+    const ledger = new Ledger();
     const term = TERM_IDS.find((id) => id === 'deductible') ?? TERM_IDS[0]!;
-    await deps.channel.send({ purpose: 'term', term, language: 'es' }).catch(() => undefined);
-    const entry = ledger.entries()[0];
+    const asked = { purpose: 'term', term, language: 'ko' } as const;
+    const entry: LedgerEntry | undefined = ledger.record({
+      at: '2026-12-01T10:00:00.000Z',
+      request: asked,
+      route: 'device_first',
+      prompt: promptFor(asked),
+      ran: 'device',
+      ms: 900,
+      error: null,
+    });
     const html = renderToStaticMarkup(<LedgerView ledger={ledger} t={en} />);
 
     expect(entry?.left).toBe('stayed');

@@ -1,4 +1,4 @@
-import { languageName, writableOnDevice, type LanguageId } from '../domain/languages';
+import { languageName, type LanguageId } from '../domain/languages';
 import { letterType, type AmountMeaning, type DeadlineMeaning, type LetterTypeId } from '../domain/letterTypes';
 import { stateName, type StateId } from '../domain/states';
 import { nameBlank } from '../domain/standIns';
@@ -40,10 +40,13 @@ export function routeFor(request: OutboundRequest): Route {
     case 'reply':
       return 'cloud_only';
     // Putting a meaning the glossary already has into another language. The model in the browser
-    // was first asked to explain the word itself and got specialised terms wrong; translating a
-    // few sentences it is given is within its reach, wherever it can write the language.
+    // was first asked to explain the word itself and got specialised terms wrong. It was then
+    // asked only to translate the glossary's meaning into Spanish, the one other language it can
+    // write: on the hosted site that took 5.7 seconds a meaning, and of four translations one
+    // changed the meaning and two had defects. The Spanish is now written in the glossary, and
+    // every other language is translated in the cloud.
     case 'term':
-      return writableOnDevice(request.language) ? 'device_first' : 'cloud_only';
+      return 'cloud_only';
   }
 }
 

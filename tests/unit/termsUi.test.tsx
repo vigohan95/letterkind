@@ -31,7 +31,6 @@ const deductible = 'deductible' as TermId;
 /** What the glossary itself says: the English shown as it is, and beside every translation of it. */
 const GLOSS = term(deductible).meaning;
 const ENGLISH_BLOCK = `<div class="term-english"><h4>${en.terms.english}</h4><p lang="en">${GLOSS}</p></div>`;
-const ES = 'El deducible (deductible) es lo que usted paga cada año por la atención cubierta antes de que su plan de salud empiece a pagar.';
 const KO = '공제액(deductible)은 건강 보험이 비용을 내기 시작하기 전에 매년 본인이 먼저 내야 하는 금액입니다.';
 const json = (explanation: string): string => JSON.stringify({ explanation });
 
@@ -50,10 +49,9 @@ function setup(transport: Transport) {
   return { ledger, deps: { channel, store: memoryStore() } };
 }
 
-const inSpanish: TermRequest = { purpose: 'term', term: deductible, language: 'es' };
 const inKorean: TermRequest = { purpose: 'term', term: deductible, language: 'ko' };
 
-const panel = (status: TermStatus, language: LanguageId = 'es'): string =>
+const panel = (status: TermStatus, language: LanguageId = 'ko'): string =>
   renderToStaticMarkup(<TermPanel term={deductible} status={status} language={language} onAsk={nothing} onClose={nothing} t={en} />);
 
 describe('letter lines with glossary terms', () => {
@@ -108,29 +106,31 @@ describe('the letter with terms that can be tapped', () => {
     expect(live).toContain('<button type="button" class="term" data-term="collection-agency" aria-pressed="false">collection agency</button>');
   });
 
+  // A source that fails the test if it is ever asked: in English and Spanish there is nobody to ask.
+  const untouched: TermSource = {
+    ask: () => {
+      throw new Error('asked for a meaning the glossary already has');
+    },
+  };
+
   it('says, before any tap, that English meanings are the glossary’s own and a tap sends nothing', () => {
-    // A source that fails the test if it is ever asked: in English there is nobody to ask.
-    const untouched: TermSource = {
-      ask: () => {
-        throw new Error('asked for a meaning the glossary already has');
-      },
-    };
     const html = renderToStaticMarkup(<GlossedLetter letter={BILL} highlights={[]} language="en" source={untouched} t={en} />);
     expect(html).toContain(en.terms.inEnglish(en.guidance.heading));
-    expect(en.terms.inEnglish(en.guidance.heading)).toContain('no model writes them');
+    expect(en.terms.inEnglish(en.guidance.heading)).toContain('nothing is sent');
     expect(html).toContain('data-term="deductible"');
   });
 
-  it('says, before any tap, where a translation will be made: on this device for a language its model can write', () => {
-    const html = renderToStaticMarkup(<GlossedLetter letter={BILL} highlights={[]} language="es" source={never} t={en} />);
-    expect(html).toContain(en.terms.onDevice('Spanish', en.guidance.heading));
+  it('says, before any tap, that Spanish meanings are the glossary’s own too and a tap sends nothing', () => {
+    const html = renderToStaticMarkup(<GlossedLetter letter={BILL} highlights={[]} language="es" source={untouched} t={en} />);
+    expect(html).toContain(en.terms.inSpanish(en.guidance.heading));
+    expect(en.terms.inSpanish(en.guidance.heading)).toContain('nothing is sent');
     expect(html).not.toContain(en.terms.inCloud('Spanish', en.guidance.heading));
     expect(html).toContain('data-term="deductible"');
     // Nothing is asked until a word is tapped.
     expect(html).not.toContain('term-panel');
   });
 
-  it('says, before any tap, that a language the device cannot write means asking the cloud, and what is sent', () => {
+  it('says, before any tap, that a language the glossary is not written in means asking the cloud, and what is sent', () => {
     const html = renderToStaticMarkup(<GlossedLetter letter={BILL} highlights={[]} language="ko" source={never} t={en} />);
     expect(html).toContain(en.terms.inCloud('Korean', en.guidance.heading));
     expect(en.terms.inCloud('Korean', en.guidance.heading)).toContain('which word you asked about');
@@ -171,8 +171,8 @@ describe('what a tapped term shows', () => {
     expect(panel({ at: 'asking' })).toContain(en.terms.close);
   });
 
-  it('shows the glossary’s own meaning in English: no model, no request, nothing to ask for', () => {
-    const html = panel({ at: 'answered', meaning: ownMeaning(deductible) }, 'en');
+  it('shows the glossary’s own meaning in English: no request, nothing to ask for', () => {
+    const html = panel({ at: 'answered', meaning: ownMeaning(deductible, 'en') }, 'en');
     expect(html).toContain(`<p class="term-meaning" lang="en">${GLOSS}</p>`);
     expect(html).toContain('data-from="glossary"');
     expect(html).toContain(en.terms.fromGlossary);
@@ -183,11 +183,23 @@ describe('what a tapped term shows', () => {
     expect(html.match(/<button/g)).toHaveLength(1);
   });
 
-  it('says where the translation is being made while it waits, with the English already there to read', () => {
-    expect(panel({ at: 'asking' }, 'es')).toContain(en.terms.asking(true));
-    expect(panel({ at: 'asking' }, 'ko')).toContain(en.terms.asking(false));
-    expect(panel({ at: 'asking' })).toContain('role="status"');
-    expect(panel({ at: 'asking' }, 'ko')).toContain(ENGLISH_BLOCK);
+  it('shows the glossary’s own meaning in Spanish with the English beside it, and nothing to ask for', () => {
+    const html = panel({ at: 'answered', meaning: ownMeaning(deductible, 'es') }, 'es');
+    expect(html).toContain(`<p class="term-meaning" lang="es">${term(deductible).meaningEs}</p>`);
+    expect(html).toContain(ENGLISH_BLOCK);
+    expect(html).toContain('data-from="glossary"');
+    expect(html).toContain(en.terms.fromGlossary);
+    expect(html).toContain(en.terms.general);
+    // It is the glossary's own Spanish, not a model's: no translation caveat, nothing to press but Close.
+    expect(html).not.toContain(en.terms.translated);
+    expect(html.match(/<button/g)).toHaveLength(1);
+  });
+
+  it('says a translation is being asked for while it waits, with the English already there to read', () => {
+    const html = panel({ at: 'asking' }, 'ko');
+    expect(html).toContain(en.terms.asking);
+    expect(html).toContain('role="status"');
+    expect(html).toContain(ENGLISH_BLOCK);
   });
 
   it('offers the translation again after the language was changed, and asks nobody until told to', () => {
@@ -195,17 +207,6 @@ describe('what a tapped term shows', () => {
     expect(html).toContain(en.terms.ask('Korean'));
     expect(html).not.toContain(KO);
     expect(html).toContain(ENGLISH_BLOCK);
-  });
-
-  it('shows a translation made on this device beside the English, and says nothing was sent', async () => {
-    const meaning = await meaningOf(inSpanish, setup(answering(json(ES))).deps);
-    const html = panel({ at: 'answered', meaning });
-    expect(html).toContain(`<p class="term-meaning" lang="es" dir="auto">${ES}</p>`);
-    expect(html).toContain(ENGLISH_BLOCK);
-    expect(html).toContain('data-from="device"');
-    expect(html).toContain(en.terms.fromDevice(1600));
-    expect(html).toContain('Nothing was sent');
-    expect(html).toContain(`${en.terms.general} ${en.terms.translated}`);
   });
 
   it('shows a translation made in the cloud, with what it was sent', async () => {
@@ -216,24 +217,25 @@ describe('what a tapped term shows', () => {
     expect(html).toContain(ENGLISH_BLOCK);
     expect(html).toContain('data-from="cloud"');
     expect(html).toContain(en.terms.fromCloud(CLOUD_MODEL, 1600, meaning.entry.bytes));
+    expect(html).toContain(`${en.terms.general} ${en.terms.translated}`);
     expect(html).not.toContain('Nothing was sent');
   });
 
   it('shows a kept translation and says nothing was sent this time', async () => {
-    const { deps } = setup(answering(json(ES)));
-    await meaningOf(inSpanish, deps);
-    const html = panel({ at: 'answered', meaning: await meaningOf(inSpanish, deps) });
-    expect(html).toContain(ES);
+    const { deps } = setup(answering(json(KO)));
+    await meaningOf(inKorean, deps);
+    const html = panel({ at: 'answered', meaning: await meaningOf(inKorean, deps) }, 'ko');
+    expect(html).toContain(KO);
     expect(html).toContain('data-from="saved"');
     expect(html).toContain('Nothing was sent this time.');
   });
 
   it('shows nothing of a translation that broke a rule, says which rule, and still shows the English', async () => {
-    const meaning = await meaningOf(inSpanish, setup(answering(json('El deducible suele ser de $500 cada año.'))).deps);
-    const html = panel({ at: 'answered', meaning });
+    const meaning = await meaningOf(inKorean, setup(answering(json('공제액은 보통 $500 정도이며 매년 본인이 먼저 냅니다.'))).deps);
+    const html = panel({ at: 'answered', meaning }, 'ko');
     expect(html).toContain(en.terms.rejectedHeading);
     expect(html).toContain(en.guidance.rejected.amount('$500'));
-    expect(html).not.toContain('suele ser');
+    expect(html).not.toContain('정도이며');
     expect(html).toContain(en.guidance.askAgain);
     expect(html).toContain(ENGLISH_BLOCK);
   });

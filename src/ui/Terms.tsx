@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { findTerms } from '../domain/glossary';
-import { type LanguageId, languageName, writableOnDevice } from '../domain/languages';
-import { term as entryOf, type TermId } from '../domain/terms';
+import { type LanguageId, languageName } from '../domain/languages';
+import { term as entryOf, isGlossaryLanguage, type TermId } from '../domain/terms';
 import type { TermSource } from '../guidance/live';
 import { type MeaningOutcome, ownMeaning, type TermRequest } from '../guidance/term';
 import type { Strings } from '../i18n/en';
@@ -35,7 +35,7 @@ function TermBody({ term, status, language, onAsk, t }: Omit<TermPanelProps, 'on
     return (
       <>
         <p className="working" role="status">
-          {t.terms.asking(writableOnDevice(language))}
+          {t.terms.asking}
         </p>
         {english}
       </>
@@ -57,9 +57,10 @@ function TermBody({ term, status, language, onAsk, t }: Omit<TermPanelProps, 'on
   if (meaning.status === 'ready' && meaning.from === 'glossary') {
     return (
       <>
-        <p className="term-meaning" lang="en">
+        <p className="term-meaning" lang={language}>
           {meaning.template.explanation}
         </p>
+        {language !== 'en' && english}
         <p className="hint">{t.terms.general}</p>
         <p className="fact-source" data-from="glossary">
           {t.terms.fromGlossary}
@@ -79,11 +80,7 @@ function TermBody({ term, status, language, onAsk, t }: Omit<TermPanelProps, 'on
           {t.terms.general} {t.terms.translated}
         </p>
         <p className="fact-source" data-from={from}>
-          {entry && from === 'device'
-            ? t.terms.fromDevice(entry.ms)
-            : entry && from === 'cloud'
-              ? t.terms.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes)
-              : t.guidance.fromSaved(day.format(new Date(meaning.at)))}
+          {entry && from === 'cloud' ? t.terms.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes) : t.guidance.fromSaved(day.format(new Date(meaning.at)))}
         </p>
       </>
     );
@@ -144,8 +141,8 @@ export interface GlossedLetterProps {
  * The letter with the glossary's terms in it made tappable.
  *
  * A tap is matched to an entry of the glossary before anything else happens.
- * In English the entry itself is shown and nothing is asked of anyone. In
- * another language a translation of the entry is asked for, and the request
+ * In English and Spanish the entry itself is shown and nothing is asked of
+ * anyone. In another language a translation of the entry is asked for, and the request
  * can name only the entry and the language. What the reader's letter says
  * around the word is never part of it.
  */
@@ -165,13 +162,13 @@ export function GlossedLetter({ letter, highlights, language, source, t }: Gloss
   if (terms.length === 0) return <LetterView letter={letter} highlights={highlights} />;
 
   const chosen = picked !== null && terms.some((term) => term.id === picked) ? picked : null;
-  /** The request a tap on this term makes, or none: the glossary is in English already. */
-  const requestFor = (id: TermId): TermRequest | null => (language === 'en' ? null : { purpose: 'term', term: id, language });
+  /** The request a tap on this term makes, or none: the glossary has English and Spanish already. */
+  const requestFor = (id: TermId): TermRequest | null => (isGlossaryLanguage(language) ? null : { purpose: 'term', term: id, language });
 
   function statusOf(id: TermId): TermStatus {
+    if (isGlossaryLanguage(language)) return { at: 'answered', meaning: ownMeaning(id, language) };
     const request = requestFor(id);
-    if (request === null) return { at: 'answered', meaning: ownMeaning(id) };
-    return known?.key === serialize(request) ? known.status : { at: 'ask' };
+    return request !== null && known?.key === serialize(request) ? known.status : { at: 'ask' };
   }
 
   function ask(id: TermId): void {
@@ -207,8 +204,8 @@ export function GlossedLetter({ letter, highlights, language, source, t }: Gloss
   const hint =
     language === 'en'
       ? t.terms.inEnglish(t.guidance.heading)
-      : writableOnDevice(language)
-        ? t.terms.onDevice(name, t.guidance.heading)
+      : language === 'es'
+        ? t.terms.inSpanish(t.guidance.heading)
         : t.terms.inCloud(name, t.guidance.heading);
   return (
     <div className="letter-side">

@@ -1,5 +1,5 @@
 import { type Meaning, parseMeaning } from '../domain/meaning';
-import { term, type TermId } from '../domain/terms';
+import { meaningIn, term, type GlossaryLanguage, type TermId } from '../domain/terms';
 import type { OutboundRequest } from '../outbound/requests';
 import { fetched, kept, type KeepDeps, type Outcome, type ReadyOutcome } from './kept';
 import type { TemplateStore } from './store';
@@ -7,12 +7,11 @@ import type { TemplateStore } from './store';
 /**
  * What a glossary term means.
  *
- * In English it is the glossary's own entry: no model, no request, nothing
- * to wait for. In another language it is that entry translated, asked for
+ * In English and in Spanish it is the glossary's own entry: fixed text that
+ * ships with the app, so there is no request and nothing to wait for. In any
+ * other language it is the English entry translated in the cloud, asked for
  * once per term and language and kept. The request names the entry and the
- * language and carries nothing else. Where the model in the browser can
- * write the language, it is asked first and the request stays on the device;
- * the ledger says which.
+ * language and carries nothing else.
  */
 
 export type TermRequest = Extract<OutboundRequest, { purpose: 'term' }>;
@@ -29,10 +28,10 @@ export interface GlossaryMeaning {
 
 export type MeaningOutcome = Outcome<Meaning> | GlossaryMeaning;
 
-/** What the glossary says a term means, in English. Sends nothing and asks no model. */
-export const ownMeaning = (id: TermId): GlossaryMeaning => ({
+/** What the glossary itself says a term means, in a language it is written in. Sends nothing and asks nobody. */
+export const ownMeaning = (id: TermId, language: GlossaryLanguage): GlossaryMeaning => ({
   status: 'ready',
-  template: { explanation: term(id).meaning },
+  template: { explanation: meaningIn(id, language) },
   from: 'glossary',
   at: null,
   entry: null,

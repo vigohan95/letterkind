@@ -1,7 +1,7 @@
 import { isLanguageId, LANGUAGE_IDS, type LanguageId } from '../domain/languages';
 import { isLetterTypeId, LETTER_TYPE_IDS, type LetterTypeId } from '../domain/letterTypes';
 import { isStateId, STATE_IDS, type StateId } from '../domain/states';
-import { isTermId, TERM_IDS, type TermId } from '../domain/terms';
+import { isGlossaryLanguage, isTermId, TERM_IDS, type GlossaryLanguage, type TermId } from '../domain/terms';
 
 /**
  * Everything this app can ask a server-side model, as a closed set.
@@ -13,8 +13,8 @@ import { isTermId, TERM_IDS, type TermId } from '../domain/terms';
  * message against the full list rather than against a pattern.
  */
 
-/** The glossary is written in English, so English is never asked for. */
-export type TermLanguage = Exclude<LanguageId, 'en'>;
+/** The glossary is written in English and Spanish, so neither is ever asked for. */
+export type TermLanguage = Exclude<LanguageId, GlossaryLanguage>;
 
 export type OutboundRequest =
   /** What this kind of letter is and what to do about it. */
@@ -71,7 +71,7 @@ export function parseRequest(input: unknown): OutboundRequest {
   if (purpose === 'term') {
     const { term } = record;
     if (!isTermId(term)) throw new OutboundRejected('term is not in the glossary');
-    if (language === 'en') throw new OutboundRejected('the glossary is already in English');
+    if (isGlossaryLanguage(language)) throw new OutboundRejected('the glossary already has this language');
     return { purpose, term, language };
   }
 
@@ -99,11 +99,11 @@ export function* allRequests(): Generator<OutboundRequest> {
   }
   for (const term of TERM_IDS) {
     for (const language of LANGUAGE_IDS) {
-      if (language !== 'en') yield { purpose: 'term', term, language };
+      if (!isGlossaryLanguage(language)) yield { purpose: 'term', term, language };
     }
   }
 }
 
 /** How many requests `allRequests` yields, worked out from the list sizes. */
 export const requestCount = (): number =>
-  2 * LETTER_TYPE_IDS.length * STATE_IDS.length * LANGUAGE_IDS.length + TERM_IDS.length * (LANGUAGE_IDS.length - 1);
+  2 * LETTER_TYPE_IDS.length * STATE_IDS.length * LANGUAGE_IDS.length + TERM_IDS.length * (LANGUAGE_IDS.length - 2);
