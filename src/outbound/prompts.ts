@@ -171,6 +171,7 @@ function explainPrompt(type: LetterTypeId, state: StateId, language: LanguageId)
 
 function replyPrompt(type: LetterTypeId, state: StateId, language: LanguageId): string {
   const translated = language !== 'en';
+  const letterFields = translated ? 'subject, body_en or body_translated' : 'subject or body_en';
   return [
     'You draft a reply that a person in the United States can send to the sender of an official letter they received.',
     '',
@@ -179,11 +180,14 @@ function replyPrompt(type: LetterTypeId, state: StateId, language: LanguageId): 
     '',
     ...gaps(type),
     'Where the reader has to add something about themselves, write a blank in square brackets and capitals, such as [YOUR FULL NAME], [YOUR ADDRESS], [TODAY\'S DATE] or [WHAT YOU ARE ASKING FOR]. The reader fills those in by hand; nothing fills them automatically.',
+    ...(placeholdersFor(type).includes('DAYS_LEFT')
+      ? [`Never use ${mark('DAYS_LEFT')} in ${letterFields}: a letter is read days after it is written. It may appear in before_sending only.`]
+      : []),
     '',
     'Fill these fields:',
     '  subject         The subject line of the reply, in English.',
-    '  body_en         The reply, in formal, polite English, ready to print: the most common reason a person writes back to this kind of letter (for example to ask for proof, more time, a payment plan, a review or a correction). State facts and requests only. Admit nothing and promise nothing on the reader\'s behalf.',
-    ...(translated ? [`  body_translated The same reply in ${languageName(language)}, so the reader knows exactly what they are signing. Keep the markers and blanks unchanged.`] : []),
+    '  body_en         The reply, in formal, polite English, ready to print: the most common reason a person writes back to this kind of letter (for example to ask for proof, more time, a payment plan, a review or a correction). State facts and requests only. Admit nothing and promise nothing on the reader\'s behalf. Do not repeat the subject line inside it.',
+    ...(translated ? [`  body_translated The same reply in ${languageName(language)}, so the reader knows exactly what they are signing. Keep every marker exactly as it is in body_en, and write each blank in ${languageName(language)}, still in square brackets.`] : []),
     `  before_sending  In ${languageName(language)}: what to check, attach and keep before sending, one item each.`,
     '',
     'If replying in writing is not the usual way to handle this kind of letter, say so in the first item of before_sending and keep the reply short.',

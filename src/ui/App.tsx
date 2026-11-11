@@ -6,7 +6,7 @@ import { type Reading, readLetter } from '../ai/read';
 import { joinPages, transcribePage, unreadableCount } from '../ai/transcribe';
 import { localIsoDate } from '../domain/deadline';
 import { LETTER_TYPE_IDS, type LetterTypeId } from '../domain/letterTypes';
-import { ledger, liveGuidance } from '../guidance/live';
+import { ledger, liveGuidance, liveReply } from '../guidance/live';
 import { en } from '../i18n/en';
 import { ACCEPTED_FILES, openFiles, UnsupportedFile } from '../input/files';
 import { SAMPLE_LETTERS } from '../samples/letters';
@@ -16,6 +16,7 @@ import { LetterView } from './LetterView';
 import { PagePictures, Transcribing } from './Pages';
 import { browserStorage, loadPrefs, type Prefs, savePrefs } from './prefs';
 import { ReadingView } from './ReadingView';
+import { ReplyPanel } from './Reply';
 
 type Phase =
   | { at: 'idle' }
@@ -341,6 +342,7 @@ export function App() {
         <>
           <ReadingView letter={phase.letter} classification={phase.classification} reading={phase.reading} chosenByReader={phase.chosen} t={t} />
           <GuidancePanel reading={phase.reading} prefs={prefs} onPrefs={choosePrefs} source={liveGuidance} t={t} />
+          <ReplyPanel reading={phase.reading} prefs={prefs} source={liveReply} t={t} />
         </>
       )}
 

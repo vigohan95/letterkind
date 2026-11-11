@@ -55,7 +55,8 @@ export type RejectReason =
   | 'date'
   | 'phone'
   | 'web_address'
-  | 'not_in_language';
+  | 'not_in_language'
+  | 'translation_differs';
 
 /**
  * A template that broke a rule. It is thrown away whole: a model that has
@@ -82,10 +83,22 @@ export class TemplateRejected extends Error {
 const LIMITS = { what: 1200, steps: 700, if_ignored: 900, who_can_help: 400, reading_hint: 600 } as const;
 const MAX_ITEMS = { steps: 6, who_can_help: 4 } as const;
 
-type FieldName = keyof typeof LIMITS;
-const FIELD_NAMES = Object.keys(LIMITS) as FieldName[];
+const FIELD_NAMES = Object.keys(LIMITS);
 
 const MARKER = /\{\{([^{}]*)\}\}/g;
+
+/** The text with every marker taken out. */
+export const withoutMarkers = (text: string): string => text.replace(MARKER, ' ');
+
+/** The gaps a piece of template text has, in the order written. */
+export function markersIn(text: string): Placeholder[] {
+  const found: Placeholder[] = [];
+  for (const m of text.matchAll(MARKER)) {
+    const name = m[1] as Placeholder;
+    if ((PLACEHOLDERS as readonly string[]).includes(name)) found.push(name);
+  }
+  return found;
+}
 
 // Digits a model may write in a script other than the letter's: Arabic-Indic, Persian, full-width.
 const OTHER_DIGITS = /[٠-٩۰-۹０-９]/g;
@@ -112,30 +125,50 @@ function specificValue(text: string): { reason: RejectReason; found: string } | 
   return null;
 }
 
-function checkText(value: unknown, field: FieldName, allowed: readonly Placeholder[]): string {
+/**
+ * One piece of text from a model's answer, or `TemplateRejected`: a string, not empty, not longer than
+ * `limit`, every marker one of `allowed`, and nothing in it that only the letter may supply.
+ */
+export function checkText(value: unknown, field: string, limit: number, allowed: readonly Placeholder[]): string {
   if (typeof value !== 'string') throw new TemplateRejected('wrong_shape', field);
   const text = value.trim();
   if (text === '') throw new TemplateRejected('wrong_shape', field);
-  if (text.length > LIMITS[field]) throw new TemplateRejected('too_long', field);
+  if (text.length > limit) throw new TemplateRejected('too_long', field);
 
   for (const m of text.matchAll(MARKER)) {
     const name = m[1] ?? '';
     if (!(PLACEHOLDERS as readonly string[]).includes(name)) throw new TemplateRejected('unknown_marker', field, m[0]);
     if (!allowed.includes(name as Placeholder)) throw new TemplateRejected('marker_not_allowed_here', field, m[0]);
   }
-  const withoutMarkers = text.replace(MARKER, ' ');
+  const own = withoutMarkers(text);
   // Any brace left over is a marker written wrongly; it would be shown to the reader as-is.
-  const stray = /[{}]+/.exec(withoutMarkers);
+  const stray = /[{}]+/.exec(own);
   if (stray) throw new TemplateRejected('unknown_marker', field, stray[0]);
 
-  const specific = specificValue(withoutMarkers);
+  const specific = specificValue(own);
   if (specific) throw new TemplateRejected(specific.reason, field, specific.found);
   return text;
 }
 
-function checkList(value: unknown, field: 'steps' | 'who_can_help', allowed: readonly Placeholder[]): string[] {
-  if (!Array.isArray(value) || value.length === 0 || value.length > MAX_ITEMS[field]) throw new TemplateRejected('wrong_shape', field);
-  return value.map((item) => checkText(item, field, allowed));
+/** A list of one to `maxItems` pieces of text, each held to `checkText`. */
+export function checkList(value: unknown, field: string, limit: number, maxItems: number, allowed: readonly Placeholder[]): string[] {
+  if (!Array.isArray(value) || value.length === 0 || value.length > maxItems) throw new TemplateRejected('wrong_shape', field);
+  return value.map((item) => checkText(item, field, limit, allowed));
+}
+
+/** A model's answer as a record with no field beyond the ones named, or `TemplateRejected`. */
+export function answerFields(answer: string, names: readonly string[]): Record<string, unknown> {
+  let data: unknown;
+  try {
+    data = JSON.parse(answer);
+  } catch {
+    throw new TemplateRejected('not_json', 'answer');
+  }
+  if (typeof data !== 'object' || data === null || Array.isArray(data)) throw new TemplateRejected('wrong_shape', 'answer');
+  const record = data as Record<string, unknown>;
+  const extra = Object.keys(record).find((key) => !names.includes(key));
+  if (extra !== undefined) throw new TemplateRejected('wrong_shape', extra.slice(0, 40));
+  return record;
 }
 
 const LATIN = /\p{Script=Latin}/gu;
@@ -177,27 +210,18 @@ export function writtenAs(text: string, language: LanguageId): boolean {
  * will be shown is written the way their language is written.
  */
 export function parseExplain(answer: string, type: LetterTypeId, language: LanguageId): ExplainTemplate {
-  let data: unknown;
-  try {
-    data = JSON.parse(answer);
-  } catch {
-    throw new TemplateRejected('not_json', 'answer');
-  }
-  if (typeof data !== 'object' || data === null || Array.isArray(data)) throw new TemplateRejected('wrong_shape', 'answer');
-  const record = data as Record<string, unknown>;
-  const extra = Object.keys(record).find((key) => !(FIELD_NAMES as string[]).includes(key));
-  if (extra !== undefined) throw new TemplateRejected('wrong_shape', extra.slice(0, 40));
+  const record = answerFields(answer, FIELD_NAMES);
 
   const allowed = placeholdersFor(type);
   const template: ExplainTemplate = {
-    what: checkText(record.what, 'what', allowed),
-    steps: checkList(record.steps, 'steps', allowed),
-    ifIgnored: checkText(record.if_ignored, 'if_ignored', allowed),
-    whoCanHelp: checkList(record.who_can_help, 'who_can_help', allowed),
-    readingHint: checkText(record.reading_hint, 'reading_hint', []),
+    what: checkText(record.what, 'what', LIMITS.what, allowed),
+    steps: checkList(record.steps, 'steps', LIMITS.steps, MAX_ITEMS.steps, allowed),
+    ifIgnored: checkText(record.if_ignored, 'if_ignored', LIMITS.if_ignored, allowed),
+    whoCanHelp: checkList(record.who_can_help, 'who_can_help', LIMITS.who_can_help, MAX_ITEMS.who_can_help, allowed),
+    readingHint: checkText(record.reading_hint, 'reading_hint', LIMITS.reading_hint, []),
   };
   // The hint for the extractor is English in every template, so it is left out of this.
-  const shown = [template.what, ...template.steps, template.ifIgnored, ...template.whoCanHelp].join(' ').replace(MARKER, ' ');
+  const shown = withoutMarkers([template.what, ...template.steps, template.ifIgnored, ...template.whoCanHelp].join(' '));
   if (!writtenAs(shown, language)) throw new TemplateRejected('not_in_language', 'answer');
   return template;
 }
@@ -243,4 +267,4 @@ export function fill(text: string, values: Values, standIns: Readonly<Record<Sta
 }
 
 /** The filled text as one string. */
-export const filledText = (pieces: readonly Piece[]): string => pieces.map((p) => p.text).join('');
+export const filledText = (pieces: readonly { text: string }[]): string => pieces.map((p) => p.text).join('');

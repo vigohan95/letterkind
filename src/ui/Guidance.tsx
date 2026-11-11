@@ -1,58 +1,19 @@
-import { Fragment, useEffect, useState } from 'react';
-import type { FieldName } from '../ai/extract';
+import { useEffect, useState } from 'react';
 import type { Reading } from '../ai/read';
 import { LANGUAGES, type LanguageId } from '../domain/languages';
 import { standInsFor } from '../domain/standIns';
 import { STATES, type StateId } from '../domain/states';
-import { fill, type Placeholder, type StandIn, type Values } from '../domain/template';
+import { fill } from '../domain/template';
 import type { ExplainRequest, Guidance, Ready } from '../guidance/explain';
 import type { GuidanceSource } from '../guidance/live';
 import { valuesOf } from '../guidance/values';
 import type { Strings } from '../i18n/en';
 import { CLOUD_MODEL } from '../outbound/channel';
 import { serialize } from '../outbound/requests';
+import { Filled, type Filling } from './Filled';
 import type { Prefs } from './prefs';
 
-/** The colour a filled-in detail wears: the same as where it is marked in the letter. */
-const FIELD: Record<Placeholder, FieldName> = {
-  SENDER: 'sender',
-  REFERENCE: 'reference',
-  AMOUNT: 'amount',
-  DEADLINE: 'deadline',
-  DAYS_LEFT: 'deadline',
-  PHONE: 'phone',
-};
-
 const day = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
-
-interface Filling {
-  values: Values;
-  standIns: Readonly<Record<StandIn, string>>;
-}
-
-/**
- * One piece of a template with its gaps filled. Everything is put on the
- * page as plain characters; nothing a model wrote is ever treated as markup.
- */
-function Filled({ text, values, standIns }: Filling & { text: string }) {
-  return (
-    <>
-      {fill(text, values, standIns).map((piece, i) =>
-        piece.kind === 'text' ? (
-          <Fragment key={i}>{piece.text}</Fragment>
-        ) : piece.kind === 'value' ? (
-          <mark key={i} data-field={FIELD[piece.placeholder]}>
-            <bdi>{piece.text}</bdi>
-          </mark>
-        ) : (
-          <span key={i} className="stand-in">
-            {piece.text}
-          </span>
-        ),
-      )}
-    </>
-  );
-}
 
 export interface GuidanceReadyProps {
   guidance: Ready;

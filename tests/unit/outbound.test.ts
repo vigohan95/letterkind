@@ -141,6 +141,22 @@ describe('prompts', () => {
     expect(promptFor({ ...reply, language: 'vi' })).toContain('body_translated');
   });
 
+  it('keep a count of days out of a letter that will be read later', () => {
+    const never = `Never use ${mark('DAYS_LEFT')} in`;
+    for (const type of LETTER_TYPE_IDS) {
+      const dated = placeholdersFor(type).includes('DAYS_LEFT');
+      expect(promptFor({ purpose: 'reply', type, state: 'US', language: 'en' }).includes(`${never} subject or body_en:`), type).toBe(dated);
+      expect(promptFor({ purpose: 'reply', type, state: 'US', language: 'ko' }).includes(`${never} subject, body_en or body_translated:`), type).toBe(dated);
+      expect(promptFor({ purpose: 'explain', type, state: 'US', language: 'en' })).not.toContain(never);
+    }
+  });
+
+  it('ask for the blanks of a translated reply in the reader\'s language', () => {
+    const prompt = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'TX', language: 'es' });
+    expect(prompt).toContain('write each blank in Spanish, still in square brackets');
+    expect(prompt).toContain('Do not repeat the subject line inside it.');
+  });
+
   it('pick where a request may run from its purpose and language alone', () => {
     // Never the model in the browser, even in a language it can write: see `routeFor`.
     expect(routeFor({ ...explain, language: 'en' })).toBe('cloud_only');

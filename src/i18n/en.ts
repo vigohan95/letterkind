@@ -174,11 +174,45 @@ export const en = {
       web_address: (found: string) => `It contained a web or e-mail address (“${found}”). Letterkind does not show addresses a model wrote.`,
       not_in_language: () =>
         'It was not written the way the language you chose is written — in other letters, or with the accents left off.',
+      translation_differs: (found: string) =>
+        `Its translation did not match the English: a gap for a detail of your letter (“${found}”) was in one and not in the other.`,
     } satisfies Record<RejectReason, (found: string) => string>,
     askAgain: 'Ask again',
     unavailableHeading: 'No explanation could be fetched',
     unavailableBody:
       'The first explanation of each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',
+  },
+
+  reply: {
+    heading: 'A reply you can send',
+    intro:
+      'Letterkind can fetch a draft of a reply to this kind of letter, written by the same model in the cloud. It is told the same three things and nothing else:',
+    change: 'The state and the language are the ones chosen above.',
+    nothingElse:
+      'Your letter is not sent, and neither is your name or anything you want to say. The draft comes back with gaps for the details of your letter, which are filled in here, and with blanks in square brackets for what only you know.',
+    ask: 'Draft a reply',
+    checking: 'Looking for a draft already kept on this device…',
+    asking: 'Asking for a draft of a reply to this kind of letter…',
+    toSend: 'The reply to send',
+    subject: 'Subject:',
+    legend: 'Highlighted words were put in on this device, from your letter.',
+    blanks: (n: number) =>
+      n === 1
+        ? '1 place in square brackets is left for you to fill in by hand.'
+        : `${n} places in square brackets are left for you to fill in by hand.`,
+    copy: 'Copy the reply',
+    copied: 'Copied',
+    copyFailed: 'The reply could not be copied. Select the text and copy it by hand.',
+    translatedHeading: (language: string) => `What it says, in ${language}`,
+    translatedNote: 'For you to read, not to send. The reply above is the one that goes out: the office that wrote to you reads English.',
+    beforeSending: 'Before you send it',
+    draftNote: 'This is a draft, not legal advice. Read every line, change what does not fit your case, and keep a copy of what you send.',
+    fromCloud: (model: string, ms: number, bytes: number) =>
+      `Drafted by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes, none of them from your letter. Kept on this device for next time.`,
+    rejectedHeading: 'The draft was thrown away',
+    unavailableHeading: 'No draft could be fetched',
+    unavailableBody:
+      'The first draft for each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',
   },
 
   ledger: {
@@ -195,7 +229,7 @@ export const en = {
       'One more thing happens the first time a request goes out: Google reCAPTCHA is loaded on this page, so the server can tell the request comes from this app and not from a script. Letterkind passes it nothing from your letter. It is not loaded before that.',
     purpose: {
       explain: 'Explanation of a kind of letter',
-      reply: 'Outline of a reply',
+      reply: 'Draft of a reply',
       term: 'Meaning of a term',
     } satisfies Record<OutboundRequest['purpose'], string>,
     left: {

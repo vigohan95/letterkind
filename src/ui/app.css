@@ -554,6 +554,69 @@ select {
   margin-top: 8px;
 }
 
+/* A draft of a reply: set like a sheet of paper, because it is meant to become one. */
+.reply {
+  margin-top: 28px;
+}
+
+.reply-draft > h3 {
+  margin: 18px 0 6px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.reply-letter {
+  max-width: 74ch;
+  padding: 18px 22px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--sheet);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.reply-subject {
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 600;
+}
+
+.reply-subject > span:first-child {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.reply-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.reply-letter mark {
+  font-weight: 600;
+}
+
+/* What only the reader can write in. It has to be impossible to send by accident. */
+.blank {
+  padding: 0 2px;
+  border-bottom: 2px dashed var(--warn);
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.reply-reading {
+  margin-top: 8px;
+  border-style: dashed;
+  color: var(--ink-soft);
+}
+
+.reply-reading mark {
+  color: var(--ink);
+}
+
 /* Everything that was asked of a model outside this browser. */
 .ledger {
   margin-top: 28px;

@@ -97,3 +97,29 @@ const STAND_INS: Record<LanguageId, Record<StandIn, string>> = {
 };
 
 export const standInsFor = (language: LanguageId): Readonly<Record<StandIn, string>> => STAND_INS[language];
+
+/**
+ * What a reply shows where the letter did not yield a detail: a blank in
+ * square brackets, like the ones left for the reader's own name and address,
+ * to be written in by hand. In the reply to send they are in English and in
+ * capitals, the way a form marks what is still missing.
+ */
+const BLANKS_EN: Record<StandIn, string> = {
+  SENDER: '[NAME OF THE SENDER]',
+  REFERENCE: '[REFERENCE NUMBER ON THE LETTER]',
+  AMOUNT: '[AMOUNT ON THE LETTER]',
+  DEADLINE: '[DATE ON THE LETTER]',
+  PHONE: '[PHONE NUMBER ON THE LETTER]',
+};
+
+export function blanksFor(language: LanguageId): Readonly<Record<StandIn, string>> {
+  if (language === 'en') return BLANKS_EN;
+  const words = STAND_INS[language];
+  return {
+    SENDER: `[${words.SENDER}]`,
+    REFERENCE: `[${words.REFERENCE}]`,
+    AMOUNT: `[${words.AMOUNT}]`,
+    DEADLINE: `[${words.DEADLINE}]`,
+    PHONE: `[${words.PHONE}]`,
+  };
+}
