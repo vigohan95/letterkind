@@ -30,11 +30,12 @@ export type Outcome<T> =
   /** An answer came back and broke a rule. Nothing from it is shown. */
   | { status: 'rejected'; reason: RejectReason; field: string; found: string; entry: LedgerEntry }
   /**
-   * No answer could be had. `busy`: the server said it was in trouble, twice;
-   * asking again later is all there is to do. `no_answer`: no connection, no
-   * model, or the service refused.
+   * No answer could be had. `busy`: the server said it was in trouble, twice.
+   * `limit`: as many requests as the project may make in a minute have been
+   * made, by everyone together. For both, asking again later is all there is
+   * to do. `no_answer`: no connection, no model, or the service refused.
    */
-  | { status: 'unavailable'; why: 'busy' | 'no_answer'; error: string };
+  | { status: 'unavailable'; why: 'busy' | 'limit' | 'no_answer'; error: string };
 
 /** Turns an answer into a checked template, or throws `TemplateRejected`. */
 export type Check<T> = (answer: string) => T;
@@ -77,7 +78,8 @@ export async function fetched<T>(request: OutboundRequest, { channel, store }: K
   try {
     answer = await channel.send(request);
   } catch (error) {
-    const why = (statusOf(error) ?? 0) >= 500 ? 'busy' : 'no_answer';
+    const status = statusOf(error) ?? 0;
+    const why = status === 429 ? 'limit' : status >= 500 ? 'busy' : 'no_answer';
     return { status: 'unavailable', why, error: error instanceof Error ? error.message : String(error) };
   }
 

@@ -183,6 +183,8 @@ export const en = {
     askAgain: 'Ask again',
     busyBody:
       'The model in the cloud was too busy to answer, twice in a row. Nothing is wrong on your side: ask again in a minute. What Letterkind read from your letter above was done on this device and is not affected.',
+    limitBody:
+      'Letterkind may ask the model in the cloud only so many times a minute, counting everyone who is using it, and that many have just been asked. Nothing is wrong on your side: ask again in a minute. What Letterkind read from your letter above was done on this device and is not affected.',
     unavailableHeading: 'No explanation could be fetched',
     unavailableBody:
       'The first explanation of each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',

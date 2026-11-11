@@ -174,8 +174,9 @@ export function ReplyBody({ status, reading, language, onAsk, t }: ReplyBodyProp
       ) : (
         <>
           <h3>{t.reply.unavailableHeading}</h3>
-          <p data-why={outcome.why}>{outcome.why === 'busy' ? t.guidance.busyBody : t.reply.unavailableBody}</p>
-          <p className="fact-source">{outcome.error}</p>
+          <p data-why={outcome.why}>{outcome.why === 'busy' ? t.guidance.busyBody : outcome.why === 'limit' ? t.guidance.limitBody : t.reply.unavailableBody}</p>
+          {/* What the server said is shown only where it explains something the words above do not. */}
+          {outcome.why === 'no_answer' && <p className="fact-source">{outcome.error}</p>}
         </>
       )}
       <p className="guidance-actions">

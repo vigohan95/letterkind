@@ -154,11 +154,21 @@ describe('the reply panel', () => {
     expect(html).toContain('Failed to reach the service.');
   });
 
+  it('says when the allowance for one minute is used up, without the server\'s talk of plans and billing', async () => {
+    const full: Transport = () => Promise.reject(Object.assign(new Error('[429 ] You exceeded your current quota, please check your plan and billing details.'), { customErrorData: { status: 429 } }));
+    const html = body(await draftReply(request, setup(full).deps), await read(truthful));
+    expect(html).toContain(en.guidance.limitBody);
+    expect(html).not.toContain(en.reply.unavailableBody);
+    expect(html).not.toContain('billing');
+    expect(html).toContain('Ask again');
+  });
+
   it('says the model in the cloud was busy, and does not blame the connection for it', async () => {
     const busy: Transport = () => Promise.reject(Object.assign(new Error('[500 ] This model is currently experiencing high demand.'), { customErrorData: { status: 500 } }));
     const html = body(await draftReply(request, setup(busy).deps), await read(truthful));
     expect(html).toContain(en.reply.unavailableHeading);
     expect(html).toContain(en.guidance.busyBody);
+    expect(html).not.toContain('experiencing high demand');
     expect(html).not.toContain(en.reply.unavailableBody);
     expect(html).toContain('Ask again');
   });

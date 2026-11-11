@@ -126,8 +126,9 @@ export function GuidanceBody({ status, reading, prefs, onAsk, onForget, t }: Gui
       ) : (
         <>
           <h3>{t.guidance.unavailableHeading}</h3>
-          <p data-why={guidance.why}>{guidance.why === 'busy' ? t.guidance.busyBody : t.guidance.unavailableBody}</p>
-          <p className="fact-source">{guidance.error}</p>
+          <p data-why={guidance.why}>{guidance.why === 'busy' ? t.guidance.busyBody : guidance.why === 'limit' ? t.guidance.limitBody : t.guidance.unavailableBody}</p>
+          {/* What the server said is shown only where it explains something the words above do not. */}
+          {guidance.why === 'no_answer' && <p className="fact-source">{guidance.error}</p>}
         </>
       )}
       <p className="guidance-actions">

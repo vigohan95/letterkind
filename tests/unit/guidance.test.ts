@@ -107,6 +107,9 @@ describe('asking for an explanation', () => {
   it('tells a server too busy to answer from a missing connection', async () => {
     const busy: Transport = () => Promise.reject(Object.assign(new Error('[500 ] This model is currently experiencing high demand.'), { customErrorData: { status: 500 } }));
     expect(await explain(request, setup(busy).deps)).toMatchObject({ status: 'unavailable', why: 'busy' });
+    // The free allowance is counted per minute for everyone together; the server says so with a 429.
+    const full: Transport = () => Promise.reject(Object.assign(new Error('[429 ] You exceeded your current quota, please check your plan and billing details.'), { customErrorData: { status: 429 } }));
+    expect(await explain(request, setup(full).deps)).toMatchObject({ status: 'unavailable', why: 'limit' });
     const refused: Transport = () => Promise.reject(Object.assign(new Error('[401 ]'), { customErrorData: { status: 401 } }));
     expect(await explain(request, setup(refused).deps)).toMatchObject({ status: 'unavailable', why: 'no_answer' });
   });
