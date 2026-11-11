@@ -190,6 +190,26 @@ export const en = {
       'The first explanation of each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',
   },
 
+  terms: {
+    onDevice: (language: string, heading: string) =>
+      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means, in ${language} — the language chosen under “${heading}”. The model in this browser writes it, and nothing is sent. Only if that model fails does Letterkind ask the model in the cloud, which is then told which word you asked about and the language, and nothing else.`,
+    inCloud: (language: string, heading: string) =>
+      `Underlined words are in Letterkind’s glossary. Tap one for what it generally means, in ${language} — the language chosen under “${heading}”. The model in this browser cannot write ${language}, so tapping asks the model in the cloud. It is told which word you asked about — the glossary’s own entry, not words copied from your letter — and the language, and nothing else.`,
+    heading: (words: string) => `What “${words}” means`,
+    close: 'Close',
+    asking: (onDevice: boolean) => (onDevice ? 'Writing the meaning on this device…' : 'Asking the model in the cloud what this word means…'),
+    ask: (language: string) => `Explain in ${language}`,
+    general: 'This is what the word generally means. It was written without your letter, so it says nothing about your case, and it is not advice.',
+    fromDevice: (ms: number) => `Written on this device in ${(ms / 1000).toFixed(1)} s. Nothing was sent. Kept for next time.`,
+    fromCloud: (model: string, ms: number, bytes: number) =>
+      `Written by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes: the glossary’s entry and the language, none of them from your letter. Kept on this device for next time.`,
+    rejectedHeading: 'The meaning was thrown away',
+    rejectedBody: 'An answer came back, but it broke one of Letterkind’s rules, so none of it is shown.',
+    unavailableHeading: 'No meaning could be fetched',
+    unavailableBody:
+      'No model gave an answer. A meaning in a language the model in this browser cannot write needs a connection. What Letterkind read from your letter was done on this device and is not affected.',
+  },
+
   reply: {
     heading: 'A reply you can send',
     intro:

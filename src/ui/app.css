@@ -695,3 +695,73 @@ footer {
   color: var(--ink-soft);
   font-size: 0.86rem;
 }
+
+/* Glossary terms in the letter, and what one of them means. */
+.letter-side {
+  min-width: 0;
+}
+
+.letter-side > .hint {
+  margin: 0 0 8px;
+}
+
+.letter .term {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  text-decoration: underline dotted var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+.letter .term:hover,
+.letter .term[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  text-decoration-style: solid;
+}
+
+.letter .term:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.term-panel {
+  position: sticky;
+  bottom: 12px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--sheet);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+}
+
+.term-panel header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.term-panel h3,
+.term-panel h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.term-meaning {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.term-panel .fact-source {
+  margin-top: 8px;
+}

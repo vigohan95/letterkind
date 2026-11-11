@@ -1,6 +1,8 @@
 import type { Reading } from '../ai/read';
 import type { FieldName } from '../ai/extract';
+import type { TermMatch } from '../domain/glossary';
 import { dropOverlaps, lineStarts } from '../domain/parse/span';
+import type { TermId } from '../domain/terms';
 
 /** A stretch of the letter that backs one of the facts shown beside it. */
 export interface Highlight {
@@ -26,7 +28,10 @@ export function highlightsOf(reading: Reading): Highlight[] {
 
 export interface LinePart {
   text: string;
+  /** Set when this stretch backs one of the facts shown beside the letter. */
   field?: FieldName;
+  /** Set when this stretch is a term of the glossary. Never set together with `field`. */
+  term?: TermId;
 }
 
 export interface LetterLine {
@@ -34,21 +39,40 @@ export interface LetterLine {
   parts: LinePart[];
 }
 
-/** Cuts the letter into numbered lines, each split where a highlight starts or ends. */
-export function letterLines(letter: string, highlights: readonly Highlight[]): LetterLine[] {
+type Mark = { start: number; end: number } & ({ field: FieldName } | { term: TermId });
+
+const isSpace = (letter: string, at: number): boolean => /\s/.test(letter.charAt(at));
+
+/**
+ * Cuts the letter into numbered lines, each split where a highlight or a
+ * glossary term starts or ends. Where the two overlap the highlight is kept:
+ * it is a fact about this letter, and the term is only a word in it.
+ */
+export function letterLines(letter: string, highlights: readonly Highlight[], terms: readonly TermMatch[] = []): LetterLine[] {
   const starts = lineStarts(letter);
-  const sorted = [...highlights].sort((a, b) => a.start - b.start);
+  const clear = terms.filter((term) => !highlights.some((h) => h.start < term.end && term.start < h.end));
+  const marks: Mark[] = [
+    ...highlights.map((h) => ({ start: h.start, end: h.end, field: h.field })),
+    ...clear.map((term) => ({ start: term.start, end: term.end, term: term.id })),
+  ].sort((a, b) => a.start - b.start);
+
   return starts.map((lineStart, index) => {
     const next = starts[index + 1];
     const lineEnd = next === undefined ? letter.length : next - 1;
     const parts: LinePart[] = [];
     let at = lineStart;
-    for (const h of sorted) {
-      const from = Math.max(h.start, lineStart);
-      const to = Math.min(h.end, lineEnd);
+    for (const mark of marks) {
+      let from = Math.max(mark.start, lineStart);
+      let to = Math.min(mark.end, lineEnd);
+      if ('term' in mark) {
+        // A term that runs over a line break is marked on each line without the indent or the line's end.
+        while (from < to && isSpace(letter, from)) from += 1;
+        while (to > from && isSpace(letter, to - 1)) to -= 1;
+      }
       if (from >= to || from < at) continue;
       if (from > at) parts.push({ text: letter.slice(at, from) });
-      parts.push({ text: letter.slice(from, to), field: h.field });
+      const text = letter.slice(from, to);
+      parts.push('term' in mark ? { text, term: mark.term } : { text, field: mark.field });
       at = to;
     }
     if (at < lineEnd) parts.push({ text: letter.slice(at, lineEnd) });

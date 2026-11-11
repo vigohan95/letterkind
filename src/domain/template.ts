@@ -209,10 +209,13 @@ function readsAsEnglish(text: string): boolean {
  * The rule for accents is loose on purpose. Measured on real answers, a
  * checklist in correct formal Spanish had two accents in three hundred
  * letters; a stricter rule threw away about one good draft in five.
+ *
+ * `enough` is how many letters it takes to judge at all. A whole template
+ * has hundreds; a caller checking something shorter may ask for fewer.
  */
-export function writtenAs(text: string, language: LanguageId): boolean {
+export function writtenAs(text: string, language: LanguageId, enough = ENOUGH_LETTERS): boolean {
   const letters = count(text, /\p{L}/gu);
-  if (letters < ENOUGH_LETTERS) return true;
+  if (letters < enough) return true;
   const script = scriptOf(language);
   if (script !== 'latin' && script !== 'latin_marked') return count(text, OWN_LETTERS[script]) * 2 >= letters;
   const latin = count(text, LATIN);

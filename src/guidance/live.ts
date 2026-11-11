@@ -3,6 +3,7 @@ import { Ledger } from '../outbound/ledger';
 import { explain, type ExplainRequest, type Guidance, type Ready, savedGuidance } from './explain';
 import { type Draft, draftReply, type ReadyDraft, type ReplyRequest, savedDraft } from './reply';
 import { browserStore } from './store';
+import { type MeaningOutcome, meaningOf, type TermRequest } from './term';
 
 /**
  * The parts the running app shares: one ledger, one way out, one place
@@ -38,4 +39,13 @@ export interface ReplySource {
 export const liveReply: ReplySource = {
   saved: (request) => savedDraft(request, store),
   ask: (request) => draftReply(request, { channel, store }),
+};
+
+export interface TermSource {
+  /** The kept meaning if there is one; otherwise ask for one, on this device where the language allows. */
+  ask(request: TermRequest): Promise<MeaningOutcome>;
+}
+
+export const liveTerms: TermSource = {
+  ask: (request) => meaningOf(request, { channel, store }),
 };

@@ -2,14 +2,17 @@ import type { ReactNode } from 'react';
 import type { Classification } from '../ai/classify';
 import type { FieldName } from '../ai/extract';
 import type { Reading } from '../ai/read';
+import type { LanguageId } from '../domain/languages';
 import { letterType } from '../domain/letterTypes';
 import type { Found } from '../domain/parse/span';
 import { formatPhone, type PhoneMatch } from '../domain/parse/phone';
 import type { NotApplicable } from '../domain/rules';
 import type { Verdict } from '../domain/verify';
+import type { TermSource } from '../guidance/live';
 import type { Strings } from '../i18n/en';
 import { highlightsOf } from './highlights';
 import { LetterView } from './LetterView';
+import { GlossedLetter } from './Terms';
 
 const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 const showDate = (iso: string): string => longDate.format(new Date(`${iso}T00:00:00Z`));
@@ -99,17 +102,24 @@ export interface ReadingViewProps {
   reading: Reading;
   /** True when the two readers disagreed and the person picked the kind. */
   chosenByReader: boolean;
+  /** Given, the glossary's terms in the letter can be tapped for what they mean, in this language. */
+  terms?: { language: LanguageId; source: TermSource };
   t: Strings;
 }
 
 /** The letter on one side; on the other, only what could be checked against it. */
-export function ReadingView({ letter, classification, reading, chosenByReader, t }: ReadingViewProps) {
+export function ReadingView({ letter, classification, reading, chosenByReader, terms, t }: ReadingViewProps) {
   const kind = letterType(reading.type);
   const onDevice = (ms: number): string => `${t.where.onDevice} · ${t.where.seconds(ms)}`;
+  const highlights = highlightsOf(reading);
 
   return (
     <div className="reading">
-      <LetterView letter={letter} highlights={highlightsOf(reading)} />
+      {terms ? (
+        <GlossedLetter letter={letter} highlights={highlights} language={terms.language} source={terms.source} t={t} />
+      ) : (
+        <LetterView letter={letter} highlights={highlights} />
+      )}
 
       <div className="facts">
         <section className="fact fact-kind">

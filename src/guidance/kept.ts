@@ -17,8 +17,11 @@ import type { TemplateStore } from './store';
 export interface ReadyOutcome<T> {
   status: 'ready';
   template: T;
-  /** `saved`: read back from this device; nothing was sent this time. */
-  from: 'cloud' | 'saved';
+  /**
+   * `saved`: read back from this device; nothing was asked this time.
+   * `device`: written just now by the model in the browser; nothing was sent.
+   */
+  from: 'cloud' | 'device' | 'saved';
   /** When the template was written, ISO 8601. */
   at: string;
   /** The ledger entry for the request; null when nothing was asked. */
@@ -96,5 +99,5 @@ export async function fetched<T>(request: OutboundRequest, { channel, store }: K
   } catch {
     // Not being able to keep a template is no reason to withhold it.
   }
-  return { status: 'ready', template, from: 'cloud', at: answer.entry.at, entry: answer.entry };
+  return { status: 'ready', template, from: answer.ran, at: answer.entry.at, entry: answer.entry };
 }
