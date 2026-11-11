@@ -135,7 +135,7 @@ describe('the reply panel', () => {
   });
 
   it('shows nothing of a draft that broke a rule, and says which', async () => {
-    const broken = JSON.stringify({ ...(JSON.parse(answer) as object), body_translated: 'Recibí su factura. [SU FIRMA]' });
+    const broken = JSON.stringify({ ...(JSON.parse(answer) as object), body_translated: 'A quien corresponda:\nRecibí su factura.\n[SU FIRMA]' });
     const { deps } = setup(cloud(broken));
     const html = body(await draftReply(request, deps), await read(truthful));
 

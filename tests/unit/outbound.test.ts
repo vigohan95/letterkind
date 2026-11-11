@@ -151,6 +151,17 @@ describe('prompts', () => {
     }
   });
 
+  it('ask for a reply laid out as a letter, in the reader\'s own voice', () => {
+    for (const language of ['en', 'vi'] as const) {
+      const prompt = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'NY', language });
+      expect(prompt).toContain('a greeting on its own line');
+      expect(prompt).toContain('"I" is always the reader and "you" is always the sender');
+      expect(prompt).toContain('Do not explain the law');
+    }
+    expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'NY', language: 'vi' })).toContain('with the same line breaks');
+    expect(promptFor({ purpose: 'explain', type: 'medical_bill', state: 'NY', language: 'en' })).not.toContain('a greeting on its own line');
+  });
+
   it('ask for the blanks of a translated reply in the reader\'s language', () => {
     const prompt = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'TX', language: 'es' });
     expect(prompt).toContain('write each blank in Spanish, still in square brackets');

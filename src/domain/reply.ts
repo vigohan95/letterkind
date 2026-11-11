@@ -73,6 +73,10 @@ const details = (text: string): Set<Placeholder> => new Set(markersIn(text).filt
  * reader's language is written, and the translation has a gap for exactly
  * the details the English has.
  */
+/** A greeting, what is asked, and a closing: fewer lines than that is a block of text, not a letter. */
+const MIN_LINES = 3;
+const laidOut = (text: string): boolean => text.split('\n').filter((line) => line.trim() !== '').length >= MIN_LINES;
+
 export function parseReply(answer: string, type: LetterTypeId, language: LanguageId): ReplyTemplate {
   const translated = language !== 'en';
   const names = translated ? ['subject', 'body_en', 'body_translated', 'before_sending'] : ['subject', 'body_en', 'before_sending'];
@@ -86,8 +90,11 @@ export function parseReply(answer: string, type: LetterTypeId, language: Languag
     beforeSending: checkList(record.before_sending, 'before_sending', LIMITS.before_sending, MAX_CHECKS, allowed),
   };
 
+  // It is going to be printed and signed; one unbroken block is not something to put a name under.
+  if (!laidOut(template.bodyEn)) throw new TemplateRejected('wrong_shape', 'body_en');
   if (!writtenAs(ownWords(template.bodyEn), 'en')) throw new TemplateRejected('not_in_language', 'body_en');
   if (template.bodyTranslated !== null) {
+    if (!laidOut(template.bodyTranslated)) throw new TemplateRejected('wrong_shape', 'body_translated');
     if (!writtenAs(ownWords(template.bodyTranslated), language)) throw new TemplateRejected('not_in_language', 'body_translated');
     // A reader who signs the English must have been shown the same details in their own language.
     const sent = details(template.bodyEn);

@@ -73,6 +73,15 @@ function rejection(text: string, type: LetterTypeId = 'medical_bill', language: 
 }
 
 describe('a draft of a reply', () => {
+  it('is thrown away when it comes as one block of text and not laid out as a letter', () => {
+    const block = (text: string): string => text.replace(/\n+/g, ' ');
+    expect(rejection(inEnglish({ body_en: block(letter) }))).toMatchObject({ reason: 'wrong_shape', field: 'body_en' });
+    expect(rejection(inSpanish({ body_translated: block(carta) }), 'medical_bill', 'es')).toMatchObject({ reason: 'wrong_shape', field: 'body_translated' });
+    // A greeting, what is asked and a closing are enough; the lines between them need not be empty.
+    const short = 'To whom it may concern:\nPlease send me an itemized statement of every charge on the bill you sent me, before I pay any of it.\nSincerely,\n[YOUR FULL NAME]';
+    expect(parseReply(inEnglish({ body_en: short }), 'medical_bill', 'en').bodyEn).toBe(short);
+  });
+
   it('is accepted with its markers and its blanks for the reader to fill in', () => {
     const draft = parseReply(inEnglish(), 'medical_bill', 'en');
     expect(draft.subject).toBe(english.subject);
@@ -88,9 +97,9 @@ describe('a draft of a reply', () => {
   });
 
   it('keeps the subject on one line and the letter free of runs of empty lines', () => {
-    const draft = parseReply(inEnglish({ subject: ' Request for\nan itemized bill ', body_en: 'Dear {{SENDER}},\r\n\r\n\r\n\r\nPlease send it.\n' }), 'medical_bill', 'en');
+    const draft = parseReply(inEnglish({ subject: ' Request for\nan itemized bill ', body_en: 'Dear {{SENDER}},\r\n\r\n\r\n\r\nPlease send it.  \n\n\nSincerely,\n' }), 'medical_bill', 'en');
     expect(draft.subject).toBe('Request for an itemized bill');
-    expect(draft.bodyEn).toBe('Dear {{SENDER}},\n\nPlease send it.');
+    expect(draft.bodyEn).toBe('Dear {{SENDER}},\n\nPlease send it.\n\nSincerely,');
   });
 
   it.each<[string, Record<string, unknown>, RejectReason, string]>([
@@ -138,10 +147,10 @@ describe('a draft of a reply', () => {
   });
 
   it('is thrown away when the letter to send is not in English, or the one to read is not in the reader’s language', () => {
-    const chinese = '我收到了贵方寄来的账单，在付款之前，请先把每一项收费的明细寄给我，并说明保险已经支付的部分。'.repeat(6);
+    const chinese = '我收到了贵方寄来的账单，在付款之前，请先把每一项收费的明细寄给我，并说明保险已经支付的部分。\n'.repeat(6);
     expect(rejection(inSpanish({ body_en: chinese }), 'medical_bill', 'es')).toMatchObject({ reason: 'not_in_language', field: 'body_en' });
 
-    const noAccents = 'Recibi su factura y antes de pagar les pido un desglose de cada cargo que aparece en ella. '.repeat(4);
+    const noAccents = 'Recibi su factura y antes de pagar les pido un desglose de cada cargo que aparece en ella.\n'.repeat(4);
     expect(rejection(inSpanish({ body_translated: `{{SENDER}} {{REFERENCE}} {{AMOUNT}} {{DEADLINE}} ${noAccents}`, before_sending: ['Guarde una copia.'] }), 'medical_bill', 'es')).toMatchObject({
       reason: 'not_in_language',
       field: 'body_translated',
