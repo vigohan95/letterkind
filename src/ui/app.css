@@ -198,6 +198,11 @@ button.primary {
   .compose-check {
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   }
+
+  /* Tall enough to check against the page without scrolling two boxes at once. */
+  .compose-check textarea {
+    min-height: 60vh;
+  }
 }
 
 .pictures {
