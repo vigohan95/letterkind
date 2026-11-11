@@ -188,6 +188,8 @@ export const en = {
       `${n === 1 ? '1 request' : `${n} requests`} sent, ${bytes.toLocaleString('en-US')} bytes in all. None of it from a letter.`,
     attempted: (n: number) => (n === 1 ? '1 request was tried and brought nothing back.' : `${n} requests were tried and brought nothing back.`),
     stayed: (n: number) => (n === 1 ? '1 request was answered on this device.' : `${n} requests were answered on this device.`),
+    underway: (n: number) => (n === 1 ? '1 request is under way.' : `${n} requests are under way.`),
+    underwayLabel: 'Under way',
     note: 'Reading a letter is done by the model inside this browser and sends nothing. This list holds every request Letterkind made to a model outside it, word for word.',
     appCheck:
       'One more thing happens the first time a request goes out: Google reCAPTCHA is loaded on this page, so the server can tell the request comes from this app and not from a script. Letterkind passes it nothing from your letter. It is not loaded before that.',

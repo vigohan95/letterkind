@@ -36,6 +36,9 @@ export interface LedgerEntry {
   error: string | null;
 }
 
+/** A request that has been handed to a model and has not come back yet. */
+export type Underway = Pick<LedgerEntry, 'id' | 'at' | 'request' | 'route' | 'prompt' | 'bytes'>;
+
 export interface LedgerTotals {
   requests: number;
   sent: number;
@@ -59,13 +62,27 @@ export function leftDevice(route: Route, ran: Ran): Left {
 
 export class Ledger {
   #entries: readonly LedgerEntry[] = [];
+  #underway: readonly Underway[] = [];
   #listeners = new Set<() => void>();
   #nextId = 1;
 
-  record(entry: Omit<LedgerEntry, 'id' | 'bytes' | 'left'>): LedgerEntry {
+  /**
+   * Notes a request at the moment it is handed over, so that the page never
+   * says nothing has left while something is on its way.
+   */
+  begin(asked: Omit<Underway, 'id' | 'bytes'>): Underway {
+    const underway: Underway = Object.freeze({ ...asked, id: this.#nextId++, bytes: byteLength(asked.prompt) });
+    this.#underway = Object.freeze([...this.#underway, underway]);
+    for (const listener of this.#listeners) listener();
+    return underway;
+  }
+
+  /** Writes down how a request ended. Given the note made when it began, it takes that note's place. */
+  record(entry: Omit<LedgerEntry, 'id' | 'bytes' | 'left'>, began?: Underway): LedgerEntry {
+    if (began) this.#underway = Object.freeze(this.#underway.filter((u) => u.id !== began.id));
     const full: LedgerEntry = Object.freeze({
       ...entry,
-      id: this.#nextId++,
+      id: began?.id ?? this.#nextId++,
       bytes: byteLength(entry.prompt),
       left: leftDevice(entry.route, entry.ran),
     });
@@ -76,6 +93,9 @@ export class Ledger {
 
   /** Everything recorded so far, oldest first. The same array until something is added. */
   entries = (): readonly LedgerEntry[] => this.#entries;
+
+  /** Requests handed over and not yet answered. The same array until one begins or ends. */
+  underway = (): readonly Underway[] => this.#underway;
 
   subscribe = (listener: () => void): (() => void) => {
     this.#listeners.add(listener);

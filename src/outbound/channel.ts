@@ -12,7 +12,8 @@ import type { OutboundRequest } from './requests';
  * accepts a request from the closed set in `requests.ts` and nothing else:
  * there is no parameter here that takes text, so the words of a letter have
  * no way in. Every request is checked again at run time, turned into its
- * fixed prompt, and written to the ledger whether it succeeds or fails.
+ * fixed prompt, and written to the ledger before it goes and again when it
+ * ends, whether it succeeds or fails.
  *
  * Tests fail the build if a cloud-capable inference mode is named anywhere
  * else in the source, or if any other file opens a network connection.
@@ -67,16 +68,11 @@ export function createChannel({ transport, ledger, now = () => new Date(), clock
       const prepared = Prepared.from(request);
       const at = now().toISOString();
       const started = clock();
+      const asked = { at, request: prepared.request, route: prepared.route, prompt: prepared.prompt };
+      // Written down before it goes, not only once it is back.
+      const began = ledger.begin(asked);
       const record = (ran: Ran, error: string | null): LedgerEntry =>
-        ledger.record({
-          at,
-          request: prepared.request,
-          route: prepared.route,
-          prompt: prepared.prompt,
-          ran,
-          ms: Math.round(clock() - started),
-          error,
-        });
+        ledger.record({ ...asked, ran, ms: Math.round(clock() - started), error }, began);
 
       let delivery: Delivery;
       try {

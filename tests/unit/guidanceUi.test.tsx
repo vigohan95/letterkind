@@ -215,8 +215,21 @@ describe('the list of what left the device', () => {
   it('says so when nothing has', () => {
     const html = renderToStaticMarkup(<LedgerView ledger={new Ledger()} t={en} />);
     expect(html).toContain('What has left this device');
-    expect(html).toContain('<span class="ledger-total" data-out="0">Nothing has left this device.</span>');
+    expect(html).toContain('<span class="ledger-total" data-out="0" data-underway="0">Nothing has left this device.</span>');
     expect(html).not.toContain('<li');
+  });
+
+  it('does not say that nothing has left while a request is under way', () => {
+    const ledger = new Ledger();
+    ledger.begin({ at: '2026-12-01T10:00:00.000Z', request, route: 'cloud_only', prompt: promptFor(request) });
+    const html = renderToStaticMarkup(<LedgerView ledger={ledger} t={en} />);
+
+    expect(html).not.toContain('Nothing has left this device.');
+    expect(html).toContain('<span class="ledger-total" data-out="0" data-underway="1">1 request is under way.</span>');
+    expect(html).toContain('<li data-left="underway">');
+    expect(html).toContain('<strong>Under way</strong> — Explanation of a kind of letter');
+    expect(html).toContain('<dd>Spanish</dd>');
+    expect(html).toContain(renderToStaticMarkup(<pre className="ledger-words">{promptFor(request)}</pre>));
   });
 
   it('shows each request with the three things it carried and its exact words', async () => {

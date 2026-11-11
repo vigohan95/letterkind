@@ -190,6 +190,28 @@ describe('the ledger', () => {
     expect(calls).toBe(1);
     expect(ledger.entries().map((e) => e.id)).toEqual([1, 2]);
   });
+
+  it('holds a request that is under way until its outcome is recorded, and tells subscribers both times', () => {
+    const ledger = new Ledger();
+    let calls = 0;
+    ledger.subscribe(() => calls++);
+    const prepared = Prepared.from(explain);
+    const asked = { at: '2026-12-01T00:00:00.000Z', request: prepared.request, route: prepared.route, prompt: prepared.prompt };
+    const none = ledger.underway();
+
+    const underway = ledger.begin(asked);
+    expect(calls).toBe(1);
+    expect(ledger.underway()).not.toBe(none);
+    expect(ledger.underway()).toEqual([{ ...asked, id: 1, bytes: byteLength(prepared.prompt) }]);
+    expect(ledger.entries()).toHaveLength(0);
+
+    const entry = ledger.record({ ...asked, ran: 'cloud', ms: 5, error: null }, underway);
+    expect(calls).toBe(2);
+    expect(entry.id).toBe(1);
+    expect(ledger.underway()).toHaveLength(0);
+    expect(ledger.entries()).toEqual([entry]);
+    expect(ledger.begin(asked).id).toBe(2);
+  });
 });
 
 describe('the channel', () => {
@@ -257,6 +279,27 @@ describe('the channel', () => {
     await expect(channel.send(explain)).rejects.toThrow('offline');
     expect(ledger.entries()).toHaveLength(1);
     expect(ledger.entries()[0]).toMatchObject({ ran: 'nowhere', left: 'attempted', error: 'offline' });
+  });
+
+  it('shows a request as under way for as long as the transport holds it, whatever the outcome', async () => {
+    for (const outcome of ['answer', 'failure'] as const) {
+      let finish = (): void => undefined;
+      const { channel, ledger } = setup(
+        () =>
+          new Promise((resolve, reject) => {
+            finish = () => (outcome === 'answer' ? resolve({ text: '{}', ran: 'cloud' }) : reject(new Error('offline')));
+          }),
+      );
+      const sending = channel.send(explain).catch(() => undefined);
+      expect(ledger.underway()).toHaveLength(1);
+      expect(ledger.underway()[0]).toMatchObject({ request: explain, route: 'cloud_only', prompt: promptFor(explain) });
+      expect(ledger.entries()).toHaveLength(0);
+
+      finish();
+      await sending;
+      expect(ledger.underway()).toHaveLength(0);
+      expect(ledger.entries().map((e) => e.id)).toEqual([1]);
+    }
   });
 
   it('refuses anything outside the closed set before the transport is reached', async () => {
