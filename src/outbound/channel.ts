@@ -100,7 +100,7 @@ export interface Ways {
 }
 
 /** The HTTP status a failed cloud request came back with, if it got that far. */
-function statusOf(error: unknown): number | undefined {
+export function statusOf(error: unknown): number | undefined {
   const status = (error as { customErrorData?: { status?: unknown } } | null)?.customErrorData?.status;
   return typeof status === 'number' ? status : undefined;
 }

@@ -174,7 +174,7 @@ export function ReplyBody({ status, reading, language, onAsk, t }: ReplyBodyProp
       ) : (
         <>
           <h3>{t.reply.unavailableHeading}</h3>
-          <p>{t.reply.unavailableBody}</p>
+          <p data-why={outcome.why}>{outcome.why === 'busy' ? t.guidance.busyBody : t.reply.unavailableBody}</p>
           <p className="fact-source">{outcome.error}</p>
         </>
       )}
@@ -227,7 +227,7 @@ export function ReplyPanel({ reading, prefs, source, t }: ReplyPanelProps) {
     try {
       outcome = await source.ask(request);
     } catch (error) {
-      outcome = { status: 'unavailable', error: error instanceof Error ? error.message : String(error) };
+      outcome = { status: 'unavailable', why: 'no_answer', error: error instanceof Error ? error.message : String(error) };
     }
     setKnown((now) => (now?.key === key && now.status.at === 'asking' ? { key, status: { at: 'answered', outcome } } : now));
   }

@@ -297,7 +297,7 @@ describe('asking for a draft of a reply', () => {
 
   it('says so when no draft can be had, and writes the attempt down', async () => {
     const { deps, ledger } = setup(offline);
-    expect(await draftReply(request, deps)).toEqual({ status: 'unavailable', error: 'Failed to reach the service.' });
+    expect(await draftReply(request, deps)).toEqual({ status: 'unavailable', why: 'no_answer', error: 'Failed to reach the service.' });
     expect(ledger.entries()[0]).toMatchObject({ ran: 'nowhere', left: 'attempted' });
   });
 

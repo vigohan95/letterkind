@@ -150,7 +150,17 @@ describe('the reply panel', () => {
     const { deps } = setup(offline);
     const html = body(await draftReply(request, deps), await read(truthful));
     expect(html).toContain(en.reply.unavailableHeading);
+    expect(html).toContain(en.reply.unavailableBody);
     expect(html).toContain('Failed to reach the service.');
+  });
+
+  it('says the model in the cloud was busy, and does not blame the connection for it', async () => {
+    const busy: Transport = () => Promise.reject(Object.assign(new Error('[500 ] This model is currently experiencing high demand.'), { customErrorData: { status: 500 } }));
+    const html = body(await draftReply(request, setup(busy).deps), await read(truthful));
+    expect(html).toContain(en.reply.unavailableHeading);
+    expect(html).toContain(en.guidance.busyBody);
+    expect(html).not.toContain(en.reply.unavailableBody);
+    expect(html).toContain('Ask again');
   });
 
   it('is written in the ledger as a draft of a reply, with the three things it carried', async () => {

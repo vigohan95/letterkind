@@ -176,6 +176,9 @@ describe('prompts', () => {
   it('ask for the blanks of a translated reply in the reader\'s language', () => {
     const prompt = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'TX', language: 'es' });
     expect(prompt).toContain('write each blank in Spanish, still in square brackets');
+    // The checklist follows a letter in English, and has come back in English for it.
+    expect(prompt).toContain('Every item is in Spanish, as body_translated is, and not in English.');
+    expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'TX', language: 'en' })).not.toContain('Every item is in');
     expect(prompt).toContain('Do not repeat the subject line inside it.');
   });
 

@@ -99,9 +99,16 @@ describe('asking for an explanation', () => {
     const { deps, ledger } = setup(offline);
     const result = await explain(request, deps);
 
-    expect(result).toEqual({ status: 'unavailable', error: 'Failed to reach the service.' });
+    expect(result).toEqual({ status: 'unavailable', why: 'no_answer', error: 'Failed to reach the service.' });
     expect(ledger.entries()).toHaveLength(1);
     expect(ledger.entries()[0]).toMatchObject({ ran: 'nowhere', left: 'attempted' });
+  });
+
+  it('tells a server too busy to answer from a missing connection', async () => {
+    const busy: Transport = () => Promise.reject(Object.assign(new Error('[500 ] This model is currently experiencing high demand.'), { customErrorData: { status: 500 } }));
+    expect(await explain(request, setup(busy).deps)).toMatchObject({ status: 'unavailable', why: 'busy' });
+    const refused: Transport = () => Promise.reject(Object.assign(new Error('[401 ]'), { customErrorData: { status: 401 } }));
+    expect(await explain(request, setup(refused).deps)).toMatchObject({ status: 'unavailable', why: 'no_answer' });
   });
 
   it('trusts a saved copy no more than a fresh answer', async () => {

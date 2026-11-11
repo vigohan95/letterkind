@@ -1,5 +1,5 @@
 import { type RejectReason, TemplateRejected } from '../domain/template';
-import { type Channel, CLOUD_MODEL } from '../outbound/channel';
+import { type Channel, CLOUD_MODEL, statusOf } from '../outbound/channel';
 import type { LedgerEntry } from '../outbound/ledger';
 import { PROMPT_VERSION } from '../outbound/prompts';
 import { type OutboundRequest, serialize } from '../outbound/requests';
@@ -29,8 +29,12 @@ export type Outcome<T> =
   | ReadyOutcome<T>
   /** An answer came back and broke a rule. Nothing from it is shown. */
   | { status: 'rejected'; reason: RejectReason; field: string; found: string; entry: LedgerEntry }
-  /** No answer could be had: no connection, no model, or the service refused. */
-  | { status: 'unavailable'; error: string };
+  /**
+   * No answer could be had. `busy`: the server said it was in trouble, twice;
+   * asking again later is all there is to do. `no_answer`: no connection, no
+   * model, or the service refused.
+   */
+  | { status: 'unavailable'; why: 'busy' | 'no_answer'; error: string };
 
 /** Turns an answer into a checked template, or throws `TemplateRejected`. */
 export type Check<T> = (answer: string) => T;
@@ -73,7 +77,8 @@ export async function fetched<T>(request: OutboundRequest, { channel, store }: K
   try {
     answer = await channel.send(request);
   } catch (error) {
-    return { status: 'unavailable', error: error instanceof Error ? error.message : String(error) };
+    const why = (statusOf(error) ?? 0) >= 500 ? 'busy' : 'no_answer';
+    return { status: 'unavailable', why, error: error instanceof Error ? error.message : String(error) };
   }
 
   let template: T;

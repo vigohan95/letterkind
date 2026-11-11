@@ -126,7 +126,7 @@ export function GuidanceBody({ status, reading, prefs, onAsk, onForget, t }: Gui
       ) : (
         <>
           <h3>{t.guidance.unavailableHeading}</h3>
-          <p>{t.guidance.unavailableBody}</p>
+          <p data-why={guidance.why}>{guidance.why === 'busy' ? t.guidance.busyBody : t.guidance.unavailableBody}</p>
           <p className="fact-source">{guidance.error}</p>
         </>
       )}
@@ -181,7 +181,7 @@ export function GuidancePanel({ reading, prefs, onPrefs, source, t }: GuidancePa
     try {
       guidance = await source.ask(request);
     } catch (error) {
-      guidance = { status: 'unavailable', error: error instanceof Error ? error.message : String(error) };
+      guidance = { status: 'unavailable', why: 'no_answer', error: error instanceof Error ? error.message : String(error) };
     }
     setKnown((now) => (now?.key === key && now.status.at === 'asking' ? { key, status: { at: 'answered', guidance } } : now));
   }

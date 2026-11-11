@@ -179,6 +179,8 @@ export const en = {
         `Its translation did not match the English: a gap for a detail of your letter (“${found}”) was in one and not in the other.`,
     } satisfies Record<RejectReason, (found: string) => string>,
     askAgain: 'Ask again',
+    busyBody:
+      'The model in the cloud was too busy to answer, twice in a row. Nothing is wrong on your side: ask again in a minute. What Letterkind read from your letter above was done on this device and is not affected.',
     unavailableHeading: 'No explanation could be fetched',
     unavailableBody:
       'The first explanation of each kind of letter needs a connection. What Letterkind read from your letter above was done on this device and is not affected.',

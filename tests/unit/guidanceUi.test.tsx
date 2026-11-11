@@ -201,6 +201,13 @@ describe('the guidance panel', () => {
     expect(html).not.toMatch(/Compare la factura|agencia de cobros|guidance-text/);
   });
 
+  it('says the model in the cloud was busy, and does not blame the connection for it', async () => {
+    const busy: Transport = () => Promise.reject(Object.assign(new Error('[500 ] This model is currently experiencing high demand.'), { customErrorData: { status: 500 } }));
+    const html = body(await explain(request, setup(busy).deps), await read(truthful));
+    expect(html).toContain(en.guidance.busyBody);
+    expect(html).not.toContain(en.guidance.unavailableBody);
+  });
+
   it('says plainly when no explanation could be had, and offers nothing written on the device in its place', async () => {
     const { deps } = setup(offline);
     const html = body(await explain(request, deps), await read(truthful));
