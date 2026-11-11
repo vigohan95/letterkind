@@ -1,0 +1,66 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+// These tests read the source tree itself. They exist so that the privacy
+// boundary is something the build enforces rather than something a reviewer
+// has to take on trust.
+
+const SRC = join(process.cwd(), 'src');
+
+function sourceFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) out.push(...sourceFiles(full));
+    else if (/\.(ts|tsx)$/.test(name)) out.push(full);
+  }
+  return out;
+}
+
+const files = sourceFiles(SRC).map((full) => ({
+  path: relative(SRC, full).split(sep).join('/'),
+  text: readFileSync(full, 'utf8'),
+}));
+
+const CLOUD_CAPABLE_MODES = ['ONLY_IN_CLOUD', 'PREFER_IN_CLOUD', 'PREFER_ON_DEVICE'];
+const CHANNEL = 'outbound/channel.ts';
+const ON_DEVICE = 'ai/onDevice.ts';
+
+describe('source boundaries', () => {
+  it('finds source files to scan', () => {
+    expect(files.length).toBeGreaterThan(0);
+  });
+
+  it('names a cloud-capable inference mode only in the outbound channel', () => {
+    const offenders = files
+      .filter((f) => f.path !== CHANNEL)
+      .filter((f) => CLOUD_CAPABLE_MODES.some((mode) => f.text.includes(mode)))
+      .map((f) => f.path);
+    expect(offenders).toEqual([]);
+  });
+
+  it('imports the AI SDK only in the on-device module and the outbound channel', () => {
+    const offenders = files
+      .filter((f) => f.path !== CHANNEL && f.path !== ON_DEVICE)
+      .filter((f) => /from\s+['"](?:firebase\/ai|@firebase\/ai)/.test(f.text) || /import\(\s*['"](?:firebase\/ai|@firebase\/ai)/.test(f.text))
+      .map((f) => f.path);
+    expect(offenders).toEqual([]);
+  });
+
+  it('makes no direct network calls outside the outbound channel', () => {
+    const direct = /\bfetch\s*\(|\bXMLHttpRequest\b|\bnew\s+WebSocket\b|\bsendBeacon\s*\(|\bnew\s+EventSource\b/;
+    const offenders = files
+      .filter((f) => f.path !== CHANNEL)
+      .filter((f) => direct.test(f.text))
+      .map((f) => f.path);
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps the on-device module on-device only', () => {
+    const onDevice = files.find((f) => f.path === ON_DEVICE);
+    if (!onDevice) return; // not written yet
+    for (const mode of CLOUD_CAPABLE_MODES) expect(onDevice.text).not.toContain(mode);
+    expect(onDevice.text).toContain('ONLY_ON_DEVICE');
+  });
+});
