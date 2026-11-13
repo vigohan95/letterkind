@@ -4,6 +4,8 @@ import { type Highlight, letterLines } from './highlights';
 
 export interface LetterViewProps {
   letter: string;
+  /** What the letter is called, for screen readers, in the interface's language. */
+  label: string;
   highlights: readonly Highlight[];
   /** Glossary terms found in the letter. Marked only when `onTerm` is given. */
   terms?: readonly TermMatch[];
@@ -14,10 +16,10 @@ export interface LetterViewProps {
 }
 
 /** The letter as pasted, with line numbers, and the facts shown beside it marked in place. */
-export function LetterView({ letter, highlights, terms, chosen, onTerm }: LetterViewProps) {
+export function LetterView({ letter, label, highlights, terms, chosen, onTerm }: LetterViewProps) {
   const lines = letterLines(letter, highlights, onTerm ? terms : undefined);
   return (
-    <div className="letter" role="region" aria-label="The letter">
+    <div className="letter" role="region" aria-label={label}>
       {lines.map((line) => (
         <div className="letter-line" key={line.number} id={`line-${line.number}`}>
           <span className="letter-no" aria-hidden="true">

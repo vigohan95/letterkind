@@ -97,11 +97,11 @@ describe('letter lines with glossary terms', () => {
 describe('the letter with terms that can be tapped', () => {
   it('shows a term as a button only when something will happen on a tap', () => {
     const terms = findTerms(BILL);
-    const plain = renderToStaticMarkup(<LetterView letter={BILL} highlights={[]} terms={terms} />);
+    const plain = renderToStaticMarkup(<LetterView letter={BILL} label="The letter" highlights={[]} terms={terms} />);
     expect(plain).not.toContain('<button');
     expect(plain).toContain('Your deductible has not been met.');
 
-    const live = renderToStaticMarkup(<LetterView letter={BILL} highlights={[]} terms={terms} chosen={deductible} onTerm={nothing} />);
+    const live = renderToStaticMarkup(<LetterView letter={BILL} label="The letter" highlights={[]} terms={terms} chosen={deductible} onTerm={nothing} />);
     expect(live).toContain('<button type="button" class="term" data-term="deductible" aria-pressed="true">deductible</button>');
     expect(live).toContain('<button type="button" class="term" data-term="collection-agency" aria-pressed="false">collection agency</button>');
   });

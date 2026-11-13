@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import type { Reading } from '../ai/read';
-import { type LanguageId, languageName } from '../domain/languages';
+import type { LanguageId } from '../domain/languages';
 import { fillLetter, type LetterPiece } from '../domain/reply';
 import { blanksFor, standInsFor } from '../domain/standIns';
 import { stateName } from '../domain/states';
@@ -14,7 +14,6 @@ import { serialize } from '../outbound/requests';
 import { Detail, Filled, type Filling } from './Filled';
 import type { Prefs } from './prefs';
 
-const day = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
 
 /** A draft with its gaps filled: plain characters, the letter's details marked, every blank left visible. */
 function Letter({ pieces }: { pieces: readonly LetterPiece[] }) {
@@ -101,7 +100,7 @@ export function ReplyReady({ draft, reading, language, t }: ReplyReadyProps) {
 
       {toRead && (
         <>
-          <h3>{t.reply.translatedHeading(languageName(language))}</h3>
+          <h3>{t.reply.translatedHeading(t.languages[language])}</h3>
           <p className="hint">{t.reply.translatedNote}</p>
           <div className="reply-letter reply-reading" lang={language} dir="auto">
             <div className="reply-body">
@@ -124,7 +123,7 @@ export function ReplyReady({ draft, reading, language, t }: ReplyReadyProps) {
       {usesStandIn && <p className="hint">{t.guidance.standInLegend}</p>}
       <p className="hint">{t.reply.draftNote}</p>
       <p className="fact-source" data-from={from}>
-        {from === 'cloud' && entry ? t.reply.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes) : t.guidance.fromSaved(day.format(new Date(draft.at)))}
+        {from === 'cloud' && entry ? t.reply.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes) : t.guidance.fromSaved(t.format.day(draft.at))}
       </p>
     </div>
   );
@@ -248,7 +247,7 @@ export function ReplyPanel({ reading, prefs, source, t }: ReplyPanelProps) {
         </div>
         <div>
           <dt>{t.guidance.language}</dt>
-          <dd>{languageName(language)}</dd>
+          <dd>{t.languages[language]}</dd>
         </div>
       </dl>
       <p className="hint">{t.reply.change}</p>

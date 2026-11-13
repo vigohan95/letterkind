@@ -14,8 +14,6 @@ import { highlightsOf } from './highlights';
 import { LetterView } from './LetterView';
 import { GlossedLetter } from './Terms';
 
-const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
-const showDate = (iso: string): string => longDate.format(new Date(`${iso}T00:00:00Z`));
 
 /** Every line a set of matches touches; a match that runs over a line break counts on each line. */
 const uniqueLines = (matches: readonly { line: number; raw: string }[]): number[] => [
@@ -118,7 +116,7 @@ export function ReadingView({ letter, classification, reading, chosenByReader, t
       {terms ? (
         <GlossedLetter letter={letter} highlights={highlights} language={terms.language} source={terms.source} t={t} />
       ) : (
-        <LetterView letter={letter} highlights={highlights} />
+        <LetterView letter={letter} label={t.input.label} highlights={highlights} />
       )}
 
       <div className="facts">
@@ -149,7 +147,7 @@ export function ReadingView({ letter, classification, reading, chosenByReader, t
           ) : (
             <VerdictBody
               verdict={reading.deadline}
-              show={(m) => showDate(m.value)}
+              show={(m) => t.format.letterDate(m.value)}
               note={reading.daysLeft === null ? null : <p className="fact-days">{t.days(reading.daysLeft)}</p>}
               t={t}
             />

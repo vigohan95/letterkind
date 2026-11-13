@@ -5,9 +5,10 @@ import { onDeviceClassifier, onDeviceExtractor, onDeviceLook, prepareDeviceModel
 import { type Reading, readLetter } from '../ai/read';
 import { joinPages, transcribePage, unreadableCount } from '../ai/transcribe';
 import { localIsoDate } from '../domain/deadline';
+import { LANGUAGES, type LanguageId } from '../domain/languages';
 import { LETTER_TYPE_IDS, type LetterTypeId } from '../domain/letterTypes';
 import { ledger, liveGuidance, liveReply, liveTerms } from '../guidance/live';
-import { en } from '../i18n/en';
+import { stringsFor } from '../i18n';
 import { ACCEPTED_FILES, openFiles, UnsupportedFile } from '../input/files';
 import { SAMPLE_LETTERS } from '../samples/letters';
 import { GuidancePanel } from './Guidance';
@@ -31,7 +32,6 @@ type Phase =
 /** Where the text in the box came from, when it was not typed or pasted. */
 type Source = { from: 'file' } | { from: 'picture'; ms: number };
 
-const t = en;
 const messageOf = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 export function App() {
@@ -46,9 +46,15 @@ export function App() {
   const [phase, setPhase] = useState<Phase>({ at: 'idle' });
   const [other, setOther] = useState<LetterTypeId>('other');
   const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs(browserStorage(), navigator.languages));
+  const t = stringsFor(prefs.language);
   // Each reading gets a number, so an answer that arrives after the reader has moved on is dropped.
   const run = useRef(0);
   const stop = useRef<AbortController | null>(null);
+
+  // The page says which language it is in, for screen readers and for the browser's own translation offer.
+  useEffect(() => {
+    document.documentElement.lang = t.lang;
+  }, [t.lang]);
 
   useEffect(() => {
     let live = true;
@@ -183,7 +189,19 @@ export function App() {
   return (
     <main>
       <header className="masthead">
-        <h1>{t.appName}</h1>
+        <div className="masthead-top">
+          <h1>{t.appName}</h1>
+          <label className="masthead-language">
+            <span>{t.interfaceLanguage}</span>
+            <select value={prefs.language} onChange={(event) => choosePrefs({ ...prefs, language: event.target.value as LanguageId })}>
+              {LANGUAGES.map((l) => (
+                <option key={l.id} value={l.id} lang={l.id}>
+                  {l.own}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <p>{t.tagline}</p>
       </header>
 
@@ -294,7 +312,7 @@ export function App() {
 
       {(phase.at === 'classifying' || phase.at === 'extracting') && (
         <div className="reading">
-          <LetterView letter={phase.letter} highlights={[]} />
+          <LetterView letter={phase.letter} label={t.input.label} highlights={[]} />
           <div className="facts">
             <p className="working" role="status">
               {phase.at === 'classifying' ? t.progress.classifying : t.progress.extracting}
@@ -305,7 +323,7 @@ export function App() {
 
       {phase.at === 'choosing' && (
         <div className="reading">
-          <LetterView letter={phase.letter} highlights={[]} />
+          <LetterView letter={phase.letter} label={t.input.label} highlights={[]} />
           <div className="facts">
             <section className="fact fact-kind">
               <h3>{t.kind.choose}</h3>

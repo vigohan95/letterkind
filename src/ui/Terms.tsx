@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { findTerms } from '../domain/glossary';
-import { type LanguageId, languageName } from '../domain/languages';
+import type { LanguageId } from '../domain/languages';
 import { term as entryOf, isGlossaryLanguage, type TermId } from '../domain/terms';
 import type { TermSource } from '../guidance/live';
 import { type MeaningOutcome, ownMeaning, type TermRequest } from '../guidance/term';
@@ -10,7 +10,6 @@ import { serialize } from '../outbound/requests';
 import type { Highlight } from './highlights';
 import { LetterView } from './LetterView';
 
-const day = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
 
 export type TermStatus = { at: 'ask' } | { at: 'asking' } | { at: 'answered'; meaning: MeaningOutcome };
 
@@ -46,7 +45,7 @@ function TermBody({ term, status, language, onAsk, t }: Omit<TermPanelProps, 'on
       <>
         <p className="guidance-actions">
           <button type="button" className="primary" onClick={onAsk}>
-            {t.terms.ask(languageName(language))}
+            {t.terms.ask(t.languages[language])}
           </button>
         </p>
         {english}
@@ -80,7 +79,7 @@ function TermBody({ term, status, language, onAsk, t }: Omit<TermPanelProps, 'on
           {t.terms.general} {t.terms.translated}
         </p>
         <p className="fact-source" data-from={from}>
-          {entry && from === 'cloud' ? t.terms.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes) : t.guidance.fromSaved(day.format(new Date(meaning.at)))}
+          {entry && from === 'cloud' ? t.terms.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes) : t.guidance.fromSaved(t.format.day(meaning.at))}
         </p>
       </>
     );
@@ -159,7 +158,7 @@ export function GlossedLetter({ letter, highlights, language, source, t }: Gloss
   // One request per term and language at a time, however often the word is tapped.
   const flights = useRef(new Map<string, Promise<MeaningOutcome>>());
 
-  if (terms.length === 0) return <LetterView letter={letter} highlights={highlights} />;
+  if (terms.length === 0) return <LetterView letter={letter} label={t.input.label} highlights={highlights} />;
 
   const chosen = picked !== null && terms.some((term) => term.id === picked) ? picked : null;
   /** The request a tap on this term makes, or none: the glossary has English and Spanish already. */
@@ -200,7 +199,7 @@ export function GlossedLetter({ letter, highlights, language, source, t }: Gloss
     if (request !== null && known?.key !== serialize(request)) ask(id);
   }
 
-  const name = languageName(language);
+  const name = t.languages[language];
   const hint =
     language === 'en'
       ? t.terms.inEnglish(t.guidance.heading)
@@ -210,7 +209,7 @@ export function GlossedLetter({ letter, highlights, language, source, t }: Gloss
   return (
     <div className="letter-side">
       <p className="hint">{hint}</p>
-      <LetterView letter={letter} highlights={highlights} terms={terms} chosen={chosen} onTerm={pick} />
+      <LetterView letter={letter} label={t.input.label} highlights={highlights} terms={terms} chosen={chosen} onTerm={pick} />
       <div aria-live="polite">
         {chosen !== null && (
           <TermPanel term={chosen} status={statusOf(chosen)} language={language} onAsk={() => ask(chosen)} onClose={() => setPicked(null)} t={t} />

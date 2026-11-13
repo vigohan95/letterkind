@@ -1,23 +1,21 @@
 import { useSyncExternalStore } from 'react';
-import { languageName } from '../domain/languages';
 import { stateName } from '../domain/states';
 import type { Strings } from '../i18n/en';
 import type { Ledger, Underway } from '../outbound/ledger';
 
-const clock = new Intl.DateTimeFormat('en-US', { timeStyle: 'medium' });
 
 /** The few things a request carried, each with its name. */
 function carried({ request }: Pick<Underway, 'request'>, t: Strings): [string, string][] {
   if (request.purpose === 'term') {
     return [
       [t.ledger.term, request.term],
-      [t.guidance.language, languageName(request.language)],
+      [t.guidance.language, t.languages[request.language]],
     ];
   }
   return [
     [t.guidance.kind, t.kinds[request.type]],
     [t.guidance.state, request.state === 'US' ? t.guidance.stateNotGiven : stateName(request.state)],
-    [t.guidance.language, languageName(request.language)],
+    [t.guidance.language, t.languages[request.language]],
   ];
 }
 
@@ -65,7 +63,7 @@ export function LedgerView({ ledger, t }: { ledger: Ledger; t: Strings }) {
               ))}
             </dl>
             <p className="fact-source">
-              {clock.format(new Date(entry.at))} · {t.ledger.ran[entry.ran]} · {t.where.seconds(entry.ms)} · {t.ledger.bytes(entry.bytes)}
+              {t.format.clock(entry.at)} · {t.ledger.ran[entry.ran]} · {t.where.seconds(entry.ms)} · {t.ledger.bytes(entry.bytes)}
               {entry.error && ` · ${entry.error}`}
             </p>
             <details>
@@ -89,7 +87,7 @@ export function LedgerView({ ledger, t }: { ledger: Ledger; t: Strings }) {
               ))}
             </dl>
             <p className="fact-source">
-              {clock.format(new Date(asked.at))} · {t.ledger.bytes(asked.bytes)}
+              {t.format.clock(asked.at)} · {t.ledger.bytes(asked.bytes)}
             </p>
             <details>
               <summary>{t.ledger.words}</summary>

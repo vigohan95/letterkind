@@ -13,7 +13,6 @@ import { serialize } from '../outbound/requests';
 import { Filled, type Filling } from './Filled';
 import type { Prefs } from './prefs';
 
-const day = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
 
 export interface GuidanceReadyProps {
   guidance: Ready;
@@ -66,7 +65,7 @@ export function GuidanceReady({ guidance, reading, language, onForget, t }: Guid
       <p className="fact-source" data-from={from}>
         {from === 'cloud' && entry
           ? t.guidance.fromCloud(CLOUD_MODEL, entry.ms, entry.bytes)
-          : t.guidance.fromSaved(day.format(new Date(guidance.at)))}
+          : t.guidance.fromSaved(t.format.day(guidance.at))}
       </p>
       {from === 'saved' && onForget && (
         <p className="guidance-actions">
@@ -223,7 +222,7 @@ export function GuidancePanel({ reading, prefs, onPrefs, source, t }: GuidancePa
             <select id="guidance-language" value={language} onChange={(event) => onPrefs({ ...prefs, language: event.target.value as LanguageId })}>
               {LANGUAGES.map((l) => (
                 <option key={l.id} value={l.id}>
-                  {l.own === l.name ? l.name : `${l.own} — ${l.name}`}
+                  {l.own.toLowerCase() === t.languages[l.id].toLowerCase() ? l.own : `${l.own} — ${t.languages[l.id]}`}
                 </option>
               ))}
             </select>

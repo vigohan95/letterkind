@@ -56,6 +56,22 @@ main {
   padding: 24px 16px 48px;
 }
 
+.masthead-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.masthead-language {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
 .masthead h1 {
   margin: 0;
   font-size: 1.6rem;

@@ -1,14 +1,36 @@
+import type { LanguageId } from '../domain/languages';
 import type { AmountMeaning, DeadlineMeaning, LetterTypeId } from '../domain/letterTypes';
 import type { RejectReason } from '../domain/template';
 import type { Left, Ran } from '../outbound/ledger';
 import type { OutboundRequest } from '../outbound/requests';
 
+/** Dates and times written the way a language writes them. */
+export function formats(locale: string) {
+  const day = new Intl.DateTimeFormat(locale, { dateStyle: 'long' });
+  const clock = new Intl.DateTimeFormat(locale, { timeStyle: 'medium' });
+  // A date in a letter is a calendar day, not a moment: shown as written, whatever the time zone.
+  const letterDay = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
+  const number = new Intl.NumberFormat(locale);
+  return {
+    day: (at: number | string): string => day.format(new Date(at)),
+    clock: (at: number | string): string => clock.format(new Date(at)),
+    letterDate: (iso: string): string => letterDay.format(new Date(`${iso}T00:00:00Z`)),
+    number: (n: number): string => number.format(n),
+  };
+}
+
+const f = formats('en-US');
+
 /**
  * Every word the interface shows, in English. Other languages provide the
- * same shape. Nothing in here is ever written by a model.
+ * same shape. Nothing in here is ever written by a model at run time.
  */
 export const en = {
+  /** The language tag of these strings, for the page and for dates. */
+  lang: 'en',
+  format: f,
   appName: 'Letterkind',
+  interfaceLanguage: 'Language',
   tagline: 'Paste, photograph or open an official letter. It is read on this device and never leaves it.',
   notAdvice: 'Letterkind helps you read a letter. It is not legal, tax or medical advice.',
 
@@ -157,7 +179,7 @@ export const en = {
     legend: 'Highlighted words were put in on this device, from your letter. The model that wrote the rest never saw them.',
     standInLegend: 'Words in italics stand where your letter gave no detail that could be checked.',
     fromCloud: (model: string, ms: number, bytes: number) =>
-      `Written by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes, none of them from your letter. Kept on this device for next time.`,
+      `Written by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${f.number(bytes)} bytes, none of them from your letter. Kept on this device for next time.`,
     fromSaved: (day: string) => `Kept on this device since ${day}. Nothing was sent this time.`,
     forget: 'Forget kept explanations',
     rejectedHeading: 'The explanation was thrown away',
@@ -206,7 +228,7 @@ export const en = {
     translated: 'A model made the translation, and a translation can be off. The English is the wording Letterkind stands behind.',
     fromGlossary: 'From Letterkind’s own glossary: fixed text that ships with the app. Nothing was generated, and nothing was sent.',
     fromCloud: (model: string, ms: number, bytes: number) =>
-      `Translated by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes: the glossary’s entry and the language, none of them from your letter. Kept on this device for next time.`,
+      `Translated by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${f.number(bytes)} bytes: the glossary’s entry and the language, none of them from your letter. Kept on this device for next time.`,
     rejectedHeading: 'The translation was thrown away',
     rejectedBody: 'A translation came back, but it broke one of Letterkind’s rules, so none of it is shown.',
     unavailableHeading: 'No translation could be had',
@@ -239,7 +261,7 @@ export const en = {
     beforeSending: 'Before you send it',
     draftNote: 'This is a draft, not legal advice. Read every line, change what does not fit your case, and keep a copy of what you send.',
     fromCloud: (model: string, ms: number, bytes: number) =>
-      `Drafted by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${bytes.toLocaleString('en-US')} bytes, none of them from your letter. Kept on this device for next time.`,
+      `Drafted by ${model} in the cloud in ${(ms / 1000).toFixed(1)} s. It was sent ${f.number(bytes)} bytes, none of them from your letter. Kept on this device for next time.`,
     rejectedHeading: 'The draft was thrown away',
     unavailableHeading: 'No draft could be fetched',
     unavailableBody:
@@ -250,7 +272,7 @@ export const en = {
     heading: 'What has left this device',
     nothing: 'Nothing has left this device.',
     sent: (n: number, bytes: number) =>
-      `${n === 1 ? '1 request' : `${n} requests`} sent, ${bytes.toLocaleString('en-US')} bytes in all. None of it from a letter.`,
+      `${n === 1 ? '1 request' : `${n} requests`} sent, ${f.number(bytes)} bytes in all. None of it from a letter.`,
     attempted: (n: number) => (n === 1 ? '1 request was tried and brought nothing back.' : `${n} requests were tried and brought nothing back.`),
     stayed: (n: number) => (n === 1 ? '1 request was answered on this device.' : `${n} requests were answered on this device.`),
     underway: (n: number) => (n === 1 ? '1 request is under way.' : `${n} requests are under way.`),
@@ -274,7 +296,7 @@ export const en = {
       nowhere: 'no answer',
     } satisfies Record<Ran, string>,
     term: 'Term',
-    bytes: (n: number) => `${n.toLocaleString('en-US')} bytes`,
+    bytes: (n: number) => `${f.number(n)} bytes`,
     words: 'The exact words that were sent',
     wordsNote:
       'These words are fixed in the app: anyone who picks the same kind of letter, state and language sends the same ones. A fixed description of the form the answer must take goes with them.',
@@ -306,6 +328,22 @@ export const en = {
     vehicle_registration_or_recall: 'Vehicle registration or recall',
     other: 'Another kind of letter',
   } satisfies Record<LetterTypeId, string>,
+
+  /** Language names, written in the interface's language. */
+  languages: {
+    en: 'English',
+    es: 'Spanish',
+    'zh-Hans': 'Chinese (Simplified)',
+    'zh-Hant': 'Chinese (Traditional)',
+    vi: 'Vietnamese',
+    tl: 'Tagalog',
+    ko: 'Korean',
+    ar: 'Arabic',
+    ru: 'Russian',
+    ht: 'Haitian Creole',
+    pt: 'Portuguese',
+    fr: 'French',
+  } satisfies Record<LanguageId, string>,
 };
 
 export type Strings = typeof en;
