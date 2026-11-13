@@ -181,6 +181,15 @@ describe('report', () => {
     expect(html).not.toContain('NaN');
   });
 
+  it('splits the counts into development and held-out letters when the run has both', async () => {
+    const both = await evaluate([EVAL_SET[0]!, EVAL_SET[EVAL_SET.length - 1]!], stubborn, TODAY);
+    const html = renderToStaticMarkup(<Report letters={both} summary={summarise(both)} setSize={EVAL_SET.length} />);
+    expect(html).toContain('Development (01–20)');
+    expect(html).toContain('Held out (21 on)');
+    const devOnly = await evaluate(EVAL_SET.slice(0, 2), stubborn, TODAY);
+    expect(renderToStaticMarkup(<Report letters={devOnly} summary={summarise(devOnly)} setSize={EVAL_SET.length} />)).not.toContain('Held out');
+  });
+
   it('says nothing about a partial run when the whole set was read', async () => {
     const letters = [await evaluateLetter(item('04'), stubborn, TODAY)];
     const html = renderToStaticMarkup(<Report letters={letters} summary={summarise(letters)} setSize={1} />);

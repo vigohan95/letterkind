@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LABELS, type Label } from '../../eval/labels';
+import { isHeldOut, LABELS, type Label } from '../../eval/labels';
 import { EXTRACT_FIELDS, type RawFields } from '../../src/ai/extract';
 import type { Generate } from '../../src/ai/types';
 import { LETTER_TYPE_IDS, letterType } from '../../src/domain/letterTypes';
@@ -24,6 +24,14 @@ describe('evaluation set', () => {
   it('has one label for every letter and one letter for every label', () => {
     expect(LABELS.map((l) => l.file).sort()).toEqual([...LETTER_FILES.keys()].sort());
     expect(distinct(LABELS.map((l) => l.file))).toBe(LABELS.length);
+  });
+
+  it('holds out half the letters, and the held-out half covers every kind the development half lacks', () => {
+    const held = LABELS.filter((l) => isHeldOut(l.file));
+    const dev = LABELS.filter((l) => !isHeldOut(l.file));
+    expect(held.length).toBe(dev.length);
+    const missingFromDev = LETTER_TYPE_IDS.filter((id) => !dev.some((l) => l.type === id));
+    for (const id of missingFromDev) expect(held.map((l) => l.type), id).toContain(id);
   });
 
   it('uses only kinds of letter the app knows', () => {

@@ -1,7 +1,8 @@
 import { EXTRACT_FIELDS, type FieldName } from '../ai/extract';
 import { type LetterResult, type Variant, VARIANTS } from './run';
 import type { Outcome } from './score';
-import { type FieldSummary, fieldsRead, type Summary } from './summary';
+import { FIRST_HELD_OUT, isHeldOut } from '../../eval/labels';
+import { type FieldSummary, fieldsRead, type Summary, summarise } from './summary';
 
 /**
  * The tables of an evaluation run. Presentation only: everything shown here
@@ -103,6 +104,56 @@ function kindCell(result: LetterResult) {
   );
 }
 
+/**
+ * The same headline counts for the letters the prompts were shaped on and for
+ * the held-out letters, so a reader can see whether the numbers carry over.
+ * Shown only when the run includes both.
+ */
+function SplitSection({ letters }: { letters: readonly LetterResult[] }) {
+  const held = letters.filter((l) => isHeldOut(l.file));
+  const dev = letters.filter((l) => !isHeldOut(l.file));
+  if (held.length === 0 || dev.length === 0) return null;
+  const rows: [string, readonly LetterResult[]][] = [
+    [`Development (01–${String(FIRST_HELD_OUT - 1).padStart(2, '0')})`, dev],
+    [`Held out (${FIRST_HELD_OUT} on)`, held],
+  ];
+  return (
+    <section aria-labelledby="by-set">
+      <h2 id="by-set">Development and held-out letters</h2>
+      <div className="scroll">
+        <table>
+          <thead>
+            <tr>
+              <td />
+              <th scope="col">Letters</th>
+              <th scope="col">Fields</th>
+              <th scope="col">Wrong, model alone</th>
+              <th scope="col">Wrong, shown by the app</th>
+              <th scope="col">Right or correctly blank, shown</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([name, subset]) => {
+              const total = summarise(subset).variants.full.total;
+              return (
+                <tr key={name}>
+                  <th scope="row">{name}</th>
+                  <td>{subset.length}</td>
+                  <td>{fieldsRead(total)}</td>
+                  <td>{total.alone.wrong}</td>
+                  <td className={total.final.wrong > 0 ? 'bad' : undefined}>{total.final.wrong}</td>
+                  <td>{total.final.right + total.final.blank}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="note">The prompts and rules were shaped while reading the development letters. The held-out letters were written afterwards and not used to change them.</p>
+    </section>
+  );
+}
+
 export function Report({ letters, summary, setSize }: { letters: readonly LetterResult[]; summary: Summary; setSize: number }) {
   const full = summary.variants.full;
   const fields = fieldsRead(full.total);
@@ -128,6 +179,8 @@ export function Report({ letters, summary, setSize }: { letters: readonly Letter
           shown where the letter asks for none.
         </p>
       </section>
+
+      <SplitSection letters={letters} />
 
       <section aria-labelledby="by-field">
         <h2 id="by-field">By field</h2>

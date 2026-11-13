@@ -1,0 +1,33 @@
+Brightwater Pharmacy Services
+Notice of Data Security Incident
+
+November 9, 2026
+
+Dana R. Sample
+3301 Example Aspen Drive
+
+Engagement number: B-118204
+
+Dear Dana R. Sample,
+
+We are writing to tell you about a security incident that may have involved some of your personal information.
+
+What happened
+On September 3, 2026, we discovered that an unauthorized party had gained access to a file server used by our mail-order prescription service. Our investigation found that the access began on August 21, 2026 and was stopped on September 4, 2026.
+
+What information was involved
+The files included your name, mailing address, date of birth, prescription numbers and health plan member ID. Your Social Security number and payment card information were not in the files.
+
+What we are doing
+We have offered you 24 months of credit monitoring and identity restoration services through Sentinel ID Protection at no cost to you. There is nothing to pay, and enrolling does not affect your credit score.
+
+What you can do
+To enroll, visit enroll.sentinelid.example and enter your activation code, or call 1-855-555-0167. You must enroll by February 26, 2027. Your activation code is SQ7-44RT-91.
+
+We also recommend that you review the explanation-of-benefits statements you receive from your health plan and report any services you did not receive.
+
+For more information
+If you have questions about this incident, call our dedicated call center at 1-855-555-0167, Monday through Friday, 8 a.m. to 8 p.m. Eastern Time. Please have your engagement number ready.
+
+Sincerely,
+Brightwater Pharmacy Services
