@@ -34,6 +34,11 @@ export const zhHans: Strings = {
     again: '读另一封信',
     samples: '或者试试一封虚构的示例信：',
     sampleNote: '示例信件。寄信方、姓名和号码都是虚构的。',
+    sampleTitles: {
+      'medical-bill': '医院账单',
+      eob: '看起来像账单的保险说明',
+      'tax-proposed': '建议调整税额的税务通知',
+    },
     add: '打开照片或 PDF',
     addNote: '照片和 PDF 只在此浏览器中打开，不会上传。',
     noPictures: '此浏览器的设备端模型看不了图片，所以这里读不了照片或扫描版 PDF。带文字层的 PDF 仍然可以读。',

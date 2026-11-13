@@ -67,6 +67,10 @@ describe('interface languages', () => {
     expect(strings.guidance.fromCloud('gemini-x', 2300, 1234)).toContain('gemini-x');
   });
 
+  it.each([['en', en] as const, ...TRANSLATIONS])('%s names every sample letter', (_, strings) => {
+    expect(Object.keys(strings.input.sampleTitles).sort()).toEqual(SAMPLE_LETTERS.map((s) => s.id).sort());
+  });
+
   it('writes Traditional Chinese with Traditional characters', () => {
     // Characters that exist only in the Simplified form (里 is left out: it is also Traditional, as in 克里).
     const simplifiedOnly = /[这读设来时为个说会发应获没对从们报务费账请认识选择删邮网]/u;

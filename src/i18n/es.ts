@@ -34,6 +34,11 @@ export const es: Strings = {
     again: 'Leer otra carta',
     samples: 'O pruebe con un ejemplo inventado:',
     sampleNote: 'Carta de ejemplo. El remitente, los nombres y los números son inventados.',
+    sampleTitles: {
+      'medical-bill': 'Factura del hospital',
+      eob: 'Aviso del seguro que parece una factura',
+      'tax-proposed': 'Aviso de impuestos que propone un cambio',
+    },
     add: 'Abrir una foto o un PDF',
     addNote: 'Las fotos y los PDF se abren en este navegador. No se suben a ningún sitio.',
     noPictures:

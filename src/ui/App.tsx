@@ -293,7 +293,7 @@ export function App() {
                     setNotice(null);
                   }}
                 >
-                  {s.title}
+                  {t.input.sampleTitles[s.id] ?? s.title}
                 </button>
               ))}
             </span>

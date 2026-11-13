@@ -35,6 +35,11 @@ export const zhHant: Strings = {
     again: '讀另一封信',
     samples: '或者試試一封虛構的範例信：',
     sampleNote: '範例信件。寄信方、姓名和號碼都是虛構的。',
+    sampleTitles: {
+      'medical-bill': '醫院帳單',
+      eob: '看起來像帳單的保險說明',
+      'tax-proposed': '建議調整稅額的稅務通知',
+    },
     add: '開啟照片或 PDF',
     addNote: '照片和 PDF 只在此瀏覽器中開啟，不會上傳。',
     noPictures: '此瀏覽器的裝置端模型看不了圖片，所以這裡讀不了照片或掃描版 PDF。帶文字層的 PDF 仍然可以讀。',

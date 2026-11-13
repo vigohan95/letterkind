@@ -52,6 +52,12 @@ export const en = {
     again: 'Read another letter',
     samples: 'Or try a made-up sample:',
     sampleNote: 'Sample letter. The sender, names and numbers are invented.',
+    /** Names of the made-up samples, by sample id. The letters themselves stay in English, as such letters are sent. */
+    sampleTitles: {
+      'medical-bill': 'Hospital bill',
+      eob: 'Insurance statement that looks like a bill',
+      'tax-proposed': 'Tax notice proposing a change',
+    } as Record<string, string>,
     add: 'Open a photo or PDF',
     addNote: 'Photos and PDFs are opened in this browser. They are not uploaded.',
     noPictures:
