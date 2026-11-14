@@ -32,6 +32,9 @@ import type { LetterTypeId } from '../src/domain/letterTypes';
  * The same day the deadline check (`checkDeadlineContext`) was written after
  * seeing letter 31, and the sender check (`verifySender`) after seeing letter
  * 37: for those fields, those letters count as development letters too.
+ * The keyword rules were widened after seeing letters 22, 37 and 39 (an
+ * `other` vote for association letters among them): for the kind of letter,
+ * those three count as development letters.
  */
 
 /** File numbers from this one on are the held-out set. */

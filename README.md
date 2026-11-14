@@ -123,6 +123,24 @@ What this says:
   at these answers, letter 37 is held out and for the sender field now counts
   as a development letter, and Nano answers differently each run. The fair
   measure is a fresh device run on letters written after these checks.
+- **Then keyword coverage, including a vote for "none of these".** The keyword
+  rules could only name one of the 24 known kinds, so a letter outside the
+  list (the homeowners' association notice) had no second opinion and the
+  model's lease-change guess went through. The rules can now also vote "other"
+  for letters that clearly come from a homeowners', condominium or community
+  association; the model's guess then meets a disagreement and the reader
+  picks. The same pass fixed three near misses: a clinic bill that says an
+  account *may later* go to a collection agency no longer counts towards the
+  collector type, the "Notice of Action" printed on every USCIS form no longer
+  counts towards a benefits notice, and a locked-card fraud alert is read as a
+  bank notice. On the 40 letters the keyword rules now name the right kind for
+  36 and the wrong kind for none (before: 30 and none); the 4 without an
+  opinion are the Spanish letters, which the rules do not read by design.
+  Replaying the stored type answers: the device run goes from **1 kind settled
+  wrong to 0** (letter 39 is now put to the reader with the right kind on
+  offer), and no kind that was settled right is lost in any of the three runs.
+  Same caveat: letters 22, 37 and 39 are held out, and for the kind of letter
+  they now count as development letters.
 
 Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
 Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).

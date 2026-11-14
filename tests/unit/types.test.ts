@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { classify } from '../../src/ai/classify';
 import { keywordPrior } from '../../src/domain/keywordPrior';
 import { isLetterTypeId, LETTER_TYPE_IDS, LETTER_TYPES, letterType } from '../../src/domain/letterTypes';
 import { applyTypeRules } from '../../src/domain/rules';
@@ -151,5 +152,43 @@ describe('keyword second opinion', () => {
     expect(opinion.ranked.length).toBeGreaterThan(1);
     const [best, second] = opinion.ranked;
     if (best && second && best.score - second.score < 2) expect(opinion.type).toBeNull();
+  });
+});
+
+describe('keyword second opinion: letters outside the list, and near misses', () => {
+  const HOA = 'Maple Court Homeowners Association. Violation notice: an unapproved fence was installed without architectural review. Under the CC&Rs please submit a request by January 4, 2027.';
+
+  it('votes other for a homeowners association letter, so a model that squeezes it into a lease change is questioned', async () => {
+    expect(keywordPrior(HOA).type).toBe('other');
+    const result = await classify(HOA, async () => ({ text: JSON.stringify({ letter_type: 'rent_increase_or_lease_change' }), ms: 1 }));
+    expect(result.type).toBeNull();
+    expect(result.candidates).toEqual(['rent_increase_or_lease_change', 'other']);
+  });
+
+  it('still leaves a lawsuit about unpaid association dues to the court type', () => {
+    const suit = 'SUMMONS. Maple Court Homeowners Association, Plaintiff, v. J. Rivera, Defendant. You are being sued for unpaid assessments. File a written answer within 30 days or a default judgment may be entered.';
+    expect(keywordPrior(suit).type).toBe('court_summons_or_lawsuit');
+  });
+
+  it('reads a clinic bill that warns of collections later as a medical bill, not a collector', () => {
+    const bill = 'Alder Creek Clinic, Patient Billing Office. Statement. Total balance due $210.00 by December 1. Accounts unpaid after 60 days may be referred to an outside collection agency.';
+    const opinion = keywordPrior(bill);
+    expect(opinion.type).toBe('medical_bill');
+    expect(opinion.ranked.find((c) => c.type === 'debt_collection')).toBeUndefined();
+  });
+
+  it('keeps a collection agency letter a collection letter', () => {
+    const collector = 'This communication is from a debt collector. This is an attempt to collect a debt. Your account was placed with our agency by the original creditor.';
+    expect(keywordPrior(collector).type).toBe('debt_collection');
+  });
+
+  it('does not read the "Notice of Action" on a USCIS form as a benefits notice', () => {
+    const interview = 'U.S. Citizenship and Immigration Services. I-797C, Notice of Action. You are hereby notified to appear for an interview on your application.';
+    expect(keywordPrior(interview).type).toBe('immigration_appointment');
+    expect(keywordPrior(interview).ranked.find((c) => c.type === 'benefits_denial_or_reduction')).toBeUndefined();
+  });
+
+  it('reads a locked-card fraud alert as a bank notice', () => {
+    expect(keywordPrior('Harbor Bank. We have locked your debit card after activity that does not look like you. Call us.').type).toBe('bank_or_credit_notice');
   });
 });

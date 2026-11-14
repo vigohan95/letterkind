@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { classify } from '../../src/ai/classify';
 import { EXTRACT_FIELDS, type RawFields } from '../../src/ai/extract';
 import { readLetter } from '../../src/ai/read';
 import { EVAL_SET } from '../../src/eval/dataset';
 import type { EvalRun } from '../../src/eval/result';
-import { type Outcome, scoreReading } from '../../src/eval/score';
+import { type Outcome, scoreClassification, scoreReading } from '../../src/eval/score';
 
 /**
  * Replays the model answers stored in `eval/results/` through the checks and
@@ -50,5 +51,29 @@ describe('replaying stored model answers through the current checks', () => {
     expect(lost).toEqual([]);
     expect(after).toBeLessThanOrEqual(before);
     console.info(`${run.reader}/${run.commit}: shown wrong (full) ${before} -> ${after}; ${changed.join('; ')}`);
+  });
+});
+
+describe('replaying stored model answers through the current keyword rules', () => {
+  it.each(Object.entries(RESULTS))('%s: no kind settled right before is lost, and no more are settled wrong', async (_path, run) => {
+    const tally = { wrongBefore: 0, wrongAfter: 0, lost: [] as string[], changed: [] as string[] };
+    for (const result of run.letters) {
+      const item = EVAL_SET.find((i) => i.label.file === result.file);
+      if (!item) continue;
+      const stored = result.classification.model;
+      const now = scoreClassification(
+        await classify(item.letter, async () => ({ text: stored ? JSON.stringify({ letter_type: stored }) : 'not json', ms: 0 })),
+        item.label.type,
+      );
+      const was = result.classificationScore;
+      if (was.combined === 'wrong') tally.wrongBefore++;
+      if (now.combined === 'wrong') tally.wrongAfter++;
+      if (was.combined === 'right' && now.combined !== 'right') tally.lost.push(result.file);
+      if (now.keywords === 'wrong') tally.lost.push(`${result.file} keywords wrong`);
+      if (was.combined !== now.combined) tally.changed.push(`${result.file} ${was.combined}->${now.combined}`);
+    }
+    expect(tally.lost).toEqual([]);
+    expect(tally.wrongAfter).toBeLessThanOrEqual(tally.wrongBefore);
+    console.info(`${run.reader}/${run.commit}: kind settled wrong ${tally.wrongBefore} -> ${tally.wrongAfter}; ${tally.changed.join('; ')}`);
   });
 });
