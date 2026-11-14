@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findLabelledNumbers, verifyAmount, verifyDate, verifyPhone, verifyQuote, verifyReference } from '../../src/domain/verify';
+import { findLabelledNumbers, verifyAmount, verifyDate, verifyPhone, verifyQuote, verifyReference, verifySender } from '../../src/domain/verify';
 
 const BILL = [
   'Riverbend Medical Group',
@@ -188,5 +188,53 @@ describe('verifyReference', () => {
     const absent = verifyReference(NOTICE, '');
     expect(absent.status).toBe('absent');
     if (absent.status === 'absent') expect(absent.candidates).toHaveLength(2);
+  });
+});
+
+describe('verifySender', () => {
+  const RFE = [
+    'U.S. Department of Homeland Security',
+    'U.S. Citizenship and Immigration Services',
+    'National Benefits Center',
+    '',
+    'October 20, 2026',
+  ].join('\n');
+  const IRS = ['Department of the Treasury', 'Internal Revenue Service', 'Ogden, UT 84201-0030', '', 'Notice CP14'].join('\n');
+  const GAS = ['GRANITE STATE GAS COMPANY', 'Credit and Collections', 'PO Box 4410', 'Concord, NH 03302'].join('\n');
+
+  it('keeps one line of a copied letterhead: the agency, not its parent body or a center under it', () => {
+    const v = verifySender(RFE, 'U.S. Department of Homeland Security\nU.S. Citizenship and Immigration Services\nNational Benefits Center');
+    expect(v.status).toBe('verified');
+    if (v.status === 'verified') expect(v.value).toBe('U.S. Citizenship and Immigration Services');
+  });
+
+  it('drops the address under the name', () => {
+    const v = verifySender(IRS, 'Department of the Treasury\nInternal Revenue Service\nOgden, UT 84201-0030');
+    if (v.status === 'verified') expect(v.value).toBe('Internal Revenue Service');
+    else expect.fail(v.status);
+  });
+
+  it('drops a department of the company', () => {
+    const v = verifySender(GAS, 'GRANITE STATE GAS COMPANY\nCredit and Collections');
+    if (v.status === 'verified') expect(v.value).toBe('GRANITE STATE GAS COMPANY');
+    else expect.fail(v.status);
+  });
+
+  it('keeps a name wrapped over two lines in one piece', () => {
+    const v = verifySender('Office of the\n   County Clerk\nRoom 4', 'Office of the\nCounty Clerk');
+    if (v.status === 'verified') expect(v.value).toBe('Office of the\n   County Clerk');
+    else expect.fail(v.status);
+  });
+
+  it('keeps a sub-unit when it is all there is', () => {
+    const v = verifySender('Office of the Jury Commissioner\nRoom 110', 'Office of the Jury Commissioner\nRoom 110');
+    if (v.status === 'verified') expect(v.value).toBe('Office of the Jury Commissioner');
+    else expect.fail(v.status);
+  });
+
+  it('leaves one-line answers and made-up names alone', () => {
+    expect(verifySender(GAS, 'Granite State Gas Company').status).toBe('verified');
+    expect(verifySender(GAS, 'Granite Gas\nCollections').status).toBe('unverified');
+    expect(verifySender(GAS, null).status).toBe('absent');
   });
 });

@@ -109,6 +109,20 @@ What this says:
   two or three letterhead lines ("Department of Homeland Security / U.S.
   Citizenship and Immigration Services"). Same caveat: letter 31 is held out,
   and for the deadline field it now counts as a development letter.
+- **Then one name out of a copied letterhead.** When the sender comes back as
+  several lines, code keeps one: address lines go, a line naming a part of the
+  organisation ("National Benefits Center", "Credit and Collections") goes
+  unless nothing else is left, and of what remains the last line is kept,
+  because letterheads run from the parent body down to the agency the reader
+  deals with (Department of the Treasury, then Internal Revenue Service). A
+  name wrapped over two lines ("Office of the / County Clerk") stays whole
+  (`verifySender` in `src/domain/verify.ts`). Replayed: the device run goes
+  from **12 wrong values to 0**, and the earlier device run (`6e1c76c`) from 6
+  to 0; nothing that was right is lost in any of the three runs. Zero on
+  replay is not zero on the next run: these checks were written after looking
+  at these answers, letter 37 is held out and for the sender field now counts
+  as a development letter, and Nano answers differently each run. The fair
+  measure is a fresh device run on letters written after these checks.
 
 Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
 Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
@@ -116,7 +130,7 @@ The full results, letter by letter, are in `eval/results/`.
 
 ## Testing it
 
-- `npm test`: 874 unit tests, including the source boundary tests described
+- `npm test`: 880 unit tests, including the source boundary tests described
   below, the parsers, the checks, the template filling, the reply drafts and
   the evaluation scoring with recorded model answers. `npm run lint` and
   `npm run typecheck` run in CI on every push.

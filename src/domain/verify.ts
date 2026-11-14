@@ -181,3 +181,53 @@ export function verifyReference(letter: string, claim: string | null | undefined
   }
   return quote;
 }
+
+/** "Ogden, UT 84201-0030", "PO Box 4410", "77 Main Street": where the sender is, not who. */
+const ADDRESS_LINE =
+  /\b[A-Z]{2}\s+\d{5}(?:-\d{4})?\b|^\s*(?:p\.?\s*o\.?\s*box|\d+\s+\S|(?:room|suite|ste\.?|floor|fl\.?|building|bldg\.?|apt\.?)\s*#?\s*\d)/i;
+
+/** "Credit and Collections", "National Benefits Center", "Office of the Jury Commissioner": a part of the sender. */
+const SUB_UNIT = /^\s*(?:office|division|bureau)\s+of\b|\b(?:section|unit|center|centre|department|division|office|team|desk|commissioner|collections|services center)\s*$/i;
+
+/** A line that ends mid-name ("Office of the") or a next line that starts in lower case: one name wrapped over two lines. */
+const CONTINUES = /\b(?:of|the|and|for|de|del|la|los)\s*$|[&,-]\s*$/i;
+
+function letterheadLines(claim: string): string[] {
+  const lines: string[] = [];
+  for (const piece of claim.split(/\r?\n/)) {
+    const line = piece.trim();
+    if (!line) continue;
+    const prev = lines[lines.length - 1];
+    if (prev !== undefined && (CONTINUES.test(prev) || /^[a-z]/.test(line))) lines[lines.length - 1] = `${prev} ${line}`;
+    else lines.push(line);
+  }
+  return lines;
+}
+
+/**
+ * The sender has to be in the letter (as any quote). A model asked for the
+ * sender often copies the whole letterhead: "U.S. Department of Homeland
+ * Security / U.S. Citizenship and Immigration Services / National Benefits
+ * Center", or the company name with the department and city under it. Shown
+ * as-is, that is three lines where the reader wanted one name.
+ *
+ * When the answer runs over several lines, code keeps one of them: address
+ * lines go, a line naming a part of the organisation (a section, a center, a
+ * collections department) goes unless nothing else is left, and of what
+ * remains the last line is kept. Letterheads run from the parent body down to
+ * the agency the reader deals with (Treasury, then the IRS), so the last is
+ * the name people know. The value shown is still the letter's own characters.
+ */
+export function verifySender(letter: string, claim: string | null | undefined): Verdict<string> {
+  const quote = verifyQuote(letter, claim);
+  if (quote.status !== 'verified' || claim === null || claim === undefined || !String(claim).trim().includes('\n')) return quote;
+
+  const lines = letterheadLines(String(claim));
+  if (lines.length < 2) return quote;
+  const names = lines.filter((line) => /\p{L}/u.test(line) && !ADDRESS_LINE.test(line));
+  const whole = names.filter((line) => !SUB_UNIT.test(line));
+  const pick = (whole.length > 0 ? whole : names).at(-1);
+  if (pick === undefined) return quote;
+  const narrowed = verifyQuote(letter, pick);
+  return narrowed.status === 'verified' ? narrowed : quote;
+}

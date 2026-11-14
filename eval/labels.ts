@@ -29,6 +29,9 @@ import type { LetterTypeId } from '../src/domain/letterTypes';
  * (`verifyReference`) was written after seeing the reference errors in the
  * 7993c7b device run, three of them on held-out letters 23, 33 and 37. For the
  * reference field those three now count as development letters.
+ * The same day the deadline check (`checkDeadlineContext`) was written after
+ * seeing letter 31, and the sender check (`verifySender`) after seeing letter
+ * 37: for those fields, those letters count as development letters too.
  */
 
 /** File numbers from this one on are the held-out set. */
