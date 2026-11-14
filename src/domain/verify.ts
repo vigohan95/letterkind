@@ -114,3 +114,70 @@ export function verifyQuote(letter: string, claim: string | null | undefined): V
     ? { status: 'verified', value: first.value, matches }
     : { status: 'unverified', claimed: String(claim), candidates: [] };
 }
+
+/**
+ * A number the letter itself labels as one: "Receipt number: MSC2790144718",
+ * "Account No. 4471-208-336", "Case #: CV-26-004417". Found by code, so the
+ * reader can be offered these when the model's answer for the reference is
+ * not one.
+ */
+const NUMBER_LABEL =
+  /\b(?:receipt|account|case|notice|reference|citation|claim|member|policy|ticket|confirmation|invoice|file|docket|loan|application|customer|violation)\s*(?:number|no\.?|#|id)\s*[:#]?[ \t]*([A-Z0-9][A-Z0-9-]*(?:[ \t][0-9][A-Z0-9-]*)*)/gi;
+
+export function findLabelledNumbers(letter: string): Found<string>[] {
+  const starts = lineStarts(letter);
+  const found: Found<string>[] = [];
+  for (const match of letter.matchAll(NUMBER_LABEL)) {
+    const raw = match[1]?.replace(/[-\s]+$/, '');
+    if (!raw || !/\d/.test(raw) || match.index === undefined) continue;
+    const start = match.index + match[0].length - (match[1]?.length ?? 0);
+    found.push({ value: raw, raw, start, end: start + raw.length, line: lineAt(starts, start) });
+  }
+  return found;
+}
+
+/** "Form I-797C, Notice of Action", "W-2": the name of a form, which is not a number anyone quotes. */
+const FORM_NAME = /^(?:form\s+\S+|[A-Z]-\d{1,4}[A-Z]?)(?=$|[\s,.;:])/i;
+
+/** Why a piece of the letter is not a reference, or null when it may be one. */
+function notAReference(raw: string): string | null {
+  if (!/\d/.test(raw)) return 'no_digits';
+  const text = raw.trim();
+  const dates = findDates(text);
+  if (dates.length > 0 && text.replace(/[\s,.]/g, '').length === dates.reduce((n, d) => n + d.raw.replace(/[\s,.]/g, '').length, 0)) return 'a_date';
+  const form = FORM_NAME.exec(text);
+  if (form && !/\d/.test(text.slice(form[0].length))) return 'a_form_name';
+  return null;
+}
+
+/**
+ * The reference has to be in the letter (as any quote) and also look like a
+ * number to quote. A model under a short prompt will offer the heading
+ * ("PERMISSION"), the date to reply by, or the name of the form ("I-797C")
+ * instead of the receipt number printed two lines below it. Those are held
+ * back, and the numbers the letter labels are offered instead.
+ *
+ * When the model copies a block of several lines that includes exactly one
+ * labelled number, that number is what is shown: still the letter's own
+ * characters, narrowed by code.
+ */
+export function verifyReference(letter: string, claim: string | null | undefined): Verdict<string> {
+  const labelled = findLabelledNumbers(letter);
+  const quote = verifyQuote(letter, claim);
+  if (quote.status === 'absent') return { status: 'absent', candidates: labelled };
+  if (quote.status === 'unverified') return { ...quote, candidates: labelled };
+
+  const first = quote.matches[0];
+  if (first && first.raw.includes('\n')) {
+    const inside = labelled.filter((n) => n.start >= first.start && n.end <= first.end);
+    const only = inside[0];
+    if (inside.length === 1 && only) {
+      return { status: 'verified', value: only.value, matches: labelled.filter((n) => n.value === only.value) };
+    }
+    return { status: 'unverified', claimed: String(claim), candidates: labelled };
+  }
+  if (first && notAReference(first.raw) !== null) {
+    return { status: 'unverified', claimed: String(claim), candidates: labelled.filter((n) => notAReference(n.raw) === null) };
+  }
+  return quote;
+}

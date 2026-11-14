@@ -2,7 +2,7 @@ import { daysLeft } from '../domain/deadline';
 import { letterType, type LetterTypeId } from '../domain/letterTypes';
 import type { PhoneMatch } from '../domain/parse/phone';
 import { applyTypeRules, type RuledFields } from '../domain/rules';
-import { verifyAmount, verifyDate, verifyPhone, verifyQuote, type Verdict } from '../domain/verify';
+import { verifyAmount, verifyDate, verifyPhone, verifyQuote, verifyReference, type Verdict } from '../domain/verify';
 import { extract, type ExtractOptions, type RawFields } from './extract';
 import type { Generate } from './types';
 
@@ -42,7 +42,7 @@ export async function readLetter(
     type,
     ...ruled,
     sender: verifyQuote(letter, fields?.sender),
-    reference: verifyQuote(letter, fields?.reference),
+    reference: verifyReference(letter, fields?.reference),
     phone: verifyPhone(letter, fields?.phone),
     daysLeft: ruled.deadline.status === 'verified' ? daysLeft(ruled.deadline.value, todayIso) : null,
     raw: fields,

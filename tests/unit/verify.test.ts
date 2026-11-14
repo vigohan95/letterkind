@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { verifyAmount, verifyDate, verifyPhone, verifyQuote } from '../../src/domain/verify';
+import { findLabelledNumbers, verifyAmount, verifyDate, verifyPhone, verifyQuote, verifyReference } from '../../src/domain/verify';
 
 const BILL = [
   'Riverbend Medical Group',
@@ -131,5 +131,62 @@ describe('verifyQuote', () => {
 
   it('reports an empty answer as absent', () => {
     expect(verifyQuote(BILL, null).status).toBe('absent');
+  });
+});
+
+const NOTICE = [
+  'Department of Homeland Security',
+  'U.S. Citizenship and Immigration Services',
+  '',
+  'Form I-797C, Notice of Action',
+  'NOTICE DATE: 10/23/2026',
+  'RECEIPT NUMBER: IOE0926447108',
+  'ACCOUNT NUMBER: 0471 2098 3350',
+  '',
+  'FIELD TRIP PERMISSION',
+  'Return this page by 11/17/2026.',
+  'Your notice CP14 is enclosed. Case CV-26-004417.',
+].join('\n');
+
+describe('findLabelledNumbers', () => {
+  it('finds the numbers the letter labels, as printed', () => {
+    expect(findLabelledNumbers(NOTICE).map((n) => n.raw)).toEqual(['IOE0926447108', '0471 2098 3350']);
+  });
+
+  it('ignores a label with no number after it', () => {
+    expect(findLabelledNumbers('Please write your account number on the check.')).toEqual([]);
+  });
+});
+
+describe('verifyReference', () => {
+  it('accepts a number that is in the letter', () => {
+    for (const claim of ['IOE0926447108', 'CP14', 'CV-26-004417', '0471 2098 3350']) {
+      expect(verifyReference(NOTICE, claim).status, claim).toBe('verified');
+    }
+  });
+
+  it('holds back a heading, a date and a form name, and offers the labelled numbers', () => {
+    for (const claim of ['PERMISSION', 'Notice of Action', '11/17/2026', 'Form I-797C, Notice of Action', 'I-797C']) {
+      const v = verifyReference(NOTICE, claim);
+      expect(v.status, claim).toBe('unverified');
+      if (v.status === 'unverified') expect(v.candidates.map((c) => c.raw)).toEqual(['IOE0926447108', '0471 2098 3350']);
+    }
+  });
+
+  it('narrows a copied block to the one labelled number inside it', () => {
+    const v = verifyReference(NOTICE, 'Form I-797C, Notice of Action\nNOTICE DATE: 10/23/2026\nRECEIPT NUMBER: IOE0926447108');
+    expect(v.status).toBe('verified');
+    if (v.status === 'verified') expect(v.matches[0]?.raw).toBe('IOE0926447108');
+  });
+
+  it('holds back a block with more than one labelled number: the reader picks', () => {
+    expect(verifyReference(NOTICE, 'RECEIPT NUMBER: IOE0926447108\nACCOUNT NUMBER: 0471 2098 3350').status).toBe('unverified');
+  });
+
+  it('still rejects what the letter does not say, and reports no answer as absent', () => {
+    expect(verifyReference(NOTICE, 'IOE0000000000').status).toBe('unverified');
+    const absent = verifyReference(NOTICE, '');
+    expect(absent.status).toBe('absent');
+    if (absent.status === 'absent') expect(absent.candidates).toHaveLength(2);
   });
 });

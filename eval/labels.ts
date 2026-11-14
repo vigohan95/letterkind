@@ -24,6 +24,11 @@ import type { LetterTypeId } from '../src/domain/letterTypes';
  * notices, vehicle registration and recalls) and new forms of the same traps.
  * Changing a prompt because of a held-out letter would make it a development
  * letter; if that ever happens, say so here.
+ *
+ * It happened once, for one field: on 2026-11-14 the reference check
+ * (`verifyReference`) was written after seeing the reference errors in the
+ * 7993c7b device run, three of them on held-out letters 23, 33 and 37. For the
+ * reference field those three now count as development letters.
  */
 
 /** File numbers from this one on are the held-out set. */

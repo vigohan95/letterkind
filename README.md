@@ -81,6 +81,19 @@ What this says:
   about that kind, so nothing questioned the model. The per-kind reading hint
   made no difference overall (12 wrong with it and without it), so the next work
   is on the immigration letters and on keyword coverage, not on longer prompts.
+- **After that run: a check for reference numbers.** Half of the twelve were
+  references that were in the letter but were not numbers to quote: a heading
+  ("PERMISSION"), the reply-by date, the form's name ("I-797C") instead of the
+  receipt number, a block of four lines. The reference is now also held back
+  when it has no digits, is a date or is a form name, and a copied block is
+  narrowed to the one labelled number inside it; the numbers the letter labels
+  ("Receipt number: ...") are offered instead. Replaying the stored model
+  answers from this run through the new check (`tests/unit/replay.test.ts`, no
+  new model calls): **12 wrong values become 6**, one of them now right, and no
+  value that was right before is lost, in any of the three stored runs. Honest
+  caveat: three of the six (letters 23, 33, 37) are held-out letters, so for the
+  reference field they now count as development letters; the device numbers in
+  the table above are kept as they were measured until the next full run.
 
 Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
 Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
@@ -88,7 +101,7 @@ The full results, letter by letter, are in `eval/results/`.
 
 ## Testing it
 
-- `npm test`: 822 unit tests, including the source boundary tests described
+- `npm test`: 834 unit tests, including the source boundary tests described
   below, the parsers, the checks, the template filling, the reply drafts and
   the evaluation scoring with recorded model answers. `npm run lint` and
   `npm run typecheck` run in CI on every push.
