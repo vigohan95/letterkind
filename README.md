@@ -94,6 +94,21 @@ What this says:
   caveat: three of the six (letters 23, 33, 37) are held-out letters, so for the
   reference field they now count as development letters; the device numbers in
   the table above are kept as they were measured until the next full run.
+- **Then a check on what each date is for.** Four of the remaining six were
+  real dates from the letter, but the wrong ones: the notice date at the top,
+  the last day of a billing period on a letter that asks for no payment, the
+  last day to ask for a postponement instead of the day to appear, the last day
+  to give notice and move out instead of the day the new rent starts. Where the
+  letter prints a label next to a date ("Notice date:", "Billing period: ... to",
+  "Requests to postpone must be received by"), code reads it and holds that date
+  back; it never swaps in a different date, it offers the others to pick from
+  (`src/domain/dateContext.ts`). A test runs it over all 40 letters and checks
+  that no labelled deadline is ever held back. Replayed the same way: the device
+  run goes from **12 wrong values to 2**, the cloud run from 1 to 0, and nothing
+  that was right is lost. The two left are the agency's name copied as a block of
+  two or three letterhead lines ("Department of Homeland Security / U.S.
+  Citizenship and Immigration Services"). Same caveat: letter 31 is held out,
+  and for the deadline field it now counts as a development letter.
 
 Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
 Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
@@ -101,7 +116,7 @@ The full results, letter by letter, are in `eval/results/`.
 
 ## Testing it
 
-- `npm test`: 834 unit tests, including the source boundary tests described
+- `npm test`: 874 unit tests, including the source boundary tests described
   below, the parsers, the checks, the template filling, the reply drafts and
   the evaluation scoring with recorded model answers. `npm run lint` and
   `npm run typecheck` run in CI on every push.

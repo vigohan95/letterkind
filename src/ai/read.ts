@@ -1,3 +1,4 @@
+import { checkDeadlineContext } from '../domain/dateContext';
 import { daysLeft } from '../domain/deadline';
 import { letterType, type LetterTypeId } from '../domain/letterTypes';
 import type { PhoneMatch } from '../domain/parse/phone';
@@ -36,7 +37,7 @@ export async function readLetter(
   const { fields, ms } = await extract(letter, letterType(type), generate, options);
   const ruled = applyTypeRules(type, {
     amount: verifyAmount(letter, fields?.amount),
-    deadline: verifyDate(letter, fields?.deadline),
+    deadline: checkDeadlineContext(letter, verifyDate(letter, fields?.deadline), letterType(type).deadline),
   });
   return {
     type,
