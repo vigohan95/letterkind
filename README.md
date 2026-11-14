@@ -52,34 +52,39 @@ and [in the cloud](https://letterkind.web.app/eval-cloud.html).
 
 | 200 field values | Nano on the device, after the app's checks | Same letters, whole, to the cloud model |
 |---|---|---|
-| Wrong values shown | **8** (the model alone: 17) | 1 |
-| Right | 162 | 167 |
-| Left blank (correctly or not) | 30 | 32 |
+| Wrong values shown | **12** (the model alone: 20) | 1 |
+| Right | 159 | 167 |
+| Left blank (correctly or not) | 29 | 32 |
 | Kind of letter, model alone | 39 of 40 | 39 of 40 |
-| Kind of letter, after the second opinion | 39 right, 0 wrong, 1 put to the reader | 39 right, 0 wrong, 1 put to the reader |
-| Median time to read one letter | 10.6 s | 1.2 s |
+| Kind of letter, after the keyword second opinion | 39 right, 1 wrong | 39 right, 0 wrong, 1 put to the reader |
+| Median time to read one letter | 10.7 s | 1.2 s |
 
 What this says:
 
-- **Reading on the device costs something, and it is measured.** Seven more
+- **Reading on the device costs something, and it is measured.** Eleven more
   wrong values in 200 than the cloud, and about nine times the wait, on a
   machine with no graphics card. That is the price of the letter never leaving.
-- **The checks are what make the device usable.** Nano alone put 17 wrong values
+  Nano does not answer the same way twice: an earlier run of the same 40 letters
+  (build `9565ad7`) showed 8 wrong values, so read the device column as give or
+  take a few.
+- **The checks are what make the device usable.** Nano alone put 20 wrong values
   on the screen; checking each answer against the letter's own text, and the
-  rules for each kind of letter, stopped 9 of them. Asking the same five
+  rules for each kind of letter, stopped 8 of them. Asking the same five
   questions of every letter, without the kind of letter deciding what is asked
-  and checked, shows 21 even after the checks.
-- **It holds on letters written after the prompts were fixed.** Four wrong values
-  in the 20 development letters, four in the 20 held-out ones.
-- **What is still wrong**: four of the eight are in the two immigration letters
-  (the agency's name and the receipt number), two are deadlines, two are
-  reference numbers. A per-kind reading hint did not help Nano overall (7 wrong
-  without it, 8 with it), which is why the next round of work is on those two
-  kinds rather than on longer prompts.
+  and checked, shows 19 even after the checks.
+- **It holds on letters written after the prompts were fixed.** Seven wrong
+  values in the 20 development letters, five in the 20 held-out ones.
+- **What is still wrong.** Six of the twelve are in the three immigration letters
+  (the agency's name, the receipt number, the appointment date); the others are
+  three deadlines and three reference numbers. One homeowners' association
+  letter was taken for a lease change: the keyword rules have nothing to say
+  about that kind, so nothing questioned the model. The per-kind reading hint
+  made no difference overall (12 wrong with it and without it), so the next work
+  is on the immigration letters and on keyword coverage, not on longer prompts.
 
-Run on 2026-11-14 in Chrome 157 on Windows, 16 cores, no GPU (the browser
-reported Microsoft Basic Render Driver). Builds `9565ad7` (device) and
-`7993c7b` (cloud); the scoring code did not change between them.
+Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
+Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
+The full results, letter by letter, are in `eval/results/`.
 
 ## Testing it
 
