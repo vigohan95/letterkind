@@ -152,6 +152,7 @@ export const es: Strings = {
     kind: 'Tipo de carta',
     state: 'Estado',
     stateNotGiven: 'Sin indicar',
+    stateFromLetter: (name: string) => `Usar ${name}, según la dirección de su carta`,
     language: 'Idioma',
     nothingElse:
       'Su carta no se envía, ni tampoco ningún nombre, cantidad, fecha o número que contenga. La explicación vuelve con huecos, y los huecos se rellenan aquí con lo que se comprobó contra su carta.',

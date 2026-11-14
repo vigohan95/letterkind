@@ -144,6 +144,8 @@ export interface GuidancePanelProps {
   prefs: Prefs;
   onPrefs: (prefs: Prefs) => void;
   source: GuidanceSource;
+  /** The state the letter's own addresses are in, read on this device; offered, never chosen for the reader. */
+  suggested?: StateId | null;
   t: Strings;
 }
 
@@ -154,7 +156,7 @@ export interface GuidancePanelProps {
  * sent, and sends only when asked. If a checked template for the same three
  * things is already on this device, it is shown at once and nothing is sent.
  */
-export function GuidancePanel({ reading, prefs, onPrefs, source, t }: GuidancePanelProps) {
+export function GuidancePanel({ reading, prefs, onPrefs, source, suggested = null, t }: GuidancePanelProps) {
   const { type } = reading;
   const { state, language } = prefs;
   const key = serialize({ purpose: 'explain', type, state, language });
@@ -212,6 +214,11 @@ export function GuidancePanel({ reading, prefs, onPrefs, source, t }: GuidancePa
                 </option>
               ))}
             </select>
+            {suggested && suggested !== state && (
+              <button type="button" className="suggest-state" onClick={() => onPrefs({ ...prefs, state: suggested })}>
+                {t.guidance.stateFromLetter(STATES.find((s) => s.id === suggested)!.name)}
+              </button>
+            )}
           </dd>
         </div>
         <div>

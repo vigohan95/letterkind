@@ -172,6 +172,7 @@ export const en = {
     kind: 'Kind of letter',
     state: 'State',
     stateNotGiven: 'Not given',
+    stateFromLetter: (name: string) => `Use ${name}, from the address on your letter`,
     language: 'Language',
     nothingElse:
       'Your letter is not sent, and neither is any name, amount, date or number in it. The explanation comes back with gaps, and the gaps are filled in here from what was checked against your letter.',

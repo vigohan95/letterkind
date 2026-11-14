@@ -495,6 +495,21 @@ mark[data-field='reference'] {
   font-weight: 600;
 }
 
+/* An offer under the state picker, read from the letter's address; plain text weight so it reads as a choice, not a field. */
+.guidance-sent .suggest-state {
+  display: block;
+  margin-top: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 select {
   max-width: 100%;
   padding: 5px 8px;

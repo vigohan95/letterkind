@@ -137,6 +137,7 @@ export const zhHant: Strings = {
     kind: '信件類型',
     state: '所在州',
     stateNotGiven: '未填',
+    stateFromLetter: (name: string) => `依信上的地址，改為 ${name}`,
     language: '語言',
     nothingElse:
       '您的信件不會發出去，信裡的姓名、金額、日期和號碼也都不會。解釋回來時帶著空位，這些空位在本裝置上用對照您信件核對過的內容填上。',

@@ -117,6 +117,19 @@ describe('the guidance panel', () => {
     expect(html).not.toMatch(/Riverbend|296|555-0199|RMG-0042/);
   });
 
+  it('offers the state from the letter’s address, but does not choose it', async () => {
+    const source: GuidanceSource = { saved: () => Promise.resolve(null), ask: () => Promise.reject(new Error('not asked')), forget: () => Promise.resolve() };
+    const reading = await read(truthful);
+    const offered = renderToStaticMarkup(<GuidancePanel reading={reading} prefs={prefs} onPrefs={nothing} source={source} suggested="OH" t={en} />);
+    expect(offered).toContain('Use Ohio, from the address on your letter');
+    expect(offered).toContain('<option value="CA" selected="">California</option>');
+
+    const same = renderToStaticMarkup(<GuidancePanel reading={reading} prefs={prefs} onPrefs={nothing} source={source} suggested="CA" t={en} />);
+    const none = renderToStaticMarkup(<GuidancePanel reading={reading} prefs={prefs} onPrefs={nothing} source={source} t={en} />);
+    expect(same).not.toContain('from the address on your letter');
+    expect(none).not.toContain('from the address on your letter');
+  });
+
   it('says what will not be sent, next to the button that sends', async () => {
     const html = renderToStaticMarkup(<GuidanceBody status={{ at: 'ask' }} reading={await read(truthful)} prefs={prefs} onAsk={nothing} onForget={nothing} t={en} />);
     expect(html).toContain(en.guidance.nothingElse);

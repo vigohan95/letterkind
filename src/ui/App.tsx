@@ -18,6 +18,7 @@ import { PagePictures, Transcribing } from './Pages';
 import { browserStorage, loadPrefs, type Prefs, savePrefs } from './prefs';
 import { ReadingView } from './ReadingView';
 import { ReplyPanel } from './Reply';
+import { suggestedState } from '../domain/parse/addressState';
 
 type Phase =
   | { at: 'idle' }
@@ -359,7 +360,7 @@ export function App() {
       {phase.at === 'done' && (
         <>
           <ReadingView letter={phase.letter} classification={phase.classification} reading={phase.reading} chosenByReader={phase.chosen} terms={{ language: prefs.language, source: liveTerms }} t={t} />
-          <GuidancePanel reading={phase.reading} prefs={prefs} onPrefs={choosePrefs} source={liveGuidance} t={t} />
+          <GuidancePanel reading={phase.reading} prefs={prefs} onPrefs={choosePrefs} source={liveGuidance} suggested={suggestedState(phase.letter)} t={t} />
           <ReplyPanel reading={phase.reading} prefs={prefs} source={liveReply} t={t} />
         </>
       )}
