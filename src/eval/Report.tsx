@@ -154,7 +154,7 @@ function SplitSection({ letters }: { letters: readonly LetterResult[] }) {
   );
 }
 
-export function Report({ letters, summary, setSize }: { letters: readonly LetterResult[]; summary: Summary; setSize: number }) {
+export function Report({ letters, summary, setSize, readerLabel = 'On-device model' }: { letters: readonly LetterResult[]; summary: Summary; setSize: number; readerLabel?: string }) {
   const full = summary.variants.full;
   const fields = fieldsRead(full.total);
   const c = summary.classification;
@@ -279,7 +279,7 @@ export function Report({ letters, summary, setSize }: { letters: readonly Letter
             </thead>
             <tbody>
               <tr>
-                <th scope="row">On-device model</th>
+                <th scope="row">{readerLabel}</th>
                 <td>{c.model.right}</td>
                 <td className={c.model.wrong > 0 ? 'bad' : undefined}>{c.model.wrong}</td>
                 <td>–</td>

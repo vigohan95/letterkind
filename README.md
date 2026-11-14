@@ -49,6 +49,15 @@ it the first time a request is about to leave, and the page says so next to the
 list of what has left the device. A request that the model in the browser can
 answer never starts it.
 
+The evaluation has a third page, `eval-cloud.html`, that does what the app
+never does: it gives each of the evaluation set's made-up letters, whole, to the
+cloud model, so that what reading on the device costs in accuracy and time is a
+measured number rather than a guess. It lives in `src/evalcloud/`, has its own
+Firebase instance, and is the one other file allowed to name a cloud mode.
+`tests/unit/sourceBoundaries.test.ts` fails the build if the app or the
+on-device evaluation imports it, if it touches the app's own Firebase
+instances, or if it imports any of the app's input or interface code.
+
 On `localhost` reCAPTCHA has no registered domain, so cloud requests are
 refused unless a debug token registered in the Firebase console is put in
 `.env.development.local` as `VITE_APPCHECK_DEBUG_TOKEN`. A production build

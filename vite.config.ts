@@ -40,8 +40,9 @@ const config = {
   preview: { headers: hostedHeaders() },
   build: {
     rollupOptions: {
-      // Two pages: the app, and the evaluation page anyone can run for themselves.
-      input: { main: 'index.html', eval: 'eval.html' },
+      // The app; the evaluation page anyone can run for themselves on the model in their browser;
+      // and the cloud baseline the evaluation is compared with, which the app never loads.
+      input: { main: 'index.html', eval: 'eval.html', evalCloud: 'eval-cloud.html' },
     },
   },
   test: {

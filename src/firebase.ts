@@ -18,6 +18,7 @@ function config() {
 
 let reading: FirebaseApp | undefined;
 let outbound: FirebaseApp | undefined;
+let baseline: FirebaseApp | undefined;
 
 /**
  * The Firebase app the model in the browser is reached through, created on
@@ -37,4 +38,15 @@ export function firebaseApp(): FirebaseApp {
  */
 export function outboundApp(): FirebaseApp {
   return (outbound ??= initializeApp(config(), 'outbound'));
+}
+
+/**
+ * A third instance, for the evaluation's cloud baseline only: the page at
+ * eval-cloud.html gives the evaluation set's made-up letters, whole, to the
+ * cloud model, to measure what reading on the device costs in accuracy. The
+ * app never imports that page, and a test fails the build if anything outside
+ * `src/evalcloud/` uses this.
+ */
+export function baselineApp(): FirebaseApp {
+  return (baseline ??= initializeApp(config(), 'baseline'));
 }

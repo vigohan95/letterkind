@@ -27,23 +27,27 @@ const CLOUD_CAPABLE_MODES = ['ONLY_IN_CLOUD', 'PREFER_IN_CLOUD', 'PREFER_ON_DEVI
 const CHANNEL = 'outbound/channel.ts';
 const ON_DEVICE = 'ai/onDevice.ts';
 const APP_CHECK = 'outbound/appCheck.ts';
+// The evaluation's cloud baseline: gives the evaluation set's made-up letters, whole, to the
+// cloud model, to measure what reading on the device costs. Reached only from eval-cloud.html.
+const BASELINE = 'evalcloud/cloud.ts';
+const BASELINE_DIR = 'evalcloud/';
 
 describe('source boundaries', () => {
   it('finds source files to scan', () => {
     expect(files.length).toBeGreaterThan(0);
   });
 
-  it('names a cloud-capable inference mode only in the outbound channel', () => {
+  it('names a cloud-capable inference mode only in the outbound channel and the evaluation baseline', () => {
     const offenders = files
-      .filter((f) => f.path !== CHANNEL)
+      .filter((f) => f.path !== CHANNEL && f.path !== BASELINE)
       .filter((f) => CLOUD_CAPABLE_MODES.some((mode) => f.text.includes(mode)))
       .map((f) => f.path);
     expect(offenders).toEqual([]);
   });
 
-  it('imports the AI SDK only in the on-device module and the outbound channel', () => {
+  it('imports the AI SDK only in the on-device module, the outbound channel and the evaluation baseline', () => {
     const offenders = files
-      .filter((f) => f.path !== CHANNEL && f.path !== ON_DEVICE)
+      .filter((f) => f.path !== CHANNEL && f.path !== ON_DEVICE && f.path !== BASELINE)
       .filter((f) => /from\s+['"](?:firebase\/ai|@firebase\/ai)/.test(f.text) || /import\(\s*['"](?:firebase\/ai|@firebase\/ai)/.test(f.text))
       .map((f) => f.path);
     expect(offenders).toEqual([]);
@@ -61,8 +65,9 @@ describe('source boundaries', () => {
   it('imports App Check only in its own module, and starts it only from the outbound channel', () => {
     const importers = files
       .filter((f) => /['"](?:firebase\/app-check|@firebase\/app-check)/.test(f.text))
-      .map((f) => f.path);
-    expect(importers).toEqual([APP_CHECK]);
+      .map((f) => f.path)
+      .sort();
+    expect(importers).toEqual([BASELINE, APP_CHECK]);
 
     const starters = files
       .filter((f) => f.path !== APP_CHECK)
@@ -87,6 +92,31 @@ describe('source boundaries', () => {
 
     const channel = files.find((f) => f.path === CHANNEL)!.text;
     expect(channel).toContain("getAI(where === 'device' ? firebaseApp() : outboundApp(),");
+  });
+
+  it('keeps the evaluation baseline out of the app, and away from the app’s own Firebase instances', () => {
+    // Nothing outside the baseline's own folder may import from it: the app cannot reach it.
+    const importers = files
+      .filter((f) => !f.path.startsWith(BASELINE_DIR))
+      .filter((f) => /from\s+['"][./]*(?:\.\.\/)*evalcloud\//.test(f.text) || /['"]\.\.?\/(?:.*\/)?evalcloud\//.test(f.text))
+      .map((f) => f.path);
+    expect(importers).toEqual([]);
+
+    // Its Firebase instance is its own, and it uses no other.
+    const users = files
+      .filter((f) => f.path !== 'firebase.ts')
+      .filter((f) => /\bbaselineApp\b/.test(f.text))
+      .map((f) => f.path);
+    expect(users).toEqual([BASELINE]);
+    const baseline = files.find((f) => f.path === BASELINE)!.text;
+    expect(baseline).not.toMatch(/\b(?:firebaseApp|outboundApp)\b/);
+
+    // It reads only the evaluation set: nothing from the app's input or interface code.
+    const own = files.filter((f) => f.path.startsWith(BASELINE_DIR));
+    for (const f of own) expect(f.text).not.toMatch(/from\s+['"]\.\.\/(?:input|ui\/(?!app\.css))/);
+    // And it is a page of its own, never the app's.
+    const html = readFileSync(join(process.cwd(), 'index.html'), 'utf8') + readFileSync(join(process.cwd(), 'eval.html'), 'utf8');
+    expect(html).not.toContain('evalcloud');
   });
 
   it('starts App Check after the on-device attempt, never when a module loads', () => {

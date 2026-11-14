@@ -1,32 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { type DeviceModelStatus, deviceModelStatus } from '../ai/availability';
-import { onDeviceClassifier, onDeviceExtractor } from '../ai/onDevice';
+import type { DeviceModelStatus } from '../ai/availability';
 import { localIsoDate } from '../domain/deadline';
 import { EVAL_SET } from './dataset';
 import { describeEnvironment } from './environment';
 import { Report } from './Report';
-import { DEVICE_MODEL_NAME, type EvalRun, resultFileName, serialise } from './result';
-import { evaluate, type LetterResult } from './run';
+import { type EvalRun, type ReaderId, resultFileName, serialise } from './result';
+import { evaluate, type LetterResult, type Models } from './run';
 import { summarise } from './summary';
 
 /**
- * The evaluation page: runs the labelled letters through the on-device model
- * in this browser, with the same code path as the app, and shows the scores.
- * Anyone with a browser that has the built-in model can reproduce the numbers
- * in the README here. Nothing is sent anywhere; the results are offered as a
- * file to save.
+ * The evaluation page: runs the labelled letters through a model, with the
+ * same code path as the app, and shows the scores. Which model is a
+ * parameter: the one in this browser (eval.html, what the app uses), or the
+ * cloud baseline (eval-cloud.html). Results are offered as a file to save.
  */
 
-type RunState = 'idle' | 'running' | 'finished' | 'stopped' | 'error';
+/** What reads the letters on a page, and how the page talks about it. */
+export interface Reader {
+  id: ReaderId;
+  /** Written into the results file. */
+  modelName: string;
+  heading: string;
+  intro: string;
+  /** The row for this model in the table of who said what kind of letter it was. */
+  rowLabel: string;
+  status(): Promise<DeviceModelStatus>;
+  statusText: Record<DeviceModelStatus | 'checking', string>;
+  /** Shown while the first letter is being read. */
+  firstLetterNote: string;
+  models(): Models;
+  /** What the about section says leaves the page, if anything. */
+  network: string;
+}
 
-const STATUS_TEXT: Record<DeviceModelStatus | 'checking', string> = {
-  checking: 'Checking for the on-device model…',
-  ready: 'On-device model ready.',
-  downloadable: 'This browser can run the on-device model but has not downloaded it yet. Open the app once and download it there, then come back.',
-  downloading: 'The on-device model is still downloading. Try again when it has finished.',
-  unavailable: 'This device cannot run the browser’s built-in model, so the evaluation cannot run here.',
-  unsupported: 'This browser has no built-in model. The evaluation needs a recent desktop Chrome.',
-};
+type RunState = 'idle' | 'running' | 'finished' | 'stopped' | 'error';
 
 /** `?limit=3` runs only the first three letters: a quick check that everything works. */
 function limitFromUrl(): number {
@@ -36,7 +43,7 @@ function limitFromUrl(): number {
 
 const messageOf = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
-export function EvalPage() {
+export function EvalPage({ reader }: { reader: Reader }) {
   const [status, setStatus] = useState<DeviceModelStatus | 'checking'>('checking');
   const [state, setState] = useState<RunState>('idle');
   const [letters, setLetters] = useState<readonly LetterResult[]>([]);
@@ -49,13 +56,13 @@ export function EvalPage() {
 
   useEffect(() => {
     let live = true;
-    void deviceModelStatus().then((s) => {
+    void reader.status().then((s) => {
       if (live) setStatus(s);
     });
     return () => {
       live = false;
     };
-  }, []);
+  }, [reader]);
 
   const fileUrl = useMemo(() => (run ? URL.createObjectURL(new Blob([serialise(run)], { type: 'application/json' })) : null), [run]);
   useEffect(
@@ -76,7 +83,7 @@ export function EvalPage() {
     setStartedMs(started.getTime());
     setNowMs(started.getTime());
     try {
-      const results = await evaluate(items, { classify: onDeviceClassifier, extract: onDeviceExtractor }, localIsoDate(started), {
+      const results = await evaluate(items, reader.models(), localIsoDate(started), {
         onLetter: (done) => {
           setLetters(done);
           setNowMs(Date.now());
@@ -90,7 +97,8 @@ export function EvalPage() {
         startedAt: started.toISOString(),
         finishedAt: new Date().toISOString(),
         setSize: EVAL_SET.length,
-        model: { name: DEVICE_MODEL_NAME, status },
+        reader: reader.id,
+        model: { name: reader.modelName, status },
         environment: await describeEnvironment(),
         summary: summarise(results),
         letters: results,
@@ -110,16 +118,13 @@ export function EvalPage() {
   return (
     <main className="eval">
       <header className="masthead">
-        <h1>Letterkind — evaluation</h1>
-        <p>
-          {EVAL_SET.length} synthetic official letters with known answers, read by the on-device model in this browser through the same code as the app. The question it answers: how
-          often would a wrong amount, date, phone number or name reach the reader — from the model alone, and after the app’s checks?
-        </p>
+        <h1>{reader.heading}</h1>
+        <p>{reader.intro}</p>
       </header>
 
       <div className="device" data-status={status} role="status">
         <span className="device-dot" aria-hidden="true" />
-        <span>{STATUS_TEXT[status]}</span>
+        <span>{reader.statusText[status]}</span>
         <span className="build">Build {__BUILD_COMMIT__}</span>
       </div>
 
@@ -141,7 +146,7 @@ export function EvalPage() {
         <span className="progress" role="status">
           {state === 'running' &&
             (done === 0
-              ? `Reading letter 1 of ${items.length}. Each letter is read four times; expect under a minute per letter.`
+              ? `Reading letter 1 of ${items.length}. ${reader.firstLetterNote}`
               : `${done} of ${items.length} letters done — about ${minutesLeft} min left.`)}
           {state === 'finished' && `Finished: ${done} letters.`}
           {state === 'stopped' && `Stopped after ${done} letters.`}
@@ -150,7 +155,7 @@ export function EvalPage() {
       {error && <p className="device-error">The run failed: {error}</p>}
 
       {summary ? (
-        <Report letters={letters} summary={summary} setSize={EVAL_SET.length} />
+        <Report letters={letters} summary={summary} setSize={EVAL_SET.length} readerLabel={reader.rowLabel} />
       ) : (
         <section className="about">
           <h2>How it is scored</h2>
@@ -164,6 +169,7 @@ export function EvalPage() {
               against the letter’s own text and the rules for that kind of letter have been applied.
             </li>
             <li>The letters and labels are in the repository under eval/, and the scoring code is in src/eval/.</li>
+            <li>{reader.network}</li>
           </ul>
         </section>
       )}

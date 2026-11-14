@@ -10,6 +10,9 @@ import tseslint from 'typescript-eslint';
 //                           only accepts the closed request types
 // App Check loads a third-party script, so it too has one home:
 //   src/outbound/appCheck.ts, started only by the channel
+// One more file may import both, and the app never loads it:
+//   src/evalcloud/cloud.ts  the evaluation's cloud baseline (eval-cloud.html),
+//                           which sends only the evaluation set's made-up letters
 const AI_SDK_BOUNDARY = {
   paths: [
     {
@@ -59,7 +62,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/ai/onDevice.ts', 'src/outbound/channel.ts', 'src/outbound/appCheck.ts'],
+    files: ['src/ai/onDevice.ts', 'src/outbound/channel.ts', 'src/outbound/appCheck.ts', 'src/evalcloud/cloud.ts'],
     rules: { 'no-restricted-imports': 'off' },
   },
   {
