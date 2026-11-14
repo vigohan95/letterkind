@@ -1,0 +1,25 @@
+EXAMPLE STATE TOLLWAY AUTHORITY
+Violations Processing Center
+
+NOTICE OF UNPAID TOLL
+
+Notice date: 11/09/2026
+Violation number: T-26-30418827
+License plate: EXM 4471 (passenger vehicle)
+
+Our records show that your vehicle used the tollway without paying:
+
+Date        Plaza                 Toll
+10/18/2026  Example River Bridge  $3.25
+10/18/2026  Northfield Plaza      $2.10
+10/24/2026  Example River Bridge  $3.25
+Tolls                                          $8.60
+Administrative fee                             $5.00
+AMOUNT DUE                                    $13.60
+
+Pay by 12/09/2026. If unpaid by 12/09/2026, a violation fine of $50.00 per toll will be added and the amount due will be $163.60.
+
+If you were not driving, or the vehicle was sold or stolen, you may contest this notice by 12/09/2026.
+
+Pay or contest online at tolls.example or by phone at 1-855-555-0123.
+To open a prepaid toll account and avoid future fees, call 1-855-555-0140.

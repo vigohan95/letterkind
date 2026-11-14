@@ -185,7 +185,12 @@ describe('report', () => {
     const both = await evaluate([EVAL_SET[0]!, EVAL_SET[EVAL_SET.length - 1]!], stubborn, TODAY);
     const html = renderToStaticMarkup(<Report letters={both} summary={summarise(both)} setSize={EVAL_SET.length} />);
     expect(html).toContain('Development (01–20)');
-    expect(html).toContain('Held out (21 on)');
+    expect(html).toContain('Written after every check (41 on)');
+    expect(html).not.toContain('Held out (21–40)');
+    const three = await evaluate([EVAL_SET[0]!, EVAL_SET[20]!, EVAL_SET[EVAL_SET.length - 1]!], stubborn, TODAY);
+    const all = renderToStaticMarkup(<Report letters={three} summary={summarise(three)} setSize={EVAL_SET.length} />);
+    expect(all).toContain('Held out (21–40)');
+    expect(all).toContain('Written after every check (41 on)');
     const devOnly = await evaluate(EVAL_SET.slice(0, 2), stubborn, TODAY);
     expect(renderToStaticMarkup(<Report letters={devOnly} summary={summarise(devOnly)} setSize={EVAL_SET.length} />)).not.toContain('Held out');
   });

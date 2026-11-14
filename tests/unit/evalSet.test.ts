@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isHeldOut, LABELS, type Label } from '../../eval/labels';
+import { isFresh, isHeldOut, LABELS, type Label } from '../../eval/labels';
 import { EXTRACT_FIELDS, type RawFields } from '../../src/ai/extract';
 import type { Generate } from '../../src/ai/types';
 import { LETTER_TYPE_IDS, letterType } from '../../src/domain/letterTypes';
@@ -26,12 +26,20 @@ describe('evaluation set', () => {
     expect(distinct(LABELS.map((l) => l.file))).toBe(LABELS.length);
   });
 
-  it('holds out half the letters, and the held-out half covers every kind the development half lacks', () => {
+  it('holds out at least half the letters, and the held-out letters cover every kind the development letters lack', () => {
     const held = LABELS.filter((l) => isHeldOut(l.file));
     const dev = LABELS.filter((l) => !isHeldOut(l.file));
-    expect(held.length).toBe(dev.length);
+    expect(held.length).toBeGreaterThanOrEqual(dev.length);
     const missingFromDev = LETTER_TYPE_IDS.filter((id) => !dev.some((l) => l.type === id));
     for (const id of missingFromDev) expect(held.map((l) => l.type), id).toContain(id);
+  });
+
+  it('has fresh letters, written after every check, that are also held out and span several kinds and both languages', () => {
+    const fresh = LABELS.filter((l) => isFresh(l.file));
+    expect(fresh.length).toBeGreaterThanOrEqual(10);
+    for (const label of fresh) expect(isHeldOut(label.file)).toBe(true);
+    expect(distinct(fresh.map((l) => l.type))).toBeGreaterThanOrEqual(8);
+    expect(fresh.some((l) => l.language === 'es')).toBe(true);
   });
 
   it('uses only kinds of letter the app knows', () => {

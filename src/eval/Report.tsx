@@ -1,7 +1,7 @@
 import { EXTRACT_FIELDS, type FieldName } from '../ai/extract';
 import { type LetterResult, type Variant, VARIANTS } from './run';
 import type { Outcome } from './score';
-import { FIRST_HELD_OUT, isHeldOut } from '../../eval/labels';
+import { FIRST_FRESH, FIRST_HELD_OUT, isFresh, isHeldOut } from '../../eval/labels';
 import { type FieldSummary, fieldsRead, type Summary, summarise } from './summary';
 
 /**
@@ -110,12 +110,14 @@ function kindCell(result: LetterResult) {
  * Shown only when the run includes both.
  */
 function SplitSection({ letters }: { letters: readonly LetterResult[] }) {
-  const held = letters.filter((l) => isHeldOut(l.file));
+  const held = letters.filter((l) => isHeldOut(l.file) && !isFresh(l.file));
+  const fresh = letters.filter((l) => isFresh(l.file));
   const dev = letters.filter((l) => !isHeldOut(l.file));
-  if (held.length === 0 || dev.length === 0) return null;
+  if (held.length + fresh.length === 0 || dev.length === 0) return null;
   const rows: [string, readonly LetterResult[]][] = [
     [`Development (01–${String(FIRST_HELD_OUT - 1).padStart(2, '0')})`, dev],
-    [`Held out (${FIRST_HELD_OUT} on)`, held],
+    [`Held out (${FIRST_HELD_OUT}–${FIRST_FRESH - 1})`, held],
+    [`Written after every check (${FIRST_FRESH} on)`, fresh],
   ];
   return (
     <section aria-labelledby="by-set">
@@ -133,7 +135,7 @@ function SplitSection({ letters }: { letters: readonly LetterResult[] }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map(([name, subset]) => {
+            {rows.filter(([, subset]) => subset.length > 0).map(([name, subset]) => {
               const total = summarise(subset).variants.full.total;
               return (
                 <tr key={name}>
@@ -149,7 +151,7 @@ function SplitSection({ letters }: { letters: readonly LetterResult[] }) {
           </tbody>
         </table>
       </div>
-      <p className="note">The prompts and rules were shaped while reading the development letters. The held-out letters were written afterwards and not used to change them.</p>
+      <p className="note">The prompts and rules were shaped while reading the development letters. The held-out letters were written afterwards; a few later checks were written after seeing some of them (listed in eval/labels.ts). The last group was written after every check and has not been used to change anything.</p>
     </section>
   );
 }

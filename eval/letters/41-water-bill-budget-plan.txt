@@ -1,0 +1,30 @@
+CITY OF ASHFORD
+Department of Public Utilities
+Water and Sewer Billing
+200 Example Civic Plaza, Ashford
+
+UTILITY BILL
+
+Account number: 30-118274-02
+Customer: Morgan T. Sample
+Service address: 92 Example Birch Lane
+Bill date: November 16, 2026
+Service period: October 14, 2026 to November 12, 2026
+
+Previous balance                                 $84.17
+Payment received October 28 - thank you         -$84.17
+Water (6,000 gallons)                            $41.28
+Sewer                                            $36.90
+Stormwater fee                                    $8.75
+TOTAL AMOUNT DUE                                 $86.93
+
+Please pay by December 7, 2026.
+If we have not received your payment by then, a late charge of $5.00 will be added and the amount due will be $91.93.
+
+Having trouble paying? Budget Billing spreads your yearly charges into equal monthly payments, which for this account would be $79.00 a month. Call us before the due date to sign up.
+
+Questions about this bill: (603) 555-0131
+Water main breaks and emergencies, 24 hours: (603) 555-0186
+Pay online at pay.ashford.example or mail the stub below.
+
+City of Ashford, Department of Public Utilities

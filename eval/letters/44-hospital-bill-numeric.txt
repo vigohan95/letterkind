@@ -1,0 +1,25 @@
+Riverside Example Medical Center
+Patient Financial Services
+PO Box 4410, Example City
+
+STATEMENT
+
+Statement date: 11/10/2026
+Account number: RX-0091847
+Patient: Casey L. Sample
+Date of service: 09/22/2026 - Emergency department
+
+Total charges                            $4,286.00
+Insurance payments (Harbor Health Plan) -$3,104.60
+Insurance adjustments                     -$842.15
+PATIENT BALANCE                            $339.25
+
+Payment due by: 12/10/2026
+
+You can pay in monthly payments of as little as $25.00 with no interest. Call us to set up a plan.
+You may qualify for financial assistance; ask for an application.
+
+Our billing is handled by Clearpath Revenue Services on behalf of Riverside Example Medical Center. Please make checks payable to Riverside Example Medical Center.
+
+Billing questions: 1-844-555-0119
+Financial assistance: 1-844-555-0177

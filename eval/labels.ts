@@ -35,6 +35,11 @@ import type { LetterTypeId } from '../src/domain/letterTypes';
  * The keyword rules were widened after seeing letters 22, 37 and 39 (an
  * `other` vote for association letters among them): for the kind of letter,
  * those three count as development letters.
+ *
+ * Letters 41–50 were written on 2026-11-14, after every check and keyword
+ * rule above existed, and nothing has been changed while looking at how they
+ * were read. They are the cleanest measure of the app as it stands; if a
+ * change is ever made because of one, say so here.
  */
 
 /** File numbers from this one on are the held-out set. */
@@ -42,6 +47,13 @@ export const FIRST_HELD_OUT = 21;
 
 export function isHeldOut(file: string): boolean {
   return Number.parseInt(file, 10) >= FIRST_HELD_OUT;
+}
+
+/** File numbers from this one on were written after every check existed. */
+export const FIRST_FRESH = 41;
+
+export function isFresh(file: string): boolean {
+  return Number.parseInt(file, 10) >= FIRST_FRESH;
 }
 
 /** What makes a letter hard to read correctly. */
@@ -578,5 +590,125 @@ export const LABELS: readonly Label[] = [
     phone: '1-800-555-0157',
     traps: ['figure_is_not_a_charge', 'multiple_dates', 'relative_deadline', 'second_organisation', 'multiple_phones'],
     note: 'A denied application. $5,000.00 is the credit limit asked for. The only time limit is 60 days from receiving the notice. The credit bureau is named, with its own number, but did not send the letter.',
+  },
+  {
+    file: '41-water-bill-budget-plan.txt',
+    type: 'utility_bill',
+    language: 'en',
+    sender: ['City of Ashford', 'Department of Public Utilities'],
+    reference: ['30-118274-02'],
+    amount: '$86.93',
+    deadline: { printed: 'December 7, 2026', iso: '2026-12-07' },
+    phone: '(603) 555-0131',
+    traps: ['multiple_amounts', 'multiple_dates', 'late_fee', 'installment_amount', 'multiple_phones'],
+    note: 'The previous balance was paid. $91.93 applies only after December 7, and $79.00 is the monthly figure under a budget plan the reader has not joined. The second number is the emergency line. The letterhead runs to four lines.',
+  },
+  {
+    file: '42-jury-summons-es.txt',
+    type: 'jury_summons',
+    language: 'es',
+    sender: ['Tribunal Superior del Condado de San Ejemplo', 'Oficina del Jurado'],
+    reference: ['6604-218-77'],
+    amount: null,
+    deadline: { printed: '11 de enero de 2027', iso: '2027-01-11' },
+    phone: '(559) 555-0172',
+    traps: ['spanish', 'figure_is_not_a_charge', 'multiple_amounts', 'multiple_dates'],
+    note: 'A jury summons in Spanish. January 11 is the day to report; December 7 is the earlier questionnaire date. The figures are juror pay, mileage and a possible fine.',
+  },
+  {
+    file: '43-snap-reduction.txt',
+    type: 'benefits_denial_or_reduction',
+    language: 'en',
+    sender: ['State Department of Human Services', 'Department of Human Services'],
+    reference: ['2207-448-19'],
+    amount: null,
+    deadline: { printed: 'December 14, 2026', iso: '2026-12-14' },
+    phone: '(502) 555-0153',
+    traps: ['figure_is_not_a_charge', 'old_and_new_amount', 'multiple_amounts', 'multiple_dates', 'second_organisation', 'multiple_phones'],
+    note: 'Every figure is a benefit amount or income. December 14 is the last day to ask for a hearing; January 1 is when the new amount starts. Legal aid is named, with its own number, but did not send the letter.',
+  },
+  {
+    file: '44-hospital-bill-numeric.txt',
+    type: 'medical_bill',
+    language: 'en',
+    sender: ['Riverside Example Medical Center'],
+    reference: ['RX-0091847'],
+    amount: '$339.25',
+    deadline: { printed: '12/10/2026', iso: '2026-12-10' },
+    phone: '1-844-555-0119',
+    traps: ['multiple_amounts', 'multiple_dates', 'installment_amount', 'numeric_dates', 'second_organisation', 'multiple_phones'],
+    note: 'The patient balance comes after charges, insurance payments and adjustments; $25.00 is the smallest monthly payment on a plan. Every date is numbers only. A billing company is named but bills on behalf of the hospital.',
+  },
+  {
+    file: '45-collection-settlement.txt',
+    type: 'debt_collection',
+    language: 'en',
+    sender: ['Northgate Recovery Group'],
+    reference: ['NRG-558104'],
+    amount: '$1,126.48',
+    deadline: { printed: 'December 28, 2026', iso: '2026-12-28' },
+    phone: '1-877-555-0162',
+    traps: ['multiple_amounts', 'multiple_dates', 'second_organisation', 'multiple_phones'],
+    note: 'December 28 is the last day to dispute; December 4 is only the settlement offer, and $675.00 is the offer, not the debt. The original creditor is named, with its own number, but is not the sender.',
+  },
+  {
+    file: '46-lease-renewal.txt',
+    type: 'rent_increase_or_lease_change',
+    language: 'en',
+    sender: ['Greenline Property Management', 'Maple Court Apartments'],
+    reference: [],
+    amount: '$1,495.00',
+    deadline: { printed: 'December 31, 2026', iso: '2026-12-31' },
+    phone: '(614) 555-0146',
+    traps: ['old_and_new_amount', 'multiple_amounts', 'multiple_dates', 'no_reference'],
+    note: 'The renewal asks for a signed lease by December 31, which comes before the March 1 start, so December 31 is the deadline. $1,645.00 is the month-to-month rent if the reader does not sign. A unit number is not a reference number.',
+  },
+  {
+    file: '47-toll-violation.txt',
+    type: 'traffic_or_parking_ticket',
+    language: 'en',
+    sender: ['Example State Tollway Authority'],
+    reference: ['T-26-30418827'],
+    amount: '$13.60',
+    deadline: { printed: '12/09/2026', iso: '2026-12-09' },
+    phone: '1-855-555-0123',
+    traps: ['multiple_amounts', 'multiple_dates', 'late_fee', 'numeric_dates', 'multiple_phones'],
+    note: 'The amount due is tolls plus a fee; $163.60 applies only after December 9. Travel dates and the notice date are not deadlines. The second number is for opening an account.',
+  },
+  {
+    file: '48-immigration-biometrics.txt',
+    type: 'immigration_appointment',
+    language: 'en',
+    sender: ['U.S. Citizenship and Immigration Services', 'USCIS', 'Department of Homeland Security'],
+    reference: ['IOE0928814456'],
+    amount: null,
+    deadline: { printed: 'December 3, 2026', iso: '2026-12-03' },
+    phone: '1-800-555-0115',
+    traps: ['multiple_dates', 'numeric_dates'],
+    note: 'The appointment date is written out; the received and notice dates are numbers. I-797C and I-765 are form names, not the receipt number.',
+  },
+  {
+    file: '49-eob-es.txt',
+    type: 'insurance_eob',
+    language: 'es',
+    sender: ['Plan de Salud Bahía Ejemplo'],
+    reference: ['26-3318-90442', 'BEJ-778104-01'],
+    amount: null,
+    deadline: null,
+    phone: '1-888-555-0174',
+    traps: ['spanish', 'not_a_bill', 'multiple_amounts', 'multiple_dates', 'relative_deadline', 'second_organisation'],
+    note: 'An explanation of benefits in Spanish that says it is not a bill; $39.50 is what the clinic may bill later. The appeal limit is 180 days from receiving the notice, so no date is the deadline. The clinic is named but did not send it.',
+  },
+  {
+    file: '50-pet-license-renewal.txt',
+    type: 'other',
+    language: 'en',
+    sender: ['Example County Animal Services'],
+    reference: ['DL-2026-48817'],
+    amount: '$20.00',
+    deadline: { printed: '12/31/2026', iso: '2026-12-31' },
+    phone: '(720) 555-0159',
+    traps: ['multiple_amounts', 'multiple_dates', 'late_fee', 'numeric_dates'],
+    note: 'A county pet licence renewal, which none of the named kinds covers. $35.00 applies only after December 31, and $10.00 is a senior rate the reader has not asked for. The rabies date is not a deadline.',
   },
 ];

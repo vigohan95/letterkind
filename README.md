@@ -142,6 +142,23 @@ What this says:
   Same caveat: letters 22, 37 and 39 are held out, and for the kind of letter
   they now count as development letters.
 
+**Ten more letters, written after every check above.** Because those checks
+were written after looking at stored answers, letters 41–50 were added on
+2026-11-14, after the last of them, and nothing has been changed while looking
+at how they are read: a water bill with a budget-plan figure and a late
+amount, a jury summons and an explanation of benefits in Spanish, a benefits
+cut with old and new amounts, a hospital statement with only numeric dates, a
+collection letter with a settlement offer, a lease renewal whose sign-by date
+comes before the new rent, a toll notice, a biometrics appointment printed
+under a three-line letterhead, and a county pet licence that none of the named
+kinds covers. The part of the app that needs no model can be measured on them
+now: the keyword rules name the right kind for 6, the wrong kind for none, and
+hold no opinion on 4 (the two Spanish letters by design; the lease renewal,
+the toll notice and the pet licence because no kind leads clearly), so for
+those the model's answer stands alone. The table above stays the 40-letter
+measurement until the next full run on the device, which will report these
+ten as their own row.
+
 Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
 Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
 The full results, letter by letter, are in `eval/results/`.
