@@ -3,15 +3,100 @@
 Official letters are hard to read: a tax notice, a medical bill, a shut-off
 warning, a court summons. Letterkind reads the letter **on your device** with
 Gemini Nano and tells you what it is, what it wants from you, how much, by when,
-and who to call.
+and who to call. Then, if you ask, it explains that kind of letter and drafts a
+reply in your language.
 
 The letter itself never leaves the browser. The cloud is only ever told three
 things — the kind of letter, the US state, and your language — and sends back a
-template that is filled in locally.
+template that is filled in on the device.
 
-Work in progress for the #BuildHybridAI hackathon. Built from scratch during the
-contest period; the only earlier work was a throwaway feasibility probe that is
-not part of this repository.
+**Try it:** https://letterkind.web.app in desktop Chrome with the built-in model.
+Three made-up sample letters are on the first screen. The interface is in
+English, Spanish and Chinese (Simplified and Traditional); explanations and
+replies come in twelve languages.
+
+## Who it is for
+
+People who get letters from US agencies, hospitals, landlords and courts in a
+register they do not read easily: people who speak another language at home,
+older people, anyone holding a letter that says "this is not a bill" next to an
+amount due. The letters that matter most are the ones people are least willing
+to paste into a chatbot, because they are full of names, account numbers and
+amounts. Letterkind is built so they do not have to.
+
+## What runs where
+
+| Step | Where | What the model is given |
+|---|---|---|
+| Open a photo or PDF | Device: Nano reads the image; a PDF's own text is taken exactly | The page |
+| Kind of letter (24 kinds) | Device: Nano, with keyword rules as a second opinion; if they disagree, the reader picks | The first page |
+| Sender, number to quote, amount, deadline, phone | Device: Nano, then every answer is checked against the letter's own characters and the rules for that kind | The letter |
+| Explanation of this kind of letter | Cloud: `gemini-3.5-flash-lite` | Kind, state, language |
+| Draft reply | Cloud, same model | Kind, state, language |
+| Glossary (tap a term) | Meanings written in this repository; Spanish ships with the app; other languages are translated in the cloud | One glossary entry, language |
+
+The cloud's answers come back as templates with gaps. The gaps are filled on the
+device from what was checked against the letter, and those words are
+highlighted, so the reader can see which parts the cloud model never saw. Every
+request that leaves is listed on the page under "What has left this device",
+written down before it goes. Explanations are kept on the device and reused for
+the next letter of the same kind, state and language.
+
+## Measured
+
+Forty made-up letters with labels written before any model saw them (20 used
+while building, 20 written afterwards and held out), five fields each. A
+*wrong* value is one the reader would be shown that does not match the letter.
+Anyone can rerun both columns: [on the device](https://letterkind.web.app/eval.html)
+and [in the cloud](https://letterkind.web.app/eval-cloud.html).
+
+| 200 field values | Nano on the device, after the app's checks | Same letters, whole, to the cloud model |
+|---|---|---|
+| Wrong values shown | **8** (the model alone: 17) | 1 |
+| Right | 162 | 167 |
+| Left blank (correctly or not) | 30 | 32 |
+| Kind of letter, model alone | 39 of 40 | 39 of 40 |
+| Kind of letter, after the second opinion | 39 right, 0 wrong, 1 put to the reader | 39 right, 0 wrong, 1 put to the reader |
+| Median time to read one letter | 10.6 s | 1.2 s |
+
+What this says:
+
+- **Reading on the device costs something, and it is measured.** Seven more
+  wrong values in 200 than the cloud, and about nine times the wait, on a
+  machine with no graphics card. That is the price of the letter never leaving.
+- **The checks are what make the device usable.** Nano alone put 17 wrong values
+  on the screen; checking each answer against the letter's own text, and the
+  rules for each kind of letter, stopped 9 of them. Asking the same five
+  questions of every letter, without the kind of letter deciding what is asked
+  and checked, shows 21 even after the checks.
+- **It holds on letters written after the prompts were fixed.** Four wrong values
+  in the 20 development letters, four in the 20 held-out ones.
+- **What is still wrong**: four of the eight are in the two immigration letters
+  (the agency's name and the receipt number), two are deadlines, two are
+  reference numbers. A per-kind reading hint did not help Nano overall (7 wrong
+  without it, 8 with it), which is why the next round of work is on those two
+  kinds rather than on longer prompts.
+
+Run on 2026-11-14 in Chrome 157 on Windows, 16 cores, no GPU (the browser
+reported Microsoft Basic Render Driver). Builds `9565ad7` (device) and
+`7993c7b` (cloud); the scoring code did not change between them.
+
+## Testing it
+
+- `npm test`: 822 unit tests, including the source boundary tests described
+  below, the parsers, the checks, the template filling, the reply drafts and
+  the evaluation scoring with recorded model answers. `npm run lint` and
+  `npm run typecheck` run in CI on every push.
+- In the browser: open https://letterkind.web.app, pick a sample letter, press
+  *Read this letter*, then *Get the explanation* and *Draft a reply*. Open
+  *What has left this device* to see exactly what was sent.
+- The two evaluation pages above rerun the numbers.
+
+## Built during the contest
+
+Every commit in this repository was made during the contest, starting
+2026-11-11. The only earlier work was a throwaway feasibility probe of Firebase
+AI Logic's on-device mode, which is not part of this repository.
 
 ## Develop
 
