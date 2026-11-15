@@ -3,6 +3,7 @@ import { firebaseApp } from '../firebase';
 import { imageSessionOptions, textSessionOptions } from './availability';
 import { CLASSIFY_SCHEMA } from './classify';
 import { EXTRACT_SCHEMA } from './extract';
+import { retryOnTransient } from './retry';
 import type { Generate, Look } from './types';
 
 /**
@@ -54,8 +55,21 @@ const transcriberModel = (): GenerativeModel =>
     onDeviceParams: { createOptions: imageSessionOptions() },
   }));
 
-export const onDeviceClassifier: Generate = (prompt) => asGenerate(classifierModel())(prompt);
-export const onDeviceExtractor: Generate = (prompt) => asGenerate(extractorModel())(prompt);
+/** A generic failure of the built-in model is retried in a new session (see retry.ts). */
+export const onDeviceClassifier: Generate = (prompt) =>
+  retryOnTransient(
+    () => asGenerate(classifierModel())(prompt),
+    () => {
+      classifier = undefined;
+    },
+  );
+export const onDeviceExtractor: Generate = (prompt) =>
+  retryOnTransient(
+    () => asGenerate(extractorModel())(prompt),
+    () => {
+      extractor = undefined;
+    },
+  );
 
 /** Shows the on-device model one page of a letter and passes on its answer as it is written. */
 export const onDeviceLook: Look = async function* (prompt, image) {
