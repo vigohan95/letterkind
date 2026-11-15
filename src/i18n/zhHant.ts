@@ -169,6 +169,7 @@ export const zhHant: Strings = {
       web_address: (found: string) => `它包含網址或電子郵件地址（「${found}」）。Letterkind 不顯示模型寫出的地址。`,
       not_in_language: () => '它不是用您所選語言的正常寫法寫的——用了別的文字、寫成了英文，或者漏掉了重音符號。',
       blank_left_in_english: (found: string) => `它的譯文裡有一處讓您填寫的空白還是英文（「${found}」）。`,
+      deadline_as_letter_date: (found: string) => `它寫的信把辦理期限當成了來信日期（「${found}」）。您會簽上一個錯誤的日期，所以沒有保留。`,
       names_a_program: (found: string) => `它寫的信點了某個專案、計畫或法律的名字（「${found}」）。它沒看過您的信，不可能知道這個專案是否存在、是否適用於您，所以沒有保留。Letterkind 寫的信只籠統地詢問有沒有可用的協助。`,
       states_the_law: (found: string) =>
         `它寫的信對法律下了斷言（「${found}」）。您簽名的內容沒人能在這裡核實，所以沒有保留。Letterkind 寫的信只提出請求，不替寄信方解釋法律。`,

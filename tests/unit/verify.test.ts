@@ -214,6 +214,21 @@ describe('verifySender', () => {
     else expect.fail(v.status);
   });
 
+  it.each([
+    ['a backslash', 'Department of the Treasury \\ Internal Revenue Service'],
+    ['a slash', 'Department of the Treasury / Internal Revenue Service'],
+    ['a bar', 'Department of the Treasury | Internal Revenue Service'],
+    ['a written-out line break', 'Department of the Treasury\\nInternal Revenue Service'],
+  ])('reads letterhead lines the model joined with %s', (_, claim) => {
+    const v = verifySender(IRS, claim);
+    if (v.status === 'verified') expect(v.value).toBe('Internal Revenue Service');
+    else expect.fail(v.status);
+  });
+
+  it('still holds back joined names that are not in the letter', () => {
+    expect(verifySender(IRS, 'Department of the Treasury \\ Ohio Department of Taxation').status).toBe('unverified');
+  });
+
   it('drops a department of the company', () => {
     const v = verifySender(GAS, 'GRANITE STATE GAS COMPANY\nCredit and Collections');
     if (v.status === 'verified') expect(v.value).toBe('GRANITE STATE GAS COMPANY');

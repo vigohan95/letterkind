@@ -59,7 +59,8 @@ export type RejectReason =
   | 'translation_differs'
   | 'blank_left_in_english'
   | 'states_the_law'
-  | 'names_a_program';
+  | 'names_a_program'
+  | 'deadline_as_letter_date';
 
 /**
  * A template that broke a rule. It is thrown away whole: a model that has

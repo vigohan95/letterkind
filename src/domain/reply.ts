@@ -110,6 +110,13 @@ export function namedProgram(text: string): string | null {
   return null;
 }
 
+/**
+ * "your letter dated {{DEADLINE}}": the gap is the date to act by, and the
+ * device fills it with that date. Written after "dated", the reader would sign
+ * a wrong date for the letter itself.
+ */
+const DEADLINE_AS_LETTER_DATE = /\b(?:dated|dated on|written on|sent on|letter of|notice of)\s+\{\{DEADLINE\}\}/i;
+
 /** A greeting, what is asked, and a closing: fewer lines than that is a block of text, not a letter. */
 const MIN_LINES = 3;
 const laidOut = (text: string): boolean => text.split('\n').filter((line) => line.trim() !== '').length >= MIN_LINES;
@@ -140,6 +147,8 @@ export function parseReply(answer: string, type: LetterTypeId, language: Languag
   ] as const) {
     const name = namedProgram(ownWords(text));
     if (name) throw new TemplateRejected('names_a_program', field, name);
+    const misdated = DEADLINE_AS_LETTER_DATE.exec(text);
+    if (misdated) throw new TemplateRejected('deadline_as_letter_date', field, misdated[0]);
   }
   if (template.bodyTranslated !== null) {
     if (!laidOut(template.bodyTranslated)) throw new TemplateRejected('wrong_shape', 'body_translated');
@@ -165,6 +174,12 @@ export type LetterPiece =
   /** Something for the reader to write in by hand. */
   | { kind: 'blank'; text: string };
 
+const LABEL_WORDS = 'account|case|notice|reference|claim|policy|ticket|invoice|file|receipt|citation|member';
+/** A number as printed with its own label in front: "Notice CP2000", "Account No. 4471". */
+const CARRIES_LABEL = new RegExp(`^(?:${LABEL_WORDS})\\b`, 'i');
+/** The draft's own label just before the gap: "regarding account number ", "Change Notice ". */
+const LABEL_BEFORE = new RegExp(`\\b(?:(?:${LABEL_WORDS})(?:\\s+(?:number|no\\.?))?|number|no\\.?)\\s*[:#]?\\s*$`, 'i');
+
 /**
  * Fill a draft's gaps on the device.
  *
@@ -182,7 +197,18 @@ export function fillLetter(text: string, values: Values, blanks: Readonly<Record
 
   const pieces: LetterPiece[] = [];
   for (const piece of fill(text, known, blanks)) {
-    if (piece.kind === 'value') pieces.push(piece);
+    if (piece.kind === 'value') {
+      // "account number Notice CP2000": the number as printed already carries its label.
+      const before = pieces.at(-1);
+      if (piece.placeholder === 'REFERENCE' && before?.kind === 'text' && CARRIES_LABEL.test(piece.text)) {
+        const trimmed = before.text.replace(LABEL_BEFORE, '');
+        if (trimmed !== before.text) {
+          if (trimmed === '') pieces.pop();
+          else before.text = /\s$/.test(trimmed) ? trimmed : `${trimmed} `;
+        }
+      }
+      pieces.push(piece);
+    }
     else if (piece.kind === 'stand_in') pieces.push({ kind: 'blank', text: piece.text });
     else {
       let at = 0;

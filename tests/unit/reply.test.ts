@@ -181,6 +181,13 @@ describe('a draft of a reply', () => {
     expect(parseReply(inEnglish({ body_en: blank }), 'medical_bill', 'en').bodyEn).toBe(blank);
   });
 
+  it('is thrown away when it writes the date to act by as the date of the letter', () => {
+    const misdated = letter.replace('I received your bill', 'I am writing about your letter dated {{DEADLINE}}. I received your bill');
+    expect(rejection(inEnglish({ body_en: misdated }))).toMatchObject({ reason: 'deadline_as_letter_date', field: 'body_en', found: 'dated {{DEADLINE}}' });
+    // "due {{DEADLINE}}" and "by {{DEADLINE}}" are what the gap is for.
+    expect(parseReply(inEnglish(), 'medical_bill', 'en').bodyEn).toContain('due {{DEADLINE}}');
+  });
+
   it('tells the cloud not to name a program, in every state and with none', () => {
     for (const state of ['OH', 'US'] as const) {
       const prompt = promptFor({ purpose: 'reply', type: 'tax_proposed_change', state, language: 'en' });
@@ -262,6 +269,19 @@ describe('filling a reply on the device', () => {
         .replace('{{AMOUNT}}', '$296.00')
         .replace('{{DEADLINE}}', 'December 15, 2026'),
     );
+  });
+
+  it('does not print a label twice when the number as printed carries its own', () => {
+    const cp2000 = { ...values, REFERENCE: 'Notice CP2000' };
+    const fill = (text: string) => filledText(fillLetter(text, cp2000, blanksFor('en')));
+    expect(fill('I am writing about account number {{REFERENCE}}.')).toBe('I am writing about Notice CP2000.');
+    expect(fill('Response to Proposed Change Notice {{REFERENCE}}')).toBe('Response to Proposed Change Notice CP2000');
+    expect(fill('Re: Account No.: {{REFERENCE}}')).toBe('Re: Notice CP2000');
+    expect(fill('{{REFERENCE}}')).toBe('Notice CP2000');
+    // A bare number keeps the label the draft gave it.
+    expect(filledText(fillLetter('Re: Account {{REFERENCE}}', values, blanksFor('en')))).toBe('Re: Account RMG-0042-7719');
+    // Words that only end like a label are left alone.
+    expect(fill('Regarding the piano {{REFERENCE}}')).toBe('Regarding the piano Notice CP2000');
   });
 
   it('turns a detail the letter did not yield into one more blank, never a guess', () => {

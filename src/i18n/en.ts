@@ -206,6 +206,8 @@ export const en = {
       not_in_language: () =>
         'It was not written the way the language you chose is written — in other letters, in English, or with the accents left off.',
       blank_left_in_english: (found: string) => `Its translation left a place for you to fill in (“${found}”) in English.`,
+      deadline_as_letter_date: (found: string) =>
+        `Its letter used the date to act by as the date of your letter (“${found}”). You would be signing a wrong date, so it was not kept.`,
       names_a_program: (found: string) =>
         `Its letter named a program, plan or law (“${found}”). It never saw your letter and could not know that one exists or applies to you, so it was not kept. A letter from Letterkind asks in general words whether help is available.`,
       states_the_law: (found: string) =>

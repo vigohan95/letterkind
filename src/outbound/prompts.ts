@@ -19,7 +19,7 @@ import { parseRequest, type OutboundRequest, type TermLanguage } from './request
  * Bump when the wording changes, so cached answers to the old wording are dropped.
  * The glossary's meanings are part of the wording: change one and bump this too.
  */
-export const PROMPT_VERSION = 5;
+export const PROMPT_VERSION = 6;
 
 /**
  * Where a request may run.
@@ -112,11 +112,11 @@ function placeholderMeaning(placeholder: Placeholder, type: LetterTypeId): strin
     case 'SENDER':
       return 'who sent the letter';
     case 'REFERENCE':
-      return 'the account, case or notice number printed on the letter';
+      return 'the account, case or notice number printed on the letter, as printed: it may carry its own label ("Notice CP2000", "Account No. 4471"), so do not write a word such as account, notice or number right before it';
     case 'AMOUNT':
       return amount === 'none' ? 'a dollar amount' : `the dollar amount in the letter: here, ${AMOUNT_IS[amount]}`;
     case 'DEADLINE':
-      return deadline === 'none' ? 'a date' : `the date in the letter: here, ${DEADLINE_IS[deadline]}`;
+      return deadline === 'none' ? 'a date' : `the date in the letter: here, ${DEADLINE_IS[deadline]}. It is never the date the letter was written; there is no marker for that date`;
     case 'DAYS_LEFT':
       return `how far off that date is, filled in as a finished phrase in the reader's language (in English it would read "in 14 days" or "tomorrow"). Use it only in brackets straight after the date, exactly like this: ${mark('DEADLINE')} (${mark('DAYS_LEFT')}). Add no words around it`;
     case 'PHONE':

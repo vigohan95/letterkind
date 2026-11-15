@@ -192,6 +192,9 @@ const SUB_UNIT = /^\s*(?:office|division|bureau)\s+of\b|\b(?:section|unit|center
 /** A line that ends mid-name ("Office of the") or a next line that starts in lower case: one name wrapped over two lines. */
 const CONTINUES = /\b(?:of|the|and|for|de|del|la|los)\s*$|[&,-]\s*$/i;
 
+/** " \ ", " / ", " | " or a literal "\n" between two names. */
+const JOINED_LINES = /\s+[\\/|]\s+|\\n/;
+
 function letterheadLines(claim: string): string[] {
   const lines: string[] = [];
   for (const piece of claim.split(/\r?\n/)) {
@@ -219,7 +222,13 @@ function letterheadLines(claim: string): string[] {
  * the name people know. The value shown is still the letter's own characters.
  */
 export function verifySender(letter: string, claim: string | null | undefined): Verdict<string> {
-  const quote = verifyQuote(letter, claim);
+  const first = verifyQuote(letter, claim);
+  // "Department of the Treasury \ Internal Revenue Service": the letterhead's lines joined by a mark of the model's own.
+  if (first.status === 'unverified' && typeof claim === 'string' && JOINED_LINES.test(claim)) {
+    const split = claim.split(JOINED_LINES).join('\n');
+    if (verifyQuote(letter, split).status === 'verified') return verifySender(letter, split);
+  }
+  const quote = first;
   if (quote.status !== 'verified' || claim === null || claim === undefined || !String(claim).trim().includes('\n')) return quote;
 
   const lines = letterheadLines(String(claim));
