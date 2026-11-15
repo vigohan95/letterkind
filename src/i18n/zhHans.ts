@@ -168,6 +168,7 @@ export const zhHans: Strings = {
       web_address: (found: string) => `它包含网址或邮箱地址（「${found}」）。Letterkind 不显示模型写出的地址。`,
       not_in_language: () => '它不是用您所选语言的正常写法写的——用了别的文字、写成了英文，或者漏掉了重音符号。',
       blank_left_in_english: (found: string) => `它的译文里有一处让您填写的空白还是英文（「${found}」）。`,
+      names_a_program: (found: string) => `它写的信点了某个项目、计划或法律的名字（「${found}」）。它没看过您的信，不可能知道这个项目是否存在、是否适用于您，所以没有保留。Letterkind 写的信只笼统地询问有没有可用的帮助。`,
       states_the_law: (found: string) =>
         `它写的信对法律下了断言（「${found}」）。您签名的内容没人能在这里核实，所以没有保留。Letterkind 写的信只提出请求，不替寄信方解释法律。`,
       translation_differs: (found: string) => `它的译文和英文对不上：信件信息的空位（「${found}」）只在其中一份里出现。`,

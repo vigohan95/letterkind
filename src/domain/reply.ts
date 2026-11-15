@@ -91,6 +91,25 @@ function legalClaim(text: string): string | null {
   return null;
 }
 
+/**
+ * A program, plan, fund, waiver or law called by a name. The cloud never saw
+ * the letter and was told only the state, and it has been caught inventing
+ * one ("the Ohio Tax Amnesty program" in a reply to a federal tax notice).
+ * A name the reader cannot check does not go in a letter they sign; the
+ * letter asks in general words whether help is available instead.
+ */
+const NAMED_PROGRAMS = [
+  /\b(?:[A-Z][\w'’.-]*\s+){1,6}(?:Program|Programme|Initiative|Fund|Waiver|Amnesty|Act)\b/,
+  /\bamnesty\b/i,
+];
+export function namedProgram(text: string): string | null {
+  for (const name of NAMED_PROGRAMS) {
+    const found = name.exec(text);
+    if (found) return found[0].slice(0, 60);
+  }
+  return null;
+}
+
 /** A greeting, what is asked, and a closing: fewer lines than that is a block of text, not a letter. */
 const MIN_LINES = 3;
 const laidOut = (text: string): boolean => text.split('\n').filter((line) => line.trim() !== '').length >= MIN_LINES;
@@ -113,6 +132,15 @@ export function parseReply(answer: string, type: LetterTypeId, language: Languag
   if (!writtenAs(ownWords(template.bodyEn), 'en')) throw new TemplateRejected('not_in_language', 'body_en');
   const claim = legalClaim(template.bodyEn);
   if (claim) throw new TemplateRejected('states_the_law', 'body_en', claim);
+  for (const [field, text] of [
+    ['subject', template.subject],
+    ['body_en', template.bodyEn],
+    ...(template.bodyTranslated !== null ? [['body_translated', template.bodyTranslated]] : []),
+    ['before_sending', template.beforeSending.join('\n')],
+  ] as const) {
+    const name = namedProgram(ownWords(text));
+    if (name) throw new TemplateRejected('names_a_program', field, name);
+  }
   if (template.bodyTranslated !== null) {
     if (!laidOut(template.bodyTranslated)) throw new TemplateRejected('wrong_shape', 'body_translated');
     if (!writtenAs(ownWords(template.bodyTranslated), language)) throw new TemplateRejected('not_in_language', 'body_translated');

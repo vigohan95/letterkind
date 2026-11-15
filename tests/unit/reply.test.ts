@@ -150,6 +150,45 @@ describe('a draft of a reply', () => {
     expect(parseReply(inEnglish({ body_en: asked }), 'medical_bill', 'en').bodyEn).toBe(asked);
   });
 
+  it.each([
+    ['a state program it made up', 'I would also like to know if I qualify for the Ohio Tax Amnesty program.', 'Ohio Tax Amnesty'],
+    ['a relief fund by name', 'Please tell me whether the Patient Hardship Relief Fund can help me.', 'Patient Hardship Relief Fund'],
+    ['a law by name', 'The No Surprises Act protects patients like me.', 'The No Surprises Act'],
+    ['amnesty in any case', 'Is there a tax amnesty I could use?', 'amnesty'],
+  ])('is thrown away when the letter to sign names %s', (_, sentence, found) => {
+    const named = letter.replace('Before I pay,', `${sentence} Before I pay,`);
+    expect(rejection(inEnglish({ body_en: named }))).toMatchObject({ reason: 'names_a_program', field: 'body_en', found });
+  });
+
+  it('is thrown away when a program is named outside the letter too', () => {
+    expect(rejection(inEnglish({ before_sending: ['Look up the Ohio Tax Amnesty Program before you send this.'] }))).toMatchObject({
+      reason: 'names_a_program',
+      field: 'before_sending',
+    });
+    expect(rejection(inEnglish({ subject: 'Hardship Waiver request, account {{REFERENCE}}' }))).toMatchObject({ reason: 'names_a_program', field: 'subject' });
+    const translated = carta.replace('Antes de pagar,', '¿Califico para el Ohio Tax Amnesty Program? Antes de pagar,');
+    expect(rejection(inSpanish({ body_translated: translated }), 'medical_bill', 'es')).toMatchObject({ reason: 'names_a_program', field: 'body_translated' });
+  });
+
+  it('keeps a letter that asks in general words whether help is available', () => {
+    const asked = letter.replace(
+      'Before I pay,',
+      'Please tell me whether any payment plan, hardship program or other relief is available to me, and how to apply. Before I pay,',
+    );
+    expect(parseReply(inEnglish({ body_en: asked }), 'medical_bill', 'en').bodyEn).toBe(asked);
+    // The blanks the reader fills in are not names the model gave.
+    const blank = letter.replace('Before I pay,', 'I am enrolled in [NAME OF YOUR HEALTH PLAN OR PROGRAM]. Before I pay,');
+    expect(parseReply(inEnglish({ body_en: blank }), 'medical_bill', 'en').bodyEn).toBe(blank);
+  });
+
+  it('tells the cloud not to name a program, in every state and with none', () => {
+    for (const state of ['OH', 'US'] as const) {
+      const prompt = promptFor({ purpose: 'reply', type: 'tax_proposed_change', state, language: 'en' });
+      expect(prompt, state).toMatch(/do not name any program, plan, fund, waiver or law/i);
+      expect(prompt, state).not.toContain('ask the sender for it there');
+    }
+  });
+
   it('is thrown away when it is not the form that was asked for', () => {
     expect(rejection('Dear Sir or Madam,')).toMatchObject({ reason: 'not_json' });
     expect(rejection('[]')).toMatchObject({ reason: 'wrong_shape' });

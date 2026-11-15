@@ -19,7 +19,7 @@ import { parseRequest, type OutboundRequest, type TermLanguage } from './request
  * Bump when the wording changes, so cached answers to the old wording are dropped.
  * The glossary's meanings are part of the wording: change one and bump this too.
  */
-export const PROMPT_VERSION = 4;
+export const PROMPT_VERSION = 5;
 
 /**
  * Where a request may run.
@@ -126,9 +126,9 @@ function placeholderMeaning(placeholder: Placeholder, type: LetterTypeId): strin
 
 /** What a draft of a reply is told about the state: a letter asks, it does not teach the law. */
 function whereToReplyFrom(state: StateId): string {
-  if (state === 'US') return 'The reader did not say which state they live in. Ask only for what a person can ask for anywhere in the United States.';
+  if (state === 'US') return 'The reader did not say which state they live in. Ask only for what a person can ask for anywhere in the United States, in general words: do not name any program, plan, fund, waiver or law.';
   const name = stateName(state);
-  return `The reader lives in ${name}. If ${name} gives people who get this kind of letter something most states do not, do not state that rule in the letter: ask the sender for it there, and name it in before_sending as something the reader can look up. If you are not sure it is specific to ${name}, say in before_sending that it can vary by state.`;
+  return `The reader lives in ${name}. Do not name any program, plan, fund, waiver or law, of ${name} or anyone else, anywhere in your answer: you have not seen the letter, and a name you are not sure exists is one the reader would be signing. Where help might exist, ask in general words (for example "Please tell me whether any payment plan or relief is available to me"), and say in before_sending that the reader can ask a free legal aid or tax help office what applies in ${name}.`;
 }
 
 function aboutTheLetter(type: LetterTypeId, state: StateId, purpose: 'explain' | 'reply' = 'explain'): string[] {

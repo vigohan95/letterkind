@@ -186,6 +186,8 @@ export const es: Strings = {
       not_in_language: () =>
         'No estaba escrita como se escribe el idioma que eligió: con otro alfabeto, en inglés o sin los acentos.',
       blank_left_in_english: (found: string) => `Su traducción dejó en inglés un espacio para que usted lo rellene («${found}»).`,
+      names_a_program: (found: string) =>
+        `Su carta nombraba un programa, plan o ley («${found}»). No vio su carta y no podía saber si existe o si le corresponde, así que no se guardó. Una carta de Letterkind pregunta en términos generales si hay ayuda disponible.`,
       states_the_law: (found: string) =>
         `Su carta afirmaba algo sobre la ley («${found}»). Usted estaría firmando algo que nadie aquí puede comprobar, así que no se guardó. Una carta de Letterkind pregunta; no le dice al remitente lo que dice la ley.`,
       translation_differs: (found: string) =>

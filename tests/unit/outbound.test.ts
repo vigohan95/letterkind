@@ -166,11 +166,12 @@ describe('prompts', () => {
     expect(promptFor({ purpose: 'explain', type: 'medical_bill', state: 'NY', language: 'en' })).not.toContain('a greeting on its own line');
   });
 
-  it('keep what a state does differently out of the letter and in the checklist', () => {
+  it('keep what a state does differently out of the letter, asked about in general words', () => {
     const reply = promptFor({ purpose: 'reply', type: 'medical_bill', state: 'NY', language: 'en' });
     expect(reply).toContain('The reader lives in New York.');
-    expect(reply).toContain('do not state that rule in the letter');
-    expect(reply).toContain('name it in before_sending');
+    expect(reply).toContain('Do not name any program, plan, fund, waiver or law');
+    expect(reply).toContain('what applies in New York');
+    expect(reply).not.toContain('name it in before_sending');
     expect(reply).not.toContain('say what applies there');
     expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'US', language: 'en' })).toContain('did not say which state');
     expect(promptFor({ purpose: 'explain', type: 'medical_bill', state: 'NY', language: 'en' })).toContain('say what applies there');

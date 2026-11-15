@@ -42,6 +42,14 @@ request that leaves is listed on the page under "What has left this device",
 written down before it goes. Explanations are kept on the device and reused for
 the next letter of the same kind, state and language.
 
+A draft reply is something the reader signs, so it is held to more than an
+explanation. It is thrown away if it tells the sender what the law requires, or
+if it names a program, plan, fund, waiver or law at all: recording the demo, a
+reply to an IRS CP2000 for a reader in Ohio asked about "the Ohio Tax Amnesty
+program", which the model had no way to know exists or applies. The reply now
+asks in general words whether any payment plan or relief is available, and the
+checklist points to free legal aid or tax help for what applies in the state.
+
 ## Measured
 
 Fifty made-up letters with labels written before any model saw them, five
