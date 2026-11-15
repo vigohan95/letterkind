@@ -135,7 +135,13 @@ export function ReadingView({ letter, classification, reading, chosenByReader, t
 
         <Fact field="amount" label={t.amount[reading.amountMeaning]}>
           {isNotApplicable(reading.amount) ? (
-            <p className="fact-missing">{reading.amount.withheld ? t.field.noAmountWithheld : t.field.noAmount}</p>
+            <p className="fact-missing">
+              {reading.amount.reason === 'credit'
+                ? t.field.amountIsCredit(reading.amount.raw ?? '')
+                : reading.amount.withheld
+                  ? t.field.noAmountWithheld
+                  : t.field.noAmount}
+            </p>
           ) : (
             <VerdictBody verdict={reading.amount} show={(m) => m.raw} t={t} />
           )}

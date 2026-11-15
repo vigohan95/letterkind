@@ -169,8 +169,8 @@ describe('readLetter', () => {
     const model = recorded({ sender: 'Northlake Health Plan', reference: '2026-448812', amount: '$25.00', deadline: '10/02/2026', phone: '1-800-555-0142' });
     const reading = await readLetter(EOB, 'insurance_eob', model, today);
 
-    expect(reading.amount).toEqual({ status: 'not_applicable', withheld: true });
-    expect(reading.deadline).toEqual({ status: 'not_applicable', withheld: true });
+    expect(reading.amount).toEqual({ status: 'not_applicable', withheld: true, reason: 'kind' });
+    expect(reading.deadline).toEqual({ status: 'not_applicable', withheld: true, reason: 'kind' });
     expect(reading.daysLeft).toBeNull();
     expect(reading.phone.status).toBe('verified');
   });

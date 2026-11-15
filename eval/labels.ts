@@ -40,6 +40,12 @@ import type { LetterTypeId } from '../src/domain/letterTypes';
  * rule above existed, and nothing has been changed while looking at how they
  * were read. They are the cleanest measure of the app as it stands; if a
  * change is ever made because of one, say so here.
+ *
+ * It happened on 2026-11-15, for the amount field: after the 0aaced7 device
+ * run, credits are held back as amounts to pay (seen on letter 31) and a kind
+ * that rests on one reader alone no longer hides a checked value (seen on
+ * letter 50). For the amount field, letters 31 and 50 count as development
+ * letters.
  */
 
 /** File numbers from this one on are the held-out set. */

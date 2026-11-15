@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { type DeviceModelStatus, deviceModelStatus, imageSessionOptions } from '../ai/availability';
-import { type Classification, classify } from '../ai/classify';
+import { type Classification, classify, typeIsCertain } from '../ai/classify';
 import { onDeviceClassifier, onDeviceExtractor, onDeviceLook, prepareDeviceModel } from '../ai/onDevice';
 import { type Reading, readLetter } from '../ai/read';
 import { joinPages, transcribePage, unreadableCount } from '../ai/transcribe';
@@ -141,7 +141,9 @@ export function App() {
 
   async function extractAs(letter: string, classification: Classification, type: LetterTypeId, chosen: boolean, id: number): Promise<void> {
     setPhase({ at: 'extracting', letter, classification });
-    const reading = await readLetter(letter, type, onDeviceExtractor, localIsoDate(new Date()));
+    const reading = await readLetter(letter, type, onDeviceExtractor, localIsoDate(new Date()), {
+      typeCertain: typeIsCertain(classification, chosen),
+    });
     if (run.current === id) setPhase({ at: 'done', letter, classification, reading, chosen });
   }
 

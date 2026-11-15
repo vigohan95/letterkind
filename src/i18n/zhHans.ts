@@ -96,6 +96,7 @@ export const zhHans: Strings = {
     inTheLetter: '信里实际写的是：',
     noAmount: '这类信件不要求您付钱。',
     noAmountWithheld: '信里提到了金额，但对这类信件来说，没有一个是账单金额，所以不显示金额。',
+    amountIsCredit: (raw: string) => `信里把 ${raw} 标为您的贷方余额（对方欠您的），不是您要付的钱，所以不显示应付金额。`,
     noDeadline: '这类信件没有给您设定期限。',
     noDeadlineWithheld: '信里提到了日期，但对这类信件来说，没有一个是期限，所以不显示日期。',
   },

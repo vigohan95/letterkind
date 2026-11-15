@@ -97,6 +97,7 @@ export const zhHant: Strings = {
     inTheLetter: '信裡實際寫的是：',
     noAmount: '這類信件不要求您付錢。',
     noAmountWithheld: '信裡提到了金額，但對這類信件來說，沒有一個是帳單金額，所以不顯示金額。',
+    amountIsCredit: (raw: string) => `信裡把 ${raw} 標為您的貸方餘額（對方欠您的），不是您要付的錢，所以不顯示應付金額。`,
     noDeadline: '這類信件沒有給您設定期限。',
     noDeadlineWithheld: '信裡提到了日期，但對這類信件來說，沒有一個是期限，所以不顯示日期。',
   },

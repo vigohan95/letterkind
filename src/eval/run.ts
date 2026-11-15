@@ -1,4 +1,4 @@
-import { classify } from '../ai/classify';
+import { classify, typeIsCertain } from '../ai/classify';
 import { EXTRACT_FIELDS, type FieldName, type RawFields } from '../ai/extract';
 import { type Reading, readLetter } from '../ai/read';
 import type { Generate } from '../ai/types';
@@ -75,8 +75,10 @@ export async function evaluateLetter(item: EvalItem, models: Models, todayIso: s
   const classification = await classify(letter, models.classify);
   const typeUsed = typeToUse(classification, label.type);
 
-  const full = await readLetter(letter, typeUsed, models.extract, todayIso);
-  const noHint = await readLetter(letter, typeUsed, models.extract, todayIso, { hint: false });
+  // When the two readers disagree, the run stands in for a person choosing the right kind.
+  const typeCertain = typeIsCertain(classification, classification.type === null);
+  const full = await readLetter(letter, typeUsed, models.extract, todayIso, { typeCertain });
+  const noHint = await readLetter(letter, typeUsed, models.extract, todayIso, { hint: false, typeCertain });
   const untyped = await readLetter(letter, 'other', models.extract, todayIso, { hint: false });
 
   return {

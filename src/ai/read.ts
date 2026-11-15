@@ -2,7 +2,7 @@ import { checkDeadlineContext } from '../domain/dateContext';
 import { daysLeft } from '../domain/deadline';
 import { letterType, type LetterTypeId } from '../domain/letterTypes';
 import type { PhoneMatch } from '../domain/parse/phone';
-import { applyTypeRules, type RuledFields } from '../domain/rules';
+import { applyTypeRules, type RuledFields, type RuleOptions } from '../domain/rules';
 import { verifyAmount, verifyDate, verifyPhone, verifyReference, verifySender, type Verdict } from '../domain/verify';
 import { extract, type ExtractOptions, type RawFields } from './extract';
 import type { Generate } from './types';
@@ -32,13 +32,18 @@ export async function readLetter(
   type: LetterTypeId,
   generate: Generate,
   todayIso: string,
-  options: ExtractOptions = {},
+  options: ExtractOptions & RuleOptions = {},
 ): Promise<Reading> {
-  const { fields, ms } = await extract(letter, letterType(type), generate, options);
-  const ruled = applyTypeRules(type, {
-    amount: verifyAmount(letter, fields?.amount),
-    deadline: checkDeadlineContext(letter, verifyDate(letter, fields?.deadline), letterType(type).deadline),
-  });
+  const { typeCertain, ...extractOptions } = options;
+  const { fields, ms } = await extract(letter, letterType(type), generate, extractOptions);
+  const ruled = applyTypeRules(
+    type,
+    {
+      amount: verifyAmount(letter, fields?.amount),
+      deadline: checkDeadlineContext(letter, verifyDate(letter, fields?.deadline), letterType(type).deadline),
+    },
+    typeCertain === undefined ? {} : { typeCertain },
+  );
   return {
     type,
     ...ruled,

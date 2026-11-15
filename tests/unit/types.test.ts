@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { classify } from '../../src/ai/classify';
+import { EVAL_SET } from '../../src/eval/dataset';
+import { classify, typeIsCertain } from '../../src/ai/classify';
 import { keywordPrior } from '../../src/domain/keywordPrior';
 import { isLetterTypeId, LETTER_TYPE_IDS, LETTER_TYPES, letterType } from '../../src/domain/letterTypes';
 import { applyTypeRules } from '../../src/domain/rules';
@@ -44,8 +45,8 @@ describe('type rules', () => {
     const amount = verifyAmount(EOB, '$25.00');
     expect(amount.status).toBe('verified');
     const ruled = applyTypeRules('insurance_eob', { amount, deadline: verifyDate(EOB, '10/02/2026') });
-    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: true });
-    expect(ruled.deadline).toEqual({ status: 'not_applicable', withheld: true });
+    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: true, reason: 'kind' });
+    expect(ruled.deadline).toEqual({ status: 'not_applicable', withheld: true, reason: 'kind' });
   });
 
   it('never shows an amount on a jury summons, and reads the date as a day to appear', () => {
@@ -53,7 +54,7 @@ describe('type rules', () => {
       amount: verifyAmount(JURY, '1500'),
       deadline: verifyDate(JURY, '2026-12-07'),
     });
-    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: true });
+    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: true, reason: 'kind' });
     expect(ruled.deadline.status).toBe('verified');
     expect(ruled.deadlineMeaning).toBe('appear');
   });
@@ -63,7 +64,7 @@ describe('type rules', () => {
       amount: verifyAmount('We are writing about a security incident.', null),
       deadline: verifyDate('Enroll by March 1, 2027.', 'March 1, 2027'),
     });
-    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: false });
+    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: false, reason: 'kind' });
     expect(ruled.deadlineMeaning).toBe('enroll');
   });
 
@@ -190,5 +191,49 @@ describe('keyword second opinion: letters outside the list, and near misses', ()
 
   it('reads a locked-card fraud alert as a bank notice', () => {
     expect(keywordPrior('Harbor Bank. We have locked your debit card after activity that does not look like you. Call us.').type).toBe('bank_or_credit_notice');
+  });
+});
+
+describe('limits on the type rules', () => {
+  const letterOf = (prefix: string): string => {
+    const item = EVAL_SET.find((i) => i.label.file.startsWith(prefix));
+    if (!item) throw new Error(prefix);
+    return item.letter;
+  };
+
+  it('does not show a credit balance as an amount to pay, and says why', () => {
+    const letter = letterOf('31-');
+    const amount = verifyAmount(letter, '$18.40');
+    expect(amount.status).toBe('verified');
+    const ruled = applyTypeRules('utility_bill', { amount, deadline: verifyDate(letter, null) });
+    expect(ruled.amount).toEqual({ status: 'not_applicable', withheld: true, reason: 'credit', raw: '$18.40 CR' });
+  });
+
+  it('still shows an amount due that only sits next to a credit elsewhere in the letter', () => {
+    const letter = 'Previous balance $52.88 CR\nTotal amount due $34.48\nPay by December 1, 2026';
+    const ruled = applyTypeRules('utility_bill', { amount: verifyAmount(letter, '34.48'), deadline: verifyDate(letter, null) });
+    expect(ruled.amount.status).toBe('verified');
+  });
+
+  it('does not treat a credit as nothing to pay where the figure is a proposal or a new rent', () => {
+    const letter = 'Proposed change: ($120.00)';
+    const ruled = applyTypeRules('tax_proposed_change', { amount: verifyAmount(letter, '120'), deadline: verifyDate(letter, null) });
+    expect(ruled.amount.status).toBe('verified');
+  });
+
+  it('does not let a kind that rests on one reader alone hide a checked amount or date', () => {
+    // Letter 50, a pet licence renewal, was read by the model as a benefits renewal and the keyword rules had no opinion.
+    const letter = letterOf('50-');
+    const fields = { amount: verifyAmount(letter, '$20.00'), deadline: verifyDate(letter, '12/31/2026') };
+    expect(applyTypeRules('benefits_renewal', fields, { typeCertain: false }).amount).toMatchObject({ status: 'verified', value: 2000 });
+    // When the kind is sure, the rule for it still holds the figure back.
+    expect(applyTypeRules('benefits_renewal', fields, { typeCertain: true }).amount).toEqual({ status: 'not_applicable', withheld: true, reason: 'kind' });
+  });
+
+  it('counts a kind as sure only when a person chose it or both readers agree', () => {
+    expect(typeIsCertain({ model: 'utility_bill', keywords: 'utility_bill', type: 'utility_bill' }, false)).toBe(true);
+    expect(typeIsCertain({ model: 'benefits_renewal', keywords: null, type: 'benefits_renewal' }, false)).toBe(false);
+    expect(typeIsCertain({ model: null, keywords: 'jury_summons', type: 'jury_summons' }, false)).toBe(false);
+    expect(typeIsCertain({ model: 'benefits_renewal', keywords: null, type: 'benefits_renewal' }, true)).toBe(true);
   });
 });

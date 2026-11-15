@@ -122,6 +122,8 @@ export const en = {
     noAmount: 'This kind of letter does not ask you to pay anything.',
     noAmountWithheld:
       'The letter mentions amounts, but for this kind of letter none of them is a bill. No amount is shown.',
+    amountIsCredit: (raw: string) =>
+      `The letter shows ${raw} as a credit to you, not an amount you owe. No amount to pay is shown.`,
     noDeadline: 'This kind of letter sets no deadline for you.',
     noDeadlineWithheld:
       'The letter mentions dates, but for this kind of letter none of them is a deadline. No date is shown.',

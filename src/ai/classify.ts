@@ -74,3 +74,13 @@ export async function classify(letter: string, generate: Generate): Promise<Clas
   if (model && keywords && model !== keywords) return { ...base, type: null, candidates: [model, keywords] };
   return { ...base, type: model ?? keywords ?? 'other', candidates: [] };
 }
+
+/**
+ * Whether the kind of letter is sure enough for the per-kind rules to hide a
+ * checked value. It is when the person chose it, or when the model and the
+ * keyword rules agree. When it rests on one of them alone, it is not.
+ */
+export function typeIsCertain(classification: Pick<Classification, 'model' | 'keywords' | 'type'>, chosenByReader: boolean): boolean {
+  if (chosenByReader || classification.type === null) return true;
+  return classification.model !== null && classification.model === classification.keywords;
+}

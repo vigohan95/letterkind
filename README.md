@@ -159,13 +159,28 @@ those the model's answer stands alone. The table above stays the 40-letter
 measurement until the next full run on the device, which will report these
 ten as their own row.
 
+**Two limits on the per-kind rules, from the first device run on all 50.**
+That run (build `0aaced7`) showed two values the rules got wrong. On letter 31
+the account is in credit ("$18.40 CR") and the letter says no payment is due,
+but Nano gave $18.40 as the amount, the check found it in the letter, and it
+was shown as an amount to pay. A figure the letter itself marks as a credit
+("CR", or in brackets) is now held back wherever the figure would mean money
+to pay, and the reader is told it is a credit. On letter 50 (the pet licence)
+Nano took the letter for a benefits renewal, the keyword rules had no opinion,
+and the rule for benefits renewals, which ask for no payment, hid the real
+$20.00 fee. A kind that rests on one reader alone may no longer hide a value
+that passed its check; only a kind the person chose, or one the model and the
+keyword rules agree on, does. Replaying the three stored 40-letter runs through
+both changes moves nothing, in either direction. Same caveat as above: letters
+31 and 50 now count as development letters for the amount field.
+
 Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
 Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
 The full results, letter by letter, are in `eval/results/`.
 
 ## Testing it
 
-- `npm test`: 880 unit tests, including the source boundary tests described
+- `npm test`: 989 unit tests, including the source boundary tests described
   below, the parsers, the checks, the template filling, the reply drafts and
   the evaluation scoring with recorded model answers. `npm run lint` and
   `npm run typecheck` run in CI on every push.

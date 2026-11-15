@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classify } from '../../src/ai/classify';
+import { classify, typeIsCertain } from '../../src/ai/classify';
 import { EXTRACT_FIELDS, type RawFields } from '../../src/ai/extract';
 import { readLetter } from '../../src/ai/read';
 import { EVAL_SET } from '../../src/eval/dataset';
@@ -26,8 +26,10 @@ async function replay(run: EvalRun) {
     for (const variant of ['full', 'no_hint', 'untyped'] as const) {
       const stored = result.variants[variant];
       const raw: RawFields | null = stored.raw;
+      const typeCertain = variant === 'untyped' ? true : typeIsCertain(result.classification, result.classification.type === null);
       const reading = await readLetter(item.letter, stored.type, async () => ({ text: raw ? JSON.stringify(raw) : 'not json', ms: 0 }), TODAY, {
         hint: HINT[variant],
+        typeCertain,
       });
       const scores = scoreReading(reading, item.label, item.letter);
       for (const field of EXTRACT_FIELDS) {

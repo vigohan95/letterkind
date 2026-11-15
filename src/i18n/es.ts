@@ -102,6 +102,8 @@ export const es: Strings = {
     noAmount: 'Este tipo de carta no le pide que pague nada.',
     noAmountWithheld:
       'La carta menciona cantidades, pero en este tipo de carta ninguna es una factura. No se muestra ninguna cantidad.',
+    amountIsCredit: (raw: string) =>
+      `La carta muestra ${raw} como un saldo a su favor, no como una cantidad que usted debe. No se muestra ninguna cantidad a pagar.`,
     noDeadline: 'Este tipo de carta no le fija ningún plazo.',
     noDeadlineWithheld:
       'La carta menciona fechas, pero en este tipo de carta ninguna es un plazo. No se muestra ninguna fecha.',
