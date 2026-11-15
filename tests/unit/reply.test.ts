@@ -184,6 +184,10 @@ describe('a draft of a reply', () => {
   it('is thrown away when it writes the date to act by as the date of the letter', () => {
     const misdated = letter.replace('I received your bill', 'I am writing about your letter dated {{DEADLINE}}. I received your bill');
     expect(rejection(inEnglish({ body_en: misdated }))).toMatchObject({ reason: 'deadline_as_letter_date', field: 'body_en', found: 'dated {{DEADLINE}}' });
+    // The prompt gives the date of the letter a blank of its own, so the model has somewhere else to put it.
+    expect(promptFor({ purpose: 'reply', type: 'tax_proposed_change', state: 'OH', language: 'en' })).toContain('[DATE AT THE TOP OF THE LETTER]');
+    const ownBlank = letter.replace('I received your bill', 'I am writing about your letter dated [DATE AT THE TOP OF THE LETTER]. I received your bill');
+    expect(parseReply(inEnglish({ body_en: ownBlank }), 'medical_bill', 'en').bodyEn).toBe(ownBlank);
     // "due {{DEADLINE}}" and "by {{DEADLINE}}" are what the gap is for.
     expect(parseReply(inEnglish(), 'medical_bill', 'en').bodyEn).toContain('due {{DEADLINE}}');
   });
