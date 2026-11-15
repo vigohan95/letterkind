@@ -122,12 +122,15 @@ export function verifyQuote(letter: string, claim: string | null | undefined): V
  * not one.
  */
 const NUMBER_LABEL =
-  /\b(?:receipt|account|case|notice|reference|citation|claim|member|policy|ticket|confirmation|invoice|file|docket|loan|application|customer|violation)\s*(?:number|no\.?|#|id)\s*[:#]?[ \t]*([A-Z0-9][A-Z0-9-]*(?:[ \t][0-9][A-Z0-9-]*)*)/gi;
+  /\b(?:receipt|account|case|notice|reference|citation|claim|member|policy|ticket|confirmation|invoice|file|docket|loan|application|customer|violation|control)\s*(?:number|no\.?|#|id)\s*[:#]?[ \t]*([A-Z0-9][A-Z0-9-]*(?:[ \t][0-9][A-Z0-9-]*)*)/gi;
+
+/** "Notice CP2000", "Letter 525": a tax agency's notice code, which its letters ask you to quote. */
+const NOTICE_CODE = /\b(?:notice|letter)\s+((?:CP|LTR)\s?\d{1,4}[A-Z]?|\d{3,4}[A-Z]?)\b/gi;
 
 export function findLabelledNumbers(letter: string): Found<string>[] {
   const starts = lineStarts(letter);
   const found: Found<string>[] = [];
-  for (const match of letter.matchAll(NUMBER_LABEL)) {
+  for (const match of [...letter.matchAll(NUMBER_LABEL), ...letter.matchAll(NOTICE_CODE)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0))) {
     const raw = match[1]?.replace(/[-\s]+$/, '');
     if (!raw || !/\d/.test(raw) || match.index === undefined) continue;
     const start = match.index + match[0].length - (match[1]?.length ?? 0);

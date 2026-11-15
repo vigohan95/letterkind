@@ -127,10 +127,13 @@ export function parseReply(answer: string, type: LetterTypeId, language: Languag
   const record = answerFields(answer, names);
 
   const allowed = placeholdersFor(type);
+  // The number on the letter is the sender's. Written into the reply, it was signed off as the reader's own
+  // ("You can reach me by phone at (800) 555-0177", to the IRS, with the IRS's number). Only the checklist may name it.
+  const inLetter = allowed.filter((p) => p !== 'PHONE');
   const template: ReplyTemplate = {
-    subject: checkText(oneLine(record.subject), 'subject', LIMITS.subject, allowed),
-    bodyEn: checkText(tidy(record.body_en), 'body_en', LIMITS.body_en, allowed),
-    bodyTranslated: translated ? checkText(tidy(record.body_translated), 'body_translated', LIMITS.body_translated, allowed) : null,
+    subject: checkText(oneLine(record.subject), 'subject', LIMITS.subject, inLetter),
+    bodyEn: checkText(tidy(record.body_en), 'body_en', LIMITS.body_en, inLetter),
+    bodyTranslated: translated ? checkText(tidy(record.body_translated), 'body_translated', LIMITS.body_translated, inLetter) : null,
     beforeSending: checkList(record.before_sending, 'before_sending', LIMITS.before_sending, MAX_CHECKS, allowed),
   };
 

@@ -19,7 +19,7 @@ import { parseRequest, type OutboundRequest, type TermLanguage } from './request
  * Bump when the wording changes, so cached answers to the old wording are dropped.
  * The glossary's meanings are part of the wording: change one and bump this too.
  */
-export const PROMPT_VERSION = 6;
+export const PROMPT_VERSION = 7;
 
 /**
  * Where a request may run.
@@ -199,6 +199,9 @@ function replyPrompt(type: LetterTypeId, state: StateId, language: LanguageId): 
     'Where the reader has to add something about themselves, write a blank in square brackets and capitals, such as [YOUR FULL NAME], [YOUR ADDRESS], [TODAY\'S DATE] or [WHAT YOU ARE ASKING FOR]. The reader fills those in by hand; nothing fills them automatically.',
     ...(placeholdersFor(type).includes('DAYS_LEFT')
       ? [`Never use ${mark('DAYS_LEFT')} in ${letterFields}: a letter is read days after it is written. It may appear in before_sending only.`]
+      : []),
+    ...(placeholdersFor(type).includes('PHONE')
+      ? [`Never use ${mark('PHONE')} in ${letterFields}: it is the sender's own number, and in the letter it would read as the reader's. It may appear in before_sending only. If the reply gives the reader's phone number, write the blank [YOUR PHONE NUMBER].`]
       : []),
     '',
     'Fill these fields:',

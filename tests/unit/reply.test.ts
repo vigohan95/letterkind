@@ -214,8 +214,24 @@ describe('a draft of a reply', () => {
       field: 'body_translated',
       found: '{{AMOUNT}}',
     });
-    const extra = `${carta}\nLlame al {{PHONE}}.`;
-    expect(rejection(inSpanish({ body_translated: extra }), 'medical_bill', 'es')).toMatchObject({ reason: 'translation_differs', found: '{{PHONE}}' });
+    const shorter = letter.replace('Re: Account {{REFERENCE}}', 'Re: Your bill');
+    expect(rejection(inSpanish({ body_en: shorter }), 'medical_bill', 'es')).toMatchObject({ reason: 'translation_differs', found: '{{REFERENCE}}' });
+  });
+
+  it('is thrown away when the letter to sign gives the sender\'s phone number, which would read as the reader\'s', () => {
+    const reachMe = letter.replace('Sincerely,', 'You can reach me by phone at {{PHONE}}.\n\nSincerely,');
+    expect(rejection(inEnglish({ body_en: reachMe }))).toMatchObject({ reason: 'marker_not_allowed_here', field: 'body_en' });
+    expect(rejection(inEnglish({ subject: 'Call {{PHONE}} about {{REFERENCE}}' }))).toMatchObject({ reason: 'marker_not_allowed_here', field: 'subject' });
+    expect(rejection(inSpanish({ body_translated: `${carta}\nLlame al {{PHONE}}.` }), 'medical_bill', 'es')).toMatchObject({
+      reason: 'marker_not_allowed_here',
+      field: 'body_translated',
+    });
+    // The checklist may still point to the number on the letter, and the reader's own number is a blank.
+    const checklist = parseReply(inEnglish({ before_sending: ['Calling {{PHONE}} may be faster than writing.'] }), 'medical_bill', 'en');
+    expect(checklist.beforeSending[0]).toContain('{{PHONE}}');
+    const ownNumber = letter.replace('Sincerely,', 'You can reach me at [YOUR PHONE NUMBER].\n\nSincerely,');
+    expect(parseReply(inEnglish({ body_en: ownNumber }), 'medical_bill', 'en').bodyEn).toContain('[YOUR PHONE NUMBER]');
+    expect(promptFor({ purpose: 'reply', type: 'medical_bill', state: 'US', language: 'en' })).toContain(`Never use {{PHONE}} in subject or body_en`);
   });
 
   it('does not mind where a count of days is, since no letter is given one', () => {

@@ -150,7 +150,22 @@ const NOTICE = [
 
 describe('findLabelledNumbers', () => {
   it('finds the numbers the letter labels, as printed', () => {
-    expect(findLabelledNumbers(NOTICE).map((n) => n.raw)).toEqual(['IOE0926447108', '0471 2098 3350']);
+    expect(findLabelledNumbers(NOTICE).map((n) => n.raw)).toEqual(['IOE0926447108', '0471 2098 3350', 'CP14']);
+  });
+
+  it("finds a tax agency's notice code and control number", () => {
+    const cp2000 = ['Notice CP2000', 'Tax year 2025', 'Notice date: November 9, 2026', 'AUR control number: 50008-2640'].join('\n');
+    expect(findLabelledNumbers(cp2000).map((n) => n.raw)).toEqual(['CP2000', '50008-2640']);
+    expect(findLabelledNumbers('Letter 525, General Unagreed Report').map((n) => n.raw)).toEqual(['525']);
+    // A year after the word is not a code.
+    expect(findLabelledNumbers('This notice is about 2025 only.')).toEqual([]);
+    // A copied heading block narrows to the code inside it; an answer not in the letter is offered both.
+    const v = verifyReference(cp2000, 'Notice CP2000\nTax year 2025');
+    if (v.status === 'verified') expect(v.value).toBe('CP2000');
+    else expect.fail(v.status);
+    const wrong = verifyReference(cp2000, 'CP2000-50008');
+    if (wrong.status === 'unverified') expect(wrong.candidates.map((n) => n.value)).toEqual(['CP2000', '50008-2640']);
+    else expect.fail(wrong.status);
   });
 
   it('ignores a label with no number after it', () => {
@@ -169,7 +184,7 @@ describe('verifyReference', () => {
     for (const claim of ['PERMISSION', 'Notice of Action', '11/17/2026', 'Form I-797C, Notice of Action', 'I-797C']) {
       const v = verifyReference(NOTICE, claim);
       expect(v.status, claim).toBe('unverified');
-      if (v.status === 'unverified') expect(v.candidates.map((c) => c.raw)).toEqual(['IOE0926447108', '0471 2098 3350']);
+      if (v.status === 'unverified') expect(v.candidates.map((c) => c.raw)).toEqual(['IOE0926447108', '0471 2098 3350', 'CP14']);
     }
   });
 
@@ -187,7 +202,7 @@ describe('verifyReference', () => {
     expect(verifyReference(NOTICE, 'IOE0000000000').status).toBe('unverified');
     const absent = verifyReference(NOTICE, '');
     expect(absent.status).toBe('absent');
-    if (absent.status === 'absent') expect(absent.candidates).toHaveLength(2);
+    if (absent.status === 'absent') expect(absent.candidates).toHaveLength(3);
   });
 });
 
