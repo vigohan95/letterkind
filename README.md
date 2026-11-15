@@ -44,36 +44,52 @@ the next letter of the same kind, state and language.
 
 ## Measured
 
-Forty made-up letters with labels written before any model saw them (20 used
-while building, 20 written afterwards and held out), five fields each. A
+Fifty made-up letters with labels written before any model saw them, five
+fields each: 20 used while building, 20 written afterwards and held out, and
+10 written after every check below and never used to change anything. A
 *wrong* value is one the reader would be shown that does not match the letter.
 Anyone can rerun both columns: [on the device](https://letterkind.web.app/eval.html)
 and [in the cloud](https://letterkind.web.app/eval-cloud.html).
 
-| 200 field values | Nano on the device, after the app's checks | Same letters, whole, to the cloud model |
+| 250 field values | Nano on the device, after the app's checks | Same letters, whole, to the cloud model |
 |---|---|---|
-| Wrong values shown | **12** (the model alone: 20) | 1 |
-| Right | 159 | 167 |
-| Left blank (correctly or not) | 29 | 32 |
-| Kind of letter, model alone | 39 of 40 | 39 of 40 |
-| Kind of letter, after the keyword second opinion | 39 right, 1 wrong | 39 right, 0 wrong, 1 put to the reader |
-| Median time to read one letter | 10.7 s | 1.2 s |
+| Wrong values shown | **2** (the model alone: 20) | 0 (the model alone: 1) |
+| Right | 205 | 211 |
+| Missed (left blank, though the letter has an answer) | 7 | 2 |
+| Correctly left blank | 36 | 37 |
+| Kind of letter, model alone | 48 of 50 | 49 of 50 |
+| Kind of letter, after the keyword second opinion | 48 right, 1 wrong, 1 put to the reader | 49 right, 0 wrong, 1 put to the reader |
+| Median time to read one letter | 11.1 s | 1.3 s |
+
+By group, on the device: 0 wrong values in the 100 of the development letters,
+1 in the 100 of the held-out letters, 1 in the 50 of the letters written after
+every check. The two wrong values: a parents' evening notice where Nano gave a
+room number as the reference (letter 33), and the date on the Spanish jury
+summons (letter 42). One right answer was lost to the checks (the sender of
+letter 03).
 
 What this says:
 
-- **Reading on the device costs something, and it is measured.** Eleven more
-  wrong values in 200 than the cloud, and about nine times the wait, on a
-  machine with no graphics card. That is the price of the letter never leaving.
-  Nano does not answer the same way twice: an earlier run of the same 40 letters
-  (build `9565ad7`) showed 8 wrong values, so read the device column as give or
-  take a few.
-- **The checks are what make the device usable.** Nano alone put 20 wrong values
-  on the screen; checking each answer against the letter's own text, and the
-  rules for each kind of letter, stopped 8 of them. Asking the same five
-  questions of every letter, without the kind of letter deciding what is asked
-  and checked, shows 19 even after the checks.
-- **It holds on letters written after the prompts were fixed.** Seven wrong
-  values in the 20 development letters, five in the 20 held-out ones.
+- **Reading on the device costs something, and it is measured.** Two more wrong
+  values in 250 than the cloud, five more answers left blank, and about eight
+  times the wait, on a machine with no graphics card. That is the price of the
+  letter never leaving.
+- **The checks are what make the device usable.** Nano alone gave 20 wrong
+  values; checking each answer against the letter's own text, and the rules for
+  each kind of letter, stopped 18 of them, at the cost of one right answer.
+  Asking the same five questions of every letter, without the kind of letter
+  deciding what is asked and checked, shows 21 wrong values even after the
+  checks.
+
+### How it got there
+
+The first full measurement was on 40 letters (build `7993c7b`, 2026-11-14):
+12 wrong values shown on the device in 200, 1 from the cloud model, 10.7 s
+against 1.2 s a letter. Nano alone gave 20 wrong values; the checks then
+stopped 8. Seven of the twelve were in the 20 development letters, five in the
+20 held-out ones; an earlier run of the same letters (build `9565ad7`) showed
+8, so a single device run is give or take a few. Each step below was written
+after looking at the answers of that run.
 - **What is still wrong.** Six of the twelve are in the three immigration letters
   (the agency's name, the receipt number, the appointment date); the others are
   three deadlines and three reference numbers. One homeowners' association
@@ -155,9 +171,8 @@ kinds covers. The part of the app that needs no model can be measured on them
 now: the keyword rules name the right kind for 6, the wrong kind for none, and
 hold no opinion on 4 (the two Spanish letters by design; the lease renewal,
 the toll notice and the pet licence because no kind leads clearly), so for
-those the model's answer stands alone. The table above stays the 40-letter
-measurement until the next full run on the device, which will report these
-ten as their own row.
+those the model's answer stands alone. On the device run in the table above
+they are their own row: one wrong value shown in 50 (the model alone: 2).
 
 **Two limits on the per-kind rules, from the first device run on all 50.**
 That run (build `0aaced7`) showed two values the rules got wrong. On letter 31
@@ -172,15 +187,21 @@ $20.00 fee. A kind that rests on one reader alone may no longer hide a value
 that passed its check; only a kind the person chose, or one the model and the
 keyword rules agree on, does. Replaying the three stored 40-letter runs through
 both changes moves nothing, in either direction. Same caveat as above: letters
-31 and 50 now count as development letters for the amount field.
+31 and 50 now count as development letters for the amount field. The next
+device run (build `d0d1eef`, the table above) shows both fixed: letter 31's
+credit is held back and letter 50's $20.00 fee is shown.
 
-Both columns are from build `7993c7b`, run on 2026-11-14 in Chrome 157 on
-Windows, 16 cores, no GPU (the browser reported Microsoft Basic Render Driver).
+Both columns of the table are from build `d0d1eef`, run on 2026-11-15 in
+Chrome 157 on Windows, 16 cores, no GPU (the browser reported Microsoft Basic
+Render Driver). Nano does not answer the same way twice: the run before it
+(`0aaced7`, same letters) also showed 2 wrong values: letter 42's date both
+times, and letter 31's credit, which the change above has since fixed, where
+this run has letter 33's room number instead.
 The full results, letter by letter, are in `eval/results/`.
 
 ## Testing it
 
-- `npm test`: 989 unit tests, including the source boundary tests described
+- `npm test`: 995 unit tests, including the source boundary tests described
   below, the parsers, the checks, the template filling, the reply drafts and
   the evaluation scoring with recorded model answers. `npm run lint` and
   `npm run typecheck` run in CI on every push.
