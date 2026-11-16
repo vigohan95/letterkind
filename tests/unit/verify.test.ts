@@ -244,6 +244,24 @@ describe('verifySender', () => {
     expect(verifySender(IRS, 'Department of the Treasury \\ Ohio Department of Taxation').status).toBe('unverified');
   });
 
+  it('takes the agency under a federal department when only the department line was copied', () => {
+    const v = verifySender(IRS, 'Department of the Treasury');
+    if (v.status === 'verified') expect(v.value).toBe('Internal Revenue Service');
+    else expect.fail(v.status);
+    const r = verifySender(RFE, 'U.S. Department of Homeland Security');
+    if (r.status === 'verified') expect(r.value).toBe('U.S. Citizenship and Immigration Services');
+    else expect.fail(r.status);
+  });
+
+  it('keeps a department that is the sender itself, or one with no agency line under it', () => {
+    const dmv = 'Department of Motor Vehicles\nVehicle Registration Unit\nPO Box 942869';
+    expect(verifySender(dmv, 'Department of Motor Vehicles')).toMatchObject({ status: 'verified', value: 'Department of Motor Vehicles' });
+    const lone = 'Department of the Treasury\nPO Box 1214\nOgden, UT 84201';
+    expect(verifySender(lone, 'Department of the Treasury')).toMatchObject({ status: 'verified', value: 'Department of the Treasury' });
+    const inText = 'Dear reader,\nWe spoke to the Department of the Treasury about this.\nInternal Revenue Service';
+    expect(verifySender(inText, 'Department of the Treasury')).toMatchObject({ status: 'verified', value: 'Department of the Treasury' });
+  });
+
   it('drops a department of the company', () => {
     const v = verifySender(GAS, 'GRANITE STATE GAS COMPANY\nCredit and Collections');
     if (v.status === 'verified') expect(v.value).toBe('GRANITE STATE GAS COMPANY');

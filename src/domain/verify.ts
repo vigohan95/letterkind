@@ -198,6 +198,35 @@ const CONTINUES = /\b(?:of|the|and|for|de|del|la|los)\s*$|[&,-]\s*$/i;
 /** " \ ", " / ", " | " or a literal "\n" between two names. */
 const JOINED_LINES = /\s+[\\/|]\s+|\\n/;
 
+/** A federal executive department that heads a letterhead without being the office the reader deals with. */
+const PARENT_DEPARTMENT =
+  /^(?:U\.?S\.?\s+|United States\s+)?Department of (?:the Treasury|Homeland Security|Health and Human Services|Labor|Justice|Agriculture|Education|Veterans Affairs|Housing and Urban Development|Transportation|State)$/i;
+
+/** "Internal Revenue Service", "U.S. Citizenship and Immigration Services", "Social Security Administration". */
+const AGENCY_NAME = /\b(?:service|services|administration|agency)$/i;
+
+/**
+ * The model sometimes copies only the top line of a two-line letterhead,
+ * "Department of the Treasury", when the line under it names the agency the
+ * letter is from and the reader writes to ("Internal Revenue Service"). Only
+ * that shape is widened: a whole letter line naming a federal department,
+ * directly followed by a line that names an agency. The value shown is still
+ * the letter's own characters.
+ */
+function agencyUnderParent(letter: string, quote: Verdict<string>): Verdict<string> {
+  if (quote.status !== 'verified') return quote;
+  const first = quote.matches[0];
+  if (!first || !PARENT_DEPARTMENT.test(first.raw.trim())) return quote;
+  const lineStart = letter.lastIndexOf('\n', first.start - 1) + 1;
+  const lineEnd = letter.indexOf('\n', first.end);
+  if (lineEnd === -1 || letter.slice(lineStart, lineEnd).trim() !== first.raw.trim()) return quote;
+  const nextEnd = letter.indexOf('\n', lineEnd + 1);
+  const next = letter.slice(lineEnd + 1, nextEnd === -1 ? undefined : nextEnd).trim();
+  if (!next || ADDRESS_LINE.test(next) || !AGENCY_NAME.test(next) || PARENT_DEPARTMENT.test(next)) return quote;
+  const widened = verifyQuote(letter, next);
+  return widened.status === 'verified' ? widened : quote;
+}
+
 function letterheadLines(claim: string): string[] {
   const lines: string[] = [];
   for (const piece of claim.split(/\r?\n/)) {
@@ -232,6 +261,7 @@ export function verifySender(letter: string, claim: string | null | undefined): 
     if (verifyQuote(letter, split).status === 'verified') return verifySender(letter, split);
   }
   const quote = first;
+  if (quote.status === 'verified' && typeof claim === 'string' && !claim.trim().includes('\n')) return agencyUnderParent(letter, quote);
   if (quote.status !== 'verified' || claim === null || claim === undefined || !String(claim).trim().includes('\n')) return quote;
 
   const lines = letterheadLines(String(claim));
