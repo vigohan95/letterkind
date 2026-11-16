@@ -57,7 +57,10 @@ fields each: 20 used while building, 20 written afterwards and held out, and
 10 written after every check below and never used to change anything. A
 *wrong* value is one the reader would be shown that does not match the letter.
 Anyone can rerun both columns: [on the device](https://letterkind.web.app/eval.html)
-and [in the cloud](https://letterkind.web.app/eval-cloud.html).
+and [in the cloud](https://letterkind.web.app/eval-cloud.html), or open the
+runs this table comes from, letter by letter, in the same pages:
+[device run](https://letterkind.web.app/eval.html?saved=nano-2026-11-15-d0d1eef),
+[cloud run](https://letterkind.web.app/eval-cloud.html?saved=cloud-2026-11-15-d0d1eef).
 
 | 250 field values | Nano on the device, after the app's checks | Same letters, whole, to the cloud model |
 |---|---|---|
@@ -205,7 +208,10 @@ Render Driver). Nano does not answer the same way twice: the run before it
 (`0aaced7`, same letters) also showed 2 wrong values: letter 42's date both
 times, and letter 31's credit, which the change above has since fixed, where
 this run has letter 33's room number instead.
-The full results, letter by letter, are in `eval/results/`.
+The full results, letter by letter, are in `eval/results/`; either evaluation
+page can show any of them (pick one under *Or look at a saved run*, or open a
+downloaded file), with the tables recomputed from the letters by the current
+scoring code.
 
 ## Testing it
 
