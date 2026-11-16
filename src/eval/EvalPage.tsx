@@ -4,6 +4,7 @@ import { localIsoDate } from '../domain/deadline';
 import { EVAL_SET } from './dataset';
 import { describeEnvironment } from './environment';
 import { Report } from './Report';
+import { describeRun, loadSavedRun, parseRunFile, savedRunNames } from './saved';
 import { type EvalRun, type ReaderId, resultFileName, serialise } from './result';
 import { evaluate, type LetterResult, type Models } from './run';
 import { summarise } from './summary';
@@ -35,6 +36,11 @@ export interface Reader {
 
 type RunState = 'idle' | 'running' | 'finished' | 'stopped' | 'error';
 
+/** `?saved=nano-2026-11-15-d0d1eef` opens that saved run from eval/results/ instead of waiting for a new one. */
+function savedFromUrl(): string | null {
+  return new URLSearchParams(window.location.search).get('saved');
+}
+
 /** `?limit=3` runs only the first three letters: a quick check that everything works. */
 function limitFromUrl(): number {
   const asked = Number(new URLSearchParams(window.location.search).get('limit'));
@@ -53,6 +59,56 @@ export function EvalPage({ reader }: { reader: Reader }) {
   const [nowMs, setNowMs] = useState(0);
   const stop = useRef(false);
   const items = useMemo(() => EVAL_SET.slice(0, limitFromUrl()), []);
+  const savedNames = useMemo(() => savedRunNames(reader.id), [reader]);
+  const [saved, setSaved] = useState<EvalRun | null>(null);
+  const [savedName, setSavedName] = useState('');
+  const [savedError, setSavedError] = useState<string | null>(null);
+
+  async function openSaved(name: string): Promise<void> {
+    setSavedName(name);
+    setSavedError(null);
+    if (!name) {
+      setSaved(null);
+      return;
+    }
+    try {
+      setSaved(await loadSavedRun(name));
+    } catch (failure) {
+      setSaved(null);
+      setSavedError(messageOf(failure));
+    }
+  }
+
+  async function openFile(file: File | undefined): Promise<void> {
+    if (!file) return;
+    setSavedName('');
+    setSavedError(null);
+    try {
+      setSaved(parseRunFile(await file.text()));
+    } catch (failure) {
+      setSaved(null);
+      setSavedError(messageOf(failure));
+    }
+  }
+
+  useEffect(() => {
+    const asked = savedFromUrl();
+    if (!asked) return;
+    let live = true;
+    loadSavedRun(asked).then(
+      (found) => {
+        if (!live) return;
+        setSavedName(asked);
+        setSaved(found);
+      },
+      (failure: unknown) => {
+        if (live) setSavedError(messageOf(failure));
+      },
+    );
+    return () => {
+      live = false;
+    };
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -75,6 +131,9 @@ export function EvalPage({ reader }: { reader: Reader }) {
   async function start(): Promise<void> {
     if (status !== 'ready') return;
     stop.current = false;
+    setSaved(null);
+    setSavedName('');
+    setSavedError(null);
     setState('running');
     setLetters([]);
     setRun(null);
@@ -154,7 +213,34 @@ export function EvalPage({ reader }: { reader: Reader }) {
       </div>
       {error && <p className="device-error">The run failed: {error}</p>}
 
-      {summary ? (
+      {state !== 'running' && (
+        <div className="eval-saved">
+          <label>
+            Or look at a saved run{' '}
+            <select value={savedName} onChange={(e) => void openSaved(e.target.value)}>
+              <option value="">Choose one from the repository…</option>
+              {savedNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="eval-open">
+            or open a results file <input type="file" accept="application/json,.json" onChange={(e) => void openFile(e.target.files?.[0])} />
+          </label>
+        </div>
+      )}
+      {savedError && <p className="device-error">{savedError}</p>}
+
+      {saved ? (
+        <>
+          <p className="saved-note" role="status">
+            Showing a saved run, not one made in this browser. {describeRun(saved)}
+          </p>
+          <Report letters={saved.letters} summary={saved.summary} setSize={saved.setSize} readerLabel={reader.rowLabel} />
+        </>
+      ) : summary ? (
         <Report letters={letters} summary={summary} setSize={EVAL_SET.length} readerLabel={reader.rowLabel} />
       ) : (
         <section className="about">
